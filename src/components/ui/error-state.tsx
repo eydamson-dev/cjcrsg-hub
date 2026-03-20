@@ -115,7 +115,7 @@ export function ErrorState({
           )}
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent className="flex-row gap-3">
+      <EmptyContent className="flex-col sm:flex-row gap-3">
         {showRetry && (
           <Button onClick={handleRetry}>
             <RotateCcw className="mr-2 h-4 w-4" />

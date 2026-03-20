@@ -166,7 +166,7 @@ export function AttendeeList({
 
     if (isPaginated && paginationInfo && paginationInfo.totalCount > 0) {
       return (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground">
             Showing {paginationInfo.startItem} to {paginationInfo.endItem} of{' '}
             {paginationInfo.totalCount} attendees
@@ -234,7 +234,7 @@ export function AttendeeList({
     if (!isPaginated || !paginationInfo) return null
 
     return (
-      <div className="flex items-center justify-between pt-4 border-t">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t">
         <span className="text-sm text-muted-foreground">
           Page {paginationInfo.currentPage} of {paginationInfo.totalPages}
         </span>
@@ -264,8 +264,8 @@ export function AttendeeList({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex-1 min-w-[200px] max-w-md">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex-1 w-full sm:min-w-[200px] sm:max-w-md">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -299,7 +299,7 @@ export function AttendeeList({
             Type at least 3 characters to search
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Select
             value={statusFilter || ''}
             onValueChange={(value) =>
@@ -316,7 +316,10 @@ export function AttendeeList({
               <SelectItem value="inactive">Inactive</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => onNavigate?.('/attendees/new')}>
+          <Button
+            onClick={() => onNavigate?.('/attendees/new')}
+            className="flex-1 sm:flex-none"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Attendee
           </Button>
@@ -390,71 +393,73 @@ export function AttendeeList({
               </Empty>
             )
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Join Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {attendees.map((attendee) => (
-                  <TableRow key={attendee._id}>
-                    <TableCell className="font-medium">
-                      {attendee.firstName} {attendee.lastName}
-                    </TableCell>
-                    <TableCell>{attendee.email || '-'}</TableCell>
-                    <TableCell>{attendee.phone || '-'}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(attendee.status)}>
-                        {attendee.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatDate(attendee.joinDate)}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onNavigate?.(`/attendees/${attendee._id}/`)
-                            }
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onNavigate?.(`/attendees/${attendee._id}/edit`)
-                            }
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          {attendee.status !== 'inactive' && (
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleArchiveClick(attendee)}
-                            >
-                              <Archive className="mr-2 h-4 w-4" />
-                              Archive
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            <div className="overflow-x-auto -mx-6 px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Join Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {attendees.map((attendee) => (
+                    <TableRow key={attendee._id}>
+                      <TableCell className="font-medium">
+                        {attendee.firstName} {attendee.lastName}
+                      </TableCell>
+                      <TableCell>{attendee.email || '-'}</TableCell>
+                      <TableCell>{attendee.phone || '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(attendee.status)}>
+                          {attendee.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatDate(attendee.joinDate)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                onNavigate?.(`/attendees/${attendee._id}/`)
+                              }
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                onNavigate?.(`/attendees/${attendee._id}/edit`)
+                              }
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            {attendee.status !== 'inactive' && (
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => handleArchiveClick(attendee)}
+                              >
+                                <Archive className="mr-2 h-4 w-4" />
+                                Archive
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

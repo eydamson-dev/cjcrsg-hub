@@ -45,17 +45,17 @@ export function AttendeeDetails({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">
             {attendee.firstName} {attendee.lastName}
           </h1>
           <p className="text-muted-foreground">View attendee information</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Button onClick={onEdit} variant="outline">
             <Edit className="mr-2 h-4 w-4" />
             Edit
@@ -69,7 +69,7 @@ export function AttendeeDetails({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Information Card */}
         <Card>
           <CardHeader>
@@ -158,21 +158,21 @@ export function AttendeeDetailsSkeleton({
 }: AttendeeDetailsSkeletonProps) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-5 w-48 mt-2" />
+        <div className="flex-1 min-w-0">
+          <Skeleton className="h-8 sm:h-9 w-48 sm:w-64" />
+          <Skeleton className="h-5 w-40 sm:w-48 mt-2" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Skeleton className="h-10 w-24" />
           <Skeleton className="h-10 w-28" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-40" />
@@ -218,12 +218,12 @@ export function AttendeeNotFound({
 }: AttendeeNotFoundProps) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Attendee Not Found
           </h1>
           <p className="text-muted-foreground">

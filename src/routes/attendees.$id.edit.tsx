@@ -42,16 +42,18 @@ function EditAttendeePage() {
   if (isPending) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <Button variant="ghost" size="icon" onClick={handleCancel}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Edit Attendee</h1>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Edit Attendee
+            </h1>
             <p className="text-muted-foreground">Update attendee information</p>
           </div>
         </div>
-        <div className="max-w-3xl">
+        <div className="max-w-3xl px-1">
           <div className="space-y-4">
             <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
             <div className="h-10 bg-gray-200 animate-pulse rounded"></div>
@@ -65,12 +67,12 @@ function EditAttendeePage() {
   if (!attendee) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <Button variant="ghost" size="icon" onClick={handleCancel}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               Attendee Not Found
             </h1>
             <p className="text-muted-foreground">
@@ -84,17 +86,19 @@ function EditAttendeePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="icon" onClick={handleCancel}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Attendee</h1>
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Edit Attendee
+          </h1>
           <p className="text-muted-foreground">Update attendee information</p>
         </div>
       </div>
 
-      <div className="max-w-3xl">
+      <div className="max-w-3xl px-1">
         <AttendeeForm
           initialData={attendee}
           onSubmit={handleSubmit}
