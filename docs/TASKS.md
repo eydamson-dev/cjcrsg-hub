@@ -6,44 +6,64 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 ## 🎯 Current Session
 
-**Updated:** 2026-03-20
+**Updated:** 2026-03-21
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.15 Complete | 🔜 Tasks 3.16-3.17 Pending
-**Current Task:** Task 3.16 - Mobile responsiveness pass
-**Status:** ✅ Task 3.15 Complete | 🔜 Task 3.16 Next
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.16 Complete | 🔜 Task 3.17 Pending
+**Current Task:** Task 3.17 - Status change without archiving
+**Status:** ✅ Task 3.16 Complete | 🔜 Task 3.17 Next
 
-**Completed This Session (Task 3.15 - ErrorState Component):**
+**Completed This Session (Task 3.16 - Mobile Responsiveness Pass):**
 
-- ✅ **3.15** ErrorState component with retry/back buttons
-  - Created reusable `ErrorState` component with 4 error types:
-    - `not-found`: For missing resources (SearchX icon)
-    - `error`: For general errors (AlertCircle icon)
-    - `network`: For connection issues (WifiOff icon)
-    - `unauthorized`: For permission errors (ShieldAlert icon)
-  - Uses shadcn `Empty` component pattern for consistency
-  - Props: `type`, `title`, `description`, `error`, `onRetry`, `onBack`
-  - Retry button reloads page; Back button navigates to `/attendees`
-  - Displays error message if provided
+- ✅ **AttendeeList.tsx** - Mobile responsiveness improvements:
+  - Wrapped table in `overflow-x-auto` container for horizontal scrolling
+  - Fixed filter/search bar to stack vertically on mobile
+  - Updated pagination controls to stack on mobile
+  - Made "Add Attendee" button full-width on mobile
 
-- ✅ **AttendeesErrorBoundary** component
-  - Route-level error boundary using TanStack Router's `errorComponent`
-  - Catches errors from all attendee routes (list, detail, edit, new)
-  - Displays appropriate ErrorState with retry/back actions
+- ✅ **AttendeeDetails.tsx** - Mobile layout fixes:
+  - Changed header from `flex` to `flex-col sm:flex-row` for stacking
+  - Scaled title from `text-3xl` to `text-2xl sm:text-3xl`
+  - Changed grid breakpoint from `lg:grid-cols-2` to `md:grid-cols-2`
+  - Made action buttons wrap with `flex-wrap`
+  - Added `truncate` to prevent long names from breaking layout
 
-- ✅ **Updated error handling across attendee routes:**
-  - `attendees.index.tsx`: Shows ErrorState when list/search/count queries fail
-  - `attendees.$id.index.tsx`: Enhanced AttendeeNotFound with ErrorState
-  - `attendees.$id.tsx`: Added errorComponent prop
-  - `attendees.$id.edit.tsx`: Added errorComponent prop
-  - `attendees.new.tsx`: Added errorComponent prop
+- ✅ **attendees.$id.edit.tsx** - Mobile header fixes:
+  - Updated header layout to stack on mobile
+  - Scaled typography for mobile
+  - Applied same fixes to loading and not-found states
+
+- ✅ **attendees.new.tsx** - Mobile header fixes:
+  - Updated header layout to stack on mobile
+  - Scaled typography for mobile
+
+- ✅ **AttendeeTableSkeleton.tsx** - Table overflow:
+  - Wrapped table in `overflow-x-auto` container
+
+- ✅ **error-state.tsx** - Button wrapping:
+  - Changed button container from `flex-row` to `flex-col sm:flex-row`
+
+**Testing Checklist for Mobile (375px):**
+
+- [x] Attendee list table scrolls horizontally without breaking layout
+- [x] Search input is full width on mobile
+- [x] Filter select and Add button stack properly
+- [x] Pagination controls are usable on mobile
+- [x] Attendee detail header doesn't overflow
+- [x] Edit/Archive buttons wrap properly
+- [x] Two cards stack vertically on mobile (<768px)
+- [x] Form pages have proper mobile layouts
 
 **Technical Changes Made:**
 
-- **Component:** Added `error-state.tsx` (`src/components/ui/`)
-- **Component:** Added `AttendeesErrorBoundary.tsx` (`src/features/attendees/components/`)
-- **Updated:** `AttendeeDetails.tsx` - Replaced custom NotFound with ErrorState
-- **Updated:** All attendee routes - Added errorComponent and error handling
-- **Pattern:** Follows existing Empty component structure for consistency
+- **Files Modified:** 6 files
+  - `AttendeeList.tsx` - Table overflow, filter layout, pagination
+  - `AttendeeDetails.tsx` - Header, grid breakpoint, skeleton
+  - `attendees.$id.edit.tsx` - Header layout for all states
+  - `attendees.new.tsx` - Header layout
+  - `AttendeeTableSkeleton.tsx` - Table overflow
+  - `error-state.tsx` - Button wrapping
+- **Pattern:** Used responsive Tailwind classes (`sm:`, `md:`) for progressive enhancement
+- **Testing:** All pages verified for 375px mobile viewport
 
 **Reminders:**
 
@@ -53,13 +73,14 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - Wait for user approval before committing
 - **Update `TASKS.md` "Current Session" section when starting/completing tasks**
 
-**Next Steps (Follow-up PRs):**
+**Next Steps:**
 
-- **Complete Phase 3.14-3.17** (Polish & UX):
-  - 3.14 AttendeeTableSkeleton component for list view
-  - 3.15 ErrorState component with retry/back buttons
-  - 3.16 Mobile responsiveness pass (test on 375px viewport)
-  - 3.17 Status change without archiving (dropdown submenu)
+- **Task 3.17** - Status change without archiving:
+  - Add status change option in actions dropdown
+  - Show submenu: Change to Member, Change to Visitor, Change to Inactive
+  - Integrate with update mutation to change status
+  - Show success toast with new status
+  - Refresh list to show updated status badge
 - **Begin Phase 4: Event Types (Admin)**
   - Create event type queries and mutations
   - Build EventTypeList and EventTypeForm components
@@ -529,11 +550,11 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 - [x] Create ErrorState component with retry/back buttons
 - [x] Add error boundary for attendee pages
 
-### 3.16 Mobile responsiveness pass
+### 3.16 Mobile responsiveness pass ✅
 
-- [ ] Test attendee list on mobile viewport (375px)
-- [ ] Test attendee form on mobile
-- [ ] Test attendee details on mobile
+- [x] Test attendee list on mobile viewport (375px)
+- [x] Test attendee form on mobile
+- [x] Test attendee details on mobile
 
 ### 3.17 Add attendee status change (without archiving)
 

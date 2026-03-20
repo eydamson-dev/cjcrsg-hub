@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.16: Mobile Responsiveness Pass for Attendee Pages**
+  - Fixed table overflow on mobile with horizontal scrolling (`overflow-x-auto`)
+  - Updated page headers to stack vertically on mobile (`flex-col sm:flex-row`)
+  - Scaled typography from `text-3xl` to `text-2xl sm:text-3xl` for better mobile readability
+  - Changed grid breakpoints from `lg:` to `md:` for earlier two-column layout
+  - Added button wrapping with `flex-wrap` to prevent overflow
+  - Fixed filter bar layout to stack vertically on mobile devices
+  - Made "Add Attendee" button full-width on mobile
+  - Updated pagination controls to stack on narrow viewports
+  - Applied consistent patterns across 6 files: AttendeeList, AttendeeDetails, edit/new routes, skeleton, and error-state
+  - Added `truncate` to prevent long attendee names from breaking layouts
+  - All pages now usable at 375px viewport width (iPhone SE)
+
 - **Task 3.15: ErrorState Component with Retry/Back Buttons**
   - Created reusable ErrorState component with 4 error types: not-found, error, network, unauthorized
   - Each type has specific Lucide icon: SearchX, AlertCircle, WifiOff, ShieldAlert
