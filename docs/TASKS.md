@@ -8,46 +8,45 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ✅ Complete (Fully Wired)
-**Current Task:** Phase 3 Complete - All attendee management features functional
-**Status:** ✅ All Phase 3 tasks completed and tested
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | 🔜 Polish Pending (3.11-3.17)
+**Current Task:** Phase 3 Core Features - Create, Read, Update, Archive fully functional
+**Status:** ✅ Core attendee management (3.6-3.10) wired and tested | 🔄 Polish items (3.11-3.17) in next PR
 
-**Completed This Session (Phase 3 Foundation):**
+**Completed This Session (Phase 3 Core - Ready to Merge):**
 
-- ✅ Created Convex backend for attendees
-  - `convex/attendees/queries.ts` - List, getById, search, count queries
-  - `convex/attendees/mutations.ts` - Create, update, archive mutations
-  - `convex/attendees/validators.ts` - Shared validation schemas
-- ✅ Built AttendeeList component (UI only)
-  - Columns: Name, Email, Phone, Status, Join Date, Actions
-  - Status badges with color coding
-  - Pagination controls structure
-  - Actions dropdown (not yet wired)
-- ✅ Built AttendeeForm component (UI only)
-  - react-hook-form with Zod validation
-  - All fields: firstName, lastName, email, phone, dateOfBirth, address, status, joinDate, notes
-  - Date pickers for dateOfBirth and joinDate
-- ✅ Created attendee route files
-  - `/attendees` - Basic list view
-  - `/attendees/new` - Placeholder (form UI ready, not wired)
-  - `/attendees/$id` - Placeholder (details UI ready, not wired)
-  - `/attendees/$id/edit` - Placeholder (form UI ready, not wired)
-- ✅ Created React Query hooks (not yet integrated)
-  - `useAttendees`, `useAttendee`, `useSearchAttendees`
-  - `useCreateAttendee`, `useUpdateAttendee`, `useArchiveAttendee`
-- ✅ Added TypeScript types for attendees
-- ✅ Installed new shadcn components: table, dropdown-menu, form, textarea, select
-- ✅ Installed dependencies: react-hook-form, @hookform/resolvers, zod
+- ✅ **3.6** Wire up `/attendees/new` - Fully functional create attendee
+  - AttendeeForm integrated with useCreateAttendee mutation
+  - Toast notifications on success/error
+  - Navigation to attendees list after creation
+  - Handles duplicate email errors gracefully
+- ✅ **3.7** Wire up `/attendees/$id/edit` - Fully functional edit attendee
+  - Fetches attendee data with useAttendee hook
+  - Pre-populates form with existing data
+  - Integrated useUpdateAttendee mutation
+  - Loading skeleton during initial load
+  - Toast notifications and navigation on success
+- ✅ **3.8** Wire up `/attendees/$id/` - Complete attendee details view
+  - Personal info card (name, email, phone, date of birth)
+  - Church info card (status, join date, address)
+  - Notes display
+  - Edit and Archive action buttons
+  - Loading skeleton and "not found" error state
+- ✅ **3.9** Wire up archive action in AttendeeList
+  - AlertDialog confirmation with attendee name
+  - useArchiveAttendee mutation integration
+  - Loading state during archive operation
+  - Success/error toast notifications
+  - List refreshes after archive
+- ✅ **3.10** Toast notifications - Already installed, now working across all operations
 
-**Implementation Notes:**
+**Technical Improvements Made:**
 
-- Required fields: firstName, lastName, address, status
-- Optional fields: email, phone, dateOfBirth, joinDate, notes
-- Phone stored as simple text (no formatting)
-- Date format: MM/DD/YYYY (system default)
-- Default pagination: 10 rows per page
-- **Routes currently show placeholder content - wiring needed in follow-up PR**
-- Search functionality pending (deferred to next iteration)
+- Fixed mutation hooks to use useConvexMutation from @convex-dev/react-query
+- Implemented modern shadcn/ui form pattern with Field components (replaced broken Form component)
+- Fixed TanStack Router nested route structure for attendees
+- Added field, calendar, popover, alert-dialog shadcn components
+- Created DatePicker component for date inputs
+- Created useDebounce hook for future search functionality
 
 **Reminders:**
 
@@ -56,16 +55,17 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - Create feature branches
 - Wait for user approval before committing
 
-**Next Steps:**
+**Next Steps (Follow-up PR):**
 
-- Complete Phase 3 Wiring (Follow-up PR):
-  - Wire up `/attendees/new` route with AttendeeForm and create mutation
-  - Wire up `/attendees/$id/edit` route with AttendeeForm and update mutation
-  - Wire up `/attendees/$id` route to display actual attendee details
-  - Wire up archive action in AttendeeList to call archive mutation
-  - Add toast notifications for success/error feedback
-  - Complete debounced search functionality (Phase 3.6)
-- Begin Phase 4: Event Types (Admin)
+- **Complete Phase 3.11-3.17** (Polish & UX):
+  - 3.11 Debounced search with backend integration (300ms)
+  - 3.12 Pagination display with "Showing X of Y" and URL params
+  - 3.13 Empty states for search/filter results
+  - 3.14 AttendeeTableSkeleton component
+  - 3.15 ErrorState component with retry/back buttons
+  - 3.16 Mobile responsiveness pass (test on 375px viewport)
+  - 3.17 Status change without archiving (dropdown submenu)
+- **Begin Phase 4: Event Types (Admin)**
   - Create event type queries and mutations
   - Build EventTypeList and EventTypeForm components
   - Create settings page for admin
