@@ -428,10 +428,9 @@ export function AttendeeList({
                         <DropdownMenu>
                           <DropdownMenuTrigger
                             onClick={(e) => e.stopPropagation()}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
                           >
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            <MoreHorizontal className="h-4 w-4" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
