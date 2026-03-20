@@ -60,6 +60,33 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 ---
 
+## 🐛 Bug Fixes (Outside Task List)
+
+### ✅ Page Reload Authentication Redirect Issue
+
+**Status:** Fixed and merged
+**PR:** #15
+
+**Problem:** Reloading any page (except attendees) would redirect to index/dashboard
+**Solution:** Implemented two-layer authentication protection with route-level `beforeLoad` guards
+
+**Changes:**
+
+- Added `beforeLoad` guards with `requireAuth()` to all protected routes
+- Added `beforeLoad` guards with `requireGuest()` to login page
+- Created `AuthContextInjector` to sync auth state with router context
+- Updated `ProtectedRoute` to handle visual loading states only
+
+**Files Modified:**
+
+- `src/routes/__root.tsx`, `src/router.tsx`
+- `src/components/auth/ProtectedRoute.tsx`
+- `src/routes/login.tsx`
+- All protected route files (index, events, attendees/\*)
+- `CHANGELOG.md` (added entry under [Unreleased] → Fixed)
+
+---
+
 ## Prerequisites
 
 Before starting implementation, ensure you have:

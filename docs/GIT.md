@@ -186,6 +186,7 @@ Before committing, ensure:
 - [ ] Run type check - no TypeScript errors
 - [ ] Test the feature manually (`pnpm dev`)
 - [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
+- [ ] **Update `TASKS.md`** - mark tasks complete or document bug fixes
 - [ ] Clear console.log statements
 - [ ] Review your own changes (diff)
 - [ ] Update AGENTS.md if needed
