@@ -13,6 +13,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
+import { Route as AttendeesNewRouteImport } from './routes/attendees.new'
+import { Route as AttendeesIdRouteImport } from './routes/attendees.$id'
+import { Route as AttendeesIdEditRouteImport } from './routes/attendees.$id.edit'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -34,37 +37,85 @@ const AttendeesIndexRoute = AttendeesIndexRouteImport.update({
   path: '/attendees/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AttendeesNewRoute = AttendeesNewRouteImport.update({
+  id: '/attendees/new',
+  path: '/attendees/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AttendeesIdRoute = AttendeesIdRouteImport.update({
+  id: '/attendees/$id',
+  path: '/attendees/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AttendeesIdEditRoute = AttendeesIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AttendeesIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/attendees/$id': typeof AttendeesIdRouteWithChildren
+  '/attendees/new': typeof AttendeesNewRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/attendees/$id/edit': typeof AttendeesIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/attendees/$id': typeof AttendeesIdRouteWithChildren
+  '/attendees/new': typeof AttendeesNewRoute
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
+  '/attendees/$id/edit': typeof AttendeesIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/attendees/$id': typeof AttendeesIdRouteWithChildren
+  '/attendees/new': typeof AttendeesNewRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/attendees/$id/edit': typeof AttendeesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/attendees/' | '/events/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/attendees/$id'
+    | '/attendees/new'
+    | '/attendees/'
+    | '/events/'
+    | '/attendees/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/attendees' | '/events'
-  id: '__root__' | '/' | '/login' | '/attendees/' | '/events/'
+  to:
+    | '/'
+    | '/login'
+    | '/attendees/$id'
+    | '/attendees/new'
+    | '/attendees'
+    | '/events'
+    | '/attendees/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/attendees/$id'
+    | '/attendees/new'
+    | '/attendees/'
+    | '/events/'
+    | '/attendees/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  AttendeesIdRoute: typeof AttendeesIdRouteWithChildren
+  AttendeesNewRoute: typeof AttendeesNewRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
 }
@@ -99,12 +150,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AttendeesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/attendees/new': {
+      id: '/attendees/new'
+      path: '/attendees/new'
+      fullPath: '/attendees/new'
+      preLoaderRoute: typeof AttendeesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/attendees/$id': {
+      id: '/attendees/$id'
+      path: '/attendees/$id'
+      fullPath: '/attendees/$id'
+      preLoaderRoute: typeof AttendeesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/attendees/$id/edit': {
+      id: '/attendees/$id/edit'
+      path: '/edit'
+      fullPath: '/attendees/$id/edit'
+      preLoaderRoute: typeof AttendeesIdEditRouteImport
+      parentRoute: typeof AttendeesIdRoute
+    }
   }
 }
+
+interface AttendeesIdRouteChildren {
+  AttendeesIdEditRoute: typeof AttendeesIdEditRoute
+}
+
+const AttendeesIdRouteChildren: AttendeesIdRouteChildren = {
+  AttendeesIdEditRoute: AttendeesIdEditRoute,
+}
+
+const AttendeesIdRouteWithChildren = AttendeesIdRoute._addFileChildren(
+  AttendeesIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  AttendeesIdRoute: AttendeesIdRouteWithChildren,
+  AttendeesNewRoute: AttendeesNewRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
 }

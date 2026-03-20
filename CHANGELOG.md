@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Phase 3: Attendee Management (Foundation)
+  - Convex backend for attendees
+    - `convex/attendees/queries.ts` - List, getById, search, count queries with pagination
+    - `convex/attendees/mutations.ts` - Create, update, archive mutations
+    - `convex/attendees/validators.ts` - Shared validation schemas
+  - AttendeeList component (UI structure)
+    - Columns: Name, Email, Phone, Status, Join Date, Actions
+    - Status badges (member=blue, visitor=green, inactive=gray)
+    - Pagination controls structure (10/25/50/100 rows per page)
+    - Actions dropdown (View, Edit, Archive buttons)
+  - AttendeeForm component (UI structure)
+    - react-hook-form with Zod validation
+    - Fields: firstName, lastName, email, phone, dateOfBirth, address, status, joinDate, notes
+    - Date pickers for dateOfBirth and joinDate
+    - Support for create and edit modes
+  - Attendee routes (structure created, placeholder content)
+    - `/attendees` - List view with AttendeeList component
+    - `/attendees/new` - Route file created (form UI ready, wiring pending)
+    - `/attendees/$id` - Route file created (details UI ready, wiring pending)
+    - `/attendees/$id/edit` - Route file created (form UI ready, wiring pending)
+  - React Query hooks for attendees (created, not yet integrated)
+    - `useAttendees` - Fetch paginated list
+    - `useAttendee` - Fetch single attendee
+    - `useSearchAttendees` - Search attendees
+    - `useCreateAttendee`, `useUpdateAttendee`, `useArchiveAttendee` - Mutations
+  - TypeScript types for attendees
+    - `Attendee`, `AttendeeStatus`, `CreateAttendeeInput`, `UpdateAttendeeInput`
+  - New shadcn components: table, dropdown-menu, form, textarea, select
+  - Dependencies: react-hook-form, @hookform/resolvers, zod, @radix-ui/react-label, @radix-ui/react-slot
+  - **Note:** Routes currently show placeholder content. Wiring mutations to forms and actions is pending in follow-up PR
+
 - Complete Convex Auth authentication system
   - Google and Facebook OAuth providers configured
   - Auth helper functions in `src/lib/auth.ts`

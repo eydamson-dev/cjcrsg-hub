@@ -8,27 +8,46 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 1 Complete (Bug Fixes Done)  
-**Current Task:** Ready for Phase 3
-**Status:** ✅ All Hydration Errors Fixed
+**Phase:** Phase 3 - In Progress (Foundation Complete)  
+**Current Task:** Create PR for Phase 3 Foundation
+**Status:** ⏳ Backend & Components Ready - Wiring Pending
 
-**Completed This Session:**
+**Completed This Session (Phase 3 Foundation):**
 
-- ✅ Fixed hydration error in Sidebar (nested button elements)
-  - Removed Button wrapper inside DropdownMenuTrigger
-  - Applied Tailwind classes directly to trigger
-- ✅ Fixed hydration error in LoginPage (setState during render)
-  - Wrapped navigation in useEffect hook
-- ✅ Removed leftover template file (anotherPage.tsx)
-- ✅ Verified fixes with browser console (0 errors)
-- ✅ PR created for fix/hydration-errors branch
+- ✅ Created Convex backend for attendees
+  - `convex/attendees/queries.ts` - List, getById, search, count queries
+  - `convex/attendees/mutations.ts` - Create, update, archive mutations
+  - `convex/attendees/validators.ts` - Shared validation schemas
+- ✅ Built AttendeeList component (UI only)
+  - Columns: Name, Email, Phone, Status, Join Date, Actions
+  - Status badges with color coding
+  - Pagination controls structure
+  - Actions dropdown (not yet wired)
+- ✅ Built AttendeeForm component (UI only)
+  - react-hook-form with Zod validation
+  - All fields: firstName, lastName, email, phone, dateOfBirth, address, status, joinDate, notes
+  - Date pickers for dateOfBirth and joinDate
+- ✅ Created attendee route files
+  - `/attendees` - Basic list view
+  - `/attendees/new` - Placeholder (form UI ready, not wired)
+  - `/attendees/$id` - Placeholder (details UI ready, not wired)
+  - `/attendees/$id/edit` - Placeholder (form UI ready, not wired)
+- ✅ Created React Query hooks (not yet integrated)
+  - `useAttendees`, `useAttendee`, `useSearchAttendees`
+  - `useCreateAttendee`, `useUpdateAttendee`, `useArchiveAttendee`
+- ✅ Added TypeScript types for attendees
+- ✅ Installed new shadcn components: table, dropdown-menu, form, textarea, select
+- ✅ Installed dependencies: react-hook-form, @hookform/resolvers, zod
 
 **Implementation Notes:**
 
-- Route guards use double protection: `beforeLoad` (route-level) + ProtectedRoute (component-level)
-- AuthLoadingScreen shows CJCRSG Hub branding with cross icon
-- Attendees and Events pages have placeholder content (Phase 3 features)
-- OAuth credentials still pending (Google/Facebook setup deferred)
+- Required fields: firstName, lastName, address, status
+- Optional fields: email, phone, dateOfBirth, joinDate, notes
+- Phone stored as simple text (no formatting)
+- Date format: MM/DD/YYYY (system default)
+- Default pagination: 10 rows per page
+- **Routes currently show placeholder content - wiring needed in follow-up PR**
+- Search functionality pending (deferred to next iteration)
 
 **Reminders:**
 
@@ -39,11 +58,17 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Next Steps:**
 
-- Begin Phase 3: Attendee Management
-  - Create attendee queries (list, get, search)
-  - Create attendee mutations (create, update)
-  - Build AttendeeList and AttendeeForm components
-  - Create routes: /attendees, /attendees/new, /attendees/$id
+- Complete Phase 3 Wiring (Follow-up PR):
+  - Wire up `/attendees/new` route with AttendeeForm and create mutation
+  - Wire up `/attendees/$id/edit` route with AttendeeForm and update mutation
+  - Wire up `/attendees/$id` route to display actual attendee details
+  - Wire up archive action in AttendeeList to call archive mutation
+  - Add toast notifications for success/error feedback
+  - Complete debounced search functionality (Phase 3.6)
+- Begin Phase 4: Event Types (Admin)
+  - Create event type queries and mutations
+  - Build EventTypeList and EventTypeForm components
+  - Create settings page for admin
 
 ---
 
@@ -333,7 +358,7 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.1 Create attendee queries (list, get, search)
 
-- [ ] Create `convex/attendees/queries.ts` file
+- [x] Create `convex/attendees/queries.ts` file
   - Implement `list` query with pagination support
   - Add `getById` query to fetch single attendee
   - Create `search` query using Convex searchIndex
@@ -343,7 +368,7 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.2 Create attendee mutations (create, update)
 
-- [ ] Create `convex/attendees/mutations.ts` file
+- [x] Create `convex/attendees/mutations.ts` file
   - Implement `create` mutation for new attendees
   - Add `update` mutation for existing attendees
   - Create `archive` mutation to soft-delete (set inactive)
@@ -353,7 +378,7 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.3 Build AttendeeList component with data table
 
-- [ ] Create `src/features/attendees/components/AttendeeList.tsx`
+- [x] Create `src/features/attendees/components/AttendeeList.tsx`
   - Use shadcn/ui `Table` component as base
   - Implement TanStack Table for sorting/filtering
   - Add columns: Name, Email, Phone, Status, Join Date, Actions
@@ -363,7 +388,7 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.4 Build AttendeeForm component
 
-- [ ] Create `src/features/attendees/components/AttendeeForm.tsx`
+- [x] Create `src/features/attendees/components/AttendeeForm.tsx`
   - Use shadcn/ui form components: `Form`, `Input`, `Label`, `Select`
   - Implement react-hook-form with Zod validation schema
   - Add fields: firstName, lastName, email, phone, dateOfBirth, address, status, notes
@@ -374,10 +399,10 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.5 Create routes: /attendees, /attendees/new, /attendees/$id
 
-- [ ] Create `src/routes/attendees.index.tsx` - List view
-- [ ] Create `src/routes/attendees.new.tsx` - Create new attendee
-- [ ] Create `src/routes/attendees.$id.tsx` - View attendee details
-- [ ] Create `src/routes/attendees.$id.edit.tsx` - Edit attendee
+- [x] Create `src/routes/attendees.index.tsx` - List view
+- [x] Create `src/routes/attendees.new.tsx` - Create new attendee
+- [x] Create `src/routes/attendees.$id.tsx` - View attendee details
+- [x] Create `src/routes/attendees.$id.edit.tsx` - Edit attendee
   - Set up proper route structure in TanStack Router
   - Add breadcrumbs for navigation context
   - Ensure all routes are protected (require auth)
