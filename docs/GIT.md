@@ -187,6 +187,7 @@ Before committing, ensure:
 - [ ] Test the feature manually (`pnpm dev`)
 - [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
 - [ ] **Update `TASKS.md`** - mark tasks complete or document bug fixes
+- [ ] **Update `TASKS.md` "Current Session" section** - reflect current task status and date
 - [ ] Clear console.log statements
 - [ ] Review your own changes (diff)
 - [ ] Update AGENTS.md if needed
