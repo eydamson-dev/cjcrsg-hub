@@ -20,9 +20,11 @@ export function Header({ onMenuClick }: HeaderProps) {
       </Button>
 
       <div className="flex flex-1 items-center gap-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <span className="text-lg font-bold">{churchName[0]}</span>
-        </div>
+        <img
+          src="/cjcrsg-logo.png"
+          alt="CJCRSG Logo"
+          className="h-9 w-9 object-contain"
+        />
         <div className="hidden md:block">
           <h1 className="text-lg font-semibold">{churchName}</h1>
           <p className="text-xs text-muted-foreground">

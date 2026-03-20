@@ -33,9 +33,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       <SheetContent side="left" className="w-80 p-0">
         <SheetHeader className="border-b p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-xl font-bold">{churchName[0]}</span>
-            </div>
+            <img
+              src="/cjcrsg-logo.png"
+              alt="CJCRSG Logo"
+              className="h-10 w-10 object-contain"
+            />
             <div className="flex flex-col">
               <SheetTitle className="text-lg font-semibold">
                 {churchName}
