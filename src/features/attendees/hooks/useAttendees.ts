@@ -1,15 +1,14 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { api } from '../../../../convex/_generated/api'
 import type { Id } from '../../../../convex/_generated/dataModel'
 
 export function useAttendees(status?: string) {
   return useQuery(
-    convexQuery(api.attendees.list, {
+    convexQuery(api.attendees.queries.list, {
       paginationOpts: {
         numItems: 10,
         cursor: null,
-        alias: null,
       },
       status: status as any,
     }),
@@ -17,46 +16,35 @@ export function useAttendees(status?: string) {
 }
 
 export function useAttendee(id: string) {
-  return useQuery(
-    convexQuery(api.attendees.getById, { id: id as Id<'attendees'> }),
-    {
-      enabled: !!id,
-    },
-  )
+  return useQuery({
+    ...convexQuery(api.attendees.queries.getById, {
+      id: id as Id<'attendees'>,
+    }),
+    enabled: !!id,
+  })
 }
 
 export function useSearchAttendees(query: string, status?: string) {
-  return useQuery(
-    convexQuery(api.attendees.search, {
+  return useQuery({
+    ...convexQuery(api.attendees.queries.search, {
       query,
       status: status as any,
     }),
-    {
-      enabled: query.length > 0,
-    },
-  )
+    enabled: query.length > 0,
+  })
 }
 
 export function useCreateAttendee() {
-  return useMutation({
-    mutationFn: async (args: any) => {
-      return await api.attendees.create({}, args)
-    },
-  })
+  const mutationFn = useConvexMutation(api.attendees.mutations.create)
+  return useMutation({ mutationFn })
 }
 
 export function useUpdateAttendee() {
-  return useMutation({
-    mutationFn: async (args: any) => {
-      return await api.attendees.update({}, args)
-    },
-  })
+  const mutationFn = useConvexMutation(api.attendees.mutations.update)
+  return useMutation({ mutationFn })
 }
 
 export function useArchiveAttendee() {
-  return useMutation({
-    mutationFn: async (id: string) => {
-      return await api.attendees.archive({}, { id })
-    },
-  })
+  const mutationFn = useConvexMutation(api.attendees.mutations.archive)
+  return useMutation({ mutationFn })
 }

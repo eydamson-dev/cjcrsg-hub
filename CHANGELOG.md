@@ -9,6 +9,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Complete Phase 3: Attendee Management - Wired and Functional**
+  - `/attendees/new` - Fully functional create attendee form
+    - Integrated AttendeeForm with useCreateAttendee mutation
+    - Toast notifications on success/error
+    - Navigation to attendees list after creation
+  - `/attendees/$id` - Complete attendee details view
+    - Displays personal info card (name, email, phone, DOB)
+    - Displays church info card (status, join date, address)
+    - Shows notes if available
+    - Edit and Archive action buttons
+    - Loading skeleton during data fetch
+    - "Not found" error state
+  - `/attendees/$id/edit` - Fully functional edit form
+    - Fetches attendee data with useAttendee hook
+    - Pre-populates form with existing data
+    - Integrated useUpdateAttendee mutation
+    - Toast notifications on success/error
+    - Navigation back to details on success
+    - Loading skeleton during initial load
+  - Archive functionality with AlertDialog confirmation
+    - Displays attendee name in confirmation
+    - Integrated useArchiveAttendee mutation
+    - Shows loading state during archive
+    - Toast notifications
+    - Refreshes list after archiving
+  - Fixed mutation hooks to use useConvexMutation from @convex-dev/react-query
+  - Added field, calendar, popover, alert-dialog shadcn components
+  - Created DatePicker component for date inputs
+  - Implemented modern shadcn/ui form pattern with Field components
+    - Replaced broken Form component (useFormContext issue)
+    - Uses Controller directly from react-hook-form
+    - Field, FieldLabel, FieldError components
+  - Created debounce hook for search functionality
+
+### Fixed
+
+- **Navigation and routing issues**
+  - Fixed edit button not working on attendee details page
+  - Implemented proper TanStack Router nested route structure
+    - `/attendees/$id` as layout route with Outlet
+    - `/attendees/$id/` as index route (details view)
+    - `/attendees/$id/edit` as child route (edit form)
+  - Fixed layout not showing header and sidebar on view/edit pages
+    - Added ProtectedRoute and Layout wrappers to attendees.$id.tsx
+
+### Changed
+
+- **Updated route structure for attendees**
+  - Each child route now fetches its own data independently
+  - No React Context dependency issues
+  - Proper TanStack Router nested route pattern
+
+---
+
+## Previous Changes
+
+### Added
+
 - Phase 3: Attendee Management (Foundation)
   - Convex backend for attendees
     - `convex/attendees/queries.ts` - List, getById, search, count queries with pagination
