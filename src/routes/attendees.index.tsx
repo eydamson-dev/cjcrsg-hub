@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { requireAuth } from '~/lib/auth-guard'
+import { ErrorState } from '~/components/ui/error-state'
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -25,8 +26,11 @@ const searchSchema = z.object({
 
 type SearchParams = z.infer<typeof searchSchema>
 
+import { AttendeesErrorBoundary } from '~/features/attendees/components/AttendeesErrorBoundary'
+
 export const Route = createFileRoute('/attendees/')({
   component: AttendeesPage,
+  errorComponent: AttendeesErrorBoundary,
   validateSearch: searchSchema,
   beforeLoad: async ({ context }) => {
     requireAuth(context)
@@ -86,6 +90,10 @@ function AttendeesContent() {
   const isPending =
     (hasValidSearchQuery ? searchQuery.isPending : listQuery.isPending) ||
     countQuery.isPending
+
+  // Check for errors in queries
+  const hasError = listQuery.error || searchQuery.error || countQuery.error
+  const queryError = listQuery.error || searchQuery.error || countQuery.error
 
   const attendees =
     hasValidSearchQuery && searchQuery.data
@@ -217,6 +225,25 @@ function AttendeesContent() {
   const handleClearSearch = () => {
     setLocalSearchQuery('')
     setLocalStatusFilter(undefined)
+  }
+
+  // Show error state if any query failed
+  if (hasError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Attendees</h1>
+          <p className="text-muted-foreground">
+            Manage church members and visitors
+          </p>
+        </div>
+        <ErrorState
+          type="error"
+          error={queryError as Error}
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    )
   }
 
   return (

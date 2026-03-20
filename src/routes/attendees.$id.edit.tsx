@@ -8,9 +8,11 @@ import { Button } from '~/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { requireAuth } from '~/lib/auth-guard'
+import { AttendeesErrorBoundary } from '~/features/attendees/components/AttendeesErrorBoundary'
 
 export const Route = createFileRoute('/attendees/$id/edit')({
   component: EditAttendeePage,
+  errorComponent: AttendeesErrorBoundary,
   beforeLoad: async ({ context }) => {
     requireAuth(context)
   },
