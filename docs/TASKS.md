@@ -8,9 +8,9 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.16 Complete | 🔜 Task 3.17 Pending
-**Current Task:** Task 3.17 - Status change without archiving
-**Status:** ✅ Task 3.16 Complete | 🔜 Task 3.17 Next
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.16 Complete | 🔄 Task 3.17 In Progress
+**Current Task:** Task 3.17 - Make attendee table rows clickable to navigate to view page
+**Status:** ✅ Task 3.16 Complete | 🔄 Task 3.17 In Progress
 
 **Completed This Session (Task 3.16 - Mobile Responsiveness Pass):**
 
@@ -75,12 +75,13 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Next Steps:**
 
-- **Task 3.17** - Status change without archiving:
-  - Add status change option in actions dropdown
-  - Show submenu: Change to Member, Change to Visitor, Change to Inactive
-  - Integrate with update mutation to change status
-  - Show success toast with new status
-  - Refresh list to show updated status badge
+- **Task 3.17** - Make attendee table rows clickable to navigate to view page:
+  - Add onClick handler to TableRow component to navigate to attendee detail view
+  - Add cursor-pointer and hover styling to table rows
+  - Remove "View" option from dropdown menu (redundant since row click handles it)
+  - Add stopPropagation to dropdown menu to prevent navigation when clicking actions
+  - Test navigation works correctly when clicking anywhere on the row
+  - Verify dropdown menu still works without triggering navigation
 - **Begin Phase 4: Event Types (Admin)**
   - Create event type queries and mutations
   - Build EventTypeList and EventTypeForm components
@@ -556,13 +557,14 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 - [x] Test attendee form on mobile
 - [x] Test attendee details on mobile
 
-### 3.17 Add attendee status change (without archiving)
+### 3.17 Make attendee table rows clickable to navigate to view page
 
-- [ ] Add status change option in actions dropdown
-- [ ] Show submenu: Change to Member, Change to Visitor, Change to Inactive
-- [ ] Integrate with update mutation to change status
-- [ ] Show success toast with new status
-- [ ] Refresh list to show updated status badge
+- [ ] Add onClick handler to TableRow component to navigate to attendee detail view
+- [ ] Add cursor-pointer and hover styling to table rows
+- [ ] Remove "View" option from dropdown menu (redundant since row click handles it)
+- [ ] Add stopPropagation to dropdown menu to prevent navigation when clicking actions
+- [ ] Test navigation works correctly when clicking anywhere on the row
+- [ ] Verify dropdown menu still works without triggering navigation
 
 ---
 

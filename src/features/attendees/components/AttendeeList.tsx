@@ -18,7 +18,6 @@ import {
   Plus,
   Search,
   Edit,
-  Eye,
   Archive,
   MoreHorizontal,
   X,
@@ -407,7 +406,13 @@ export function AttendeeList({
                 </TableHeader>
                 <TableBody>
                   {attendees.map((attendee) => (
-                    <TableRow key={attendee._id}>
+                    <TableRow
+                      key={attendee._id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() =>
+                        onNavigate?.(`/attendees/${attendee._id}/`)
+                      }
+                    >
                       <TableCell className="font-medium">
                         {attendee.firstName} {attendee.lastName}
                       </TableCell>
@@ -421,24 +426,19 @@ export function AttendeeList({
                       <TableCell>{formatDate(attendee.joinDate)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
-                          <DropdownMenuTrigger>
+                          <DropdownMenuTrigger
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <Button variant="ghost" size="icon">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() =>
-                                onNavigate?.(`/attendees/${attendee._id}/`)
-                              }
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
+                              onClick={(e) => {
+                                e.stopPropagation()
                                 onNavigate?.(`/attendees/${attendee._id}/edit`)
-                              }
+                              }}
                             >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
@@ -446,7 +446,10 @@ export function AttendeeList({
                             {attendee.status !== 'inactive' && (
                               <DropdownMenuItem
                                 className="text-destructive"
-                                onClick={() => handleArchiveClick(attendee)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleArchiveClick(attendee)
+                                }}
                               >
                                 <Archive className="mr-2 h-4 w-4" />
                                 Archive
