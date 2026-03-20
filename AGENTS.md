@@ -214,6 +214,38 @@ git push -u origin feature-name
 
 ---
 
+## Development Tools & AI Assistants
+
+### OpenCode Configuration
+
+This project uses **OpenCode** for AI-assisted development with the following configuration:
+
+**MCP (Model Context Protocol) Tools:**
+
+- **shadcn MCP** - AI assistant for shadcn/ui component management
+  - Automatically adds, updates, and manages shadcn components
+  - Provides component recommendations based on context
+  - Configuration: `opencode.json`
+
+**Skills:**
+
+- **shadcn/ui Skill** - Comprehensive knowledge base for shadcn/ui
+  - Located in: `.agents/skills/shadcn/`
+  - Includes: CLI commands, customization guides, component rules
+  - Helps with: Component selection, styling, forms, icons
+
+### VS Code Extensions
+
+Recommended extensions for development:
+
+- **Convex** - Official Convex extension
+- **Tailwind CSS IntelliSense** - Autocomplete for Tailwind
+- **TypeScript Importer** - Auto-imports
+- **ESLint** - Linting
+- **Prettier** - Code formatting
+
+---
+
 ## Implementation Status
 
 ### ✅ Completed

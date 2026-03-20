@@ -36,6 +36,9 @@ Before starting implementation, ensure you have:
   - Verify by checking that shadcn theme variables exist in app.css
   - Test by importing a button component and verifying it renders
 
+**💡 Tip:** Use the shadcn MCP tool or ask the AI about shadcn components.
+The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guidance.
+
 ### 1.2 Setup Convex Auth
 
 - [ ] Install Convex Auth packages:
