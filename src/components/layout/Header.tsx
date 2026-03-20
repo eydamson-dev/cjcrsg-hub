@@ -23,7 +23,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <img
           src="/cjcrsg-logo.png"
           alt="CJCRSG Logo"
-          className="h-9 w-9 object-contain"
+          className="h-9 w-9 object-contain lg:hidden"
         />
         <div className="hidden md:block">
           <h1 className="text-lg font-semibold">{churchName}</h1>
