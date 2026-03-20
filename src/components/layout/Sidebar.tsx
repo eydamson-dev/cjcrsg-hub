@@ -47,9 +47,11 @@ export function Sidebar() {
     <aside className="hidden w-64 flex-col border-r bg-card lg:flex">
       <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="text-2xl font-bold">{churchName[0]}</span>
-          </div>
+          <img
+            src="/cjcrsg-logo.png"
+            alt="CJCRSG Logo"
+            className="h-12 w-12 object-contain"
+          />
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold">{churchName}</h2>
             <p className="text-xs text-muted-foreground">{churchFullName}</p>

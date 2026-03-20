@@ -49,6 +49,13 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/cjcrsg-logo.png"
+              alt="CJCRSG Logo"
+              className="h-16 w-16 object-contain"
+            />
+          </div>
           <CardTitle className="text-2xl">CJCRSG Hub</CardTitle>
           <CardDescription>Church Management System</CardDescription>
         </CardHeader>
