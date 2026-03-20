@@ -385,4 +385,99 @@ const add = (a: number, b: number) => a + b
 
 ---
 
+## Changelog Conventions
+
+The project uses [Keep a Changelog](https://keepachangelog.com/) format.
+See `CHANGELOG.md` in the project root for examples.
+
+### Good vs Bad Examples
+
+**Good:**
+
+```markdown
+### Added
+
+- Add attendee search with real-time filtering and pagination
+- Implement password reset via email verification
+- Support Google and Facebook OAuth authentication
+```
+
+**Bad:**
+
+```markdown
+### Added
+
+- Attendee search
+- Password stuff
+- OAuth
+```
+
+### Entry Categories (in order)
+
+**Added:**
+
+- New features, endpoints, components
+- New dependencies with purpose
+- New configuration options
+
+**Changed:**
+
+- Modifications to existing behavior
+- UI/UX improvements
+- Performance optimizations
+- API changes (breaking or not)
+
+**Fixed:**
+
+- Bug fixes
+- Error handling improvements
+- Correct typos or mistakes
+
+**Deprecated:**
+
+- Features to be removed in next version
+- Old APIs being phased out
+
+**Removed:**
+
+- Deleted features
+- Removed dependencies
+- Deprecated code cleanup
+
+**Security:**
+
+- Security vulnerability fixes
+- Authentication/authorization improvements
+- Data protection enhancements
+
+### Writing Guidelines
+
+- **Use imperative mood:** "Add feature" not "Added feature"
+- **Be specific:** Include what and why when not obvious
+- **Keep concise:** One clear sentence per entry
+- **Group related changes:** Under the same category
+- **Include context:** Reference issues/PRs when helpful: `(#123)`
+
+### Breaking Changes
+
+Mark with `[BREAKING]` prefix:
+
+```markdown
+### Changed
+
+- [BREAKING] Rename `attendee.status` field to `attendee.membershipStatus`
+```
+
+### Work In Progress
+
+Use `[WIP]` prefix for incomplete features:
+
+```markdown
+### Added
+
+- [WIP] Event calendar integration (basic view only)
+```
+
+---
+
 _Last Updated: 2026-03-20_

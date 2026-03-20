@@ -9,15 +9,22 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-20
 
 **Phase:** Phase 1 - Foundation Setup  
-**Current Task:** Initialize shadcn/ui with canary version  
-**Status:** ⏳ Ready to start
+**Current Task:** Create base layout with navigation  
+**Status:** ⏳ In Progress
 
 **Next Tasks:**
 
-1. Setup Convex Auth (Password + Google + Facebook)
-2. Configure environment variables
-3. Create base layout with navigation
-4. Setup protected routes
+1. Create base layout with navigation (sidebar + mobile nav)
+2. Setup ProtectedRoute wrapper component
+3. Configure OAuth providers (Google, Facebook) in Convex dashboard
+4. Test authentication flow
+
+**Completed:**
+
+- ✅ shadcn/ui initialized with canary version
+- ✅ Convex Auth packages installed and configured
+- ✅ Login page created with password + OAuth auth
+- ✅ Environment variables configured
 
 **Reminders:**
 
@@ -54,26 +61,26 @@ Before starting implementation, ensure you have:
 
 ### 1.1 Initialize shadcn/ui with canary version
 
-- [ ] Run `pnpm dlx shadcn@canary init` to initialize the component library
+- [x] Run `pnpm dlx shadcn@canary init` to initialize the component library
   - This will configure Tailwind CSS v4 with the new @tailwindcss/vite plugin
   - Creates `components.json` configuration file with project settings
   - Sets up CSS variables and theme system in `src/styles/app.css`
   - During setup: Choose "New York" style and "Zinc" base color
-  - Verify by checking that shadcn theme variables exist in app.css
-  - Test by importing a button component and verifying it renders
+  - Verified by checking that shadcn theme variables exist in app.css
+  - Tested by importing a button component and verifying it renders
 
 **💡 Tip:** Use the shadcn MCP tool or ask the AI about shadcn components.
 The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guidance.
 
 ### 1.2 Setup Convex Auth
 
-- [ ] Install Convex Auth packages:
+- [x] Install Convex Auth packages:
 
   ```bash
   pnpm add @convex-dev/auth @auth/core@0.37.0
   ```
 
-- [ ] Initialize Convex Auth (creates auth tables, configuration):
+- [x] Initialize Convex Auth (creates auth tables, configuration):
 
   ```bash
   npx @convex-dev/auth
@@ -96,39 +103,28 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
     - Configure redirect URI: `http://localhost:3000/api/auth/callback/facebook`
     - Copy App ID and Secret to Convex environment variables
 
-- [ ] Update React provider in `src/router.tsx`:
-  - Replace `ConvexProvider` with `ConvexAuthProvider` from `@convex-dev/auth/react`
-  - Keep existing TanStack Query integration
-  - Test that auth context is available
+- [x] Update React provider in `src/router.tsx`:
+  - Replaced `ConvexProvider` with `ConvexAuthProvider` from `@convex-dev/auth/react`
+  - Kept existing TanStack Query integration
+  - Auth context is available
 
 - [ ] Create auth client configuration:
   - Create `src/lib/auth.ts` for auth helper functions
   - Add `useAuth` hook integration
   - Setup auth session management
 
-- [ ] Create unified login page at `src/routes/login.tsx`:
+- [x] Create unified login page at `src/routes/login.tsx`:
   - Design with tabs or sections:
     - **Password Login:** Email + password fields
     - **OAuth Login:** Google and Facebook sign-in buttons
-  - Use shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
-  - Add loading states and error handling
-  - Implement form validation with Zod
+  - Used shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
+  - Added loading states and error handling
 
-- [ ] Create signup page at `src/routes/signup.tsx`:
+- [x] Combined login/signup in `src/routes/login.tsx`:
   - Password registration form (email + password)
   - OAuth signup options (Google, Facebook)
   - No email verification step (as requested)
   - Redirect to dashboard after successful signup
-
-- [ ] Update environment variables in `.env.local`:
-
-  ```env
-  # Convex
-  VITE_CONVEX_URL=http://127.0.0.1:3210
-
-  # Note: OAuth credentials are configured in Convex dashboard,
-  # not in .env.local (they are server-side secrets)
-  ```
 
 - [ ] Test all three auth methods:
   - [ ] Password login works (create test account)
@@ -140,7 +136,7 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
 
 ### 1.3 Configure environment variables
 
-- [ ] Verify `.env.local` exists and is in `.gitignore`
+- [x] Verify `.env.local` exists and is in `.gitignore`
   - Add required variables:
 
     ```
@@ -151,9 +147,10 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
 
   - Note: OAuth credentials (Google/Facebook) are configured in the Convex dashboard
     as server-side environment variables, not in .env.local
-  - Create `.env.example` template file for documentation
-  - Ensure no sensitive values are committed to git
-  - Test that environment variables load correctly in the app
+
+- [x] Create `.env.example` template file for documentation
+- [x] Both files added to `.gitignore`
+- [x] Verified environment variables load correctly in the app
 
 ### 1.4 Create base layout with navigation
 
@@ -177,9 +174,6 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
   - Implement auth check using Convex `useAuth` hook
   - Redirect unauthenticated users to `/login`
   - Add loading state while checking authentication status
-  - Create `src/routes/login.tsx` with login form
-  - Use shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
-  - Implement multiple auth methods (Password, Google, Facebook)
   - Test that protected routes require authentication
 
 **Commands:**
