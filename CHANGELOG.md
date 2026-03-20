@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.12: Pagination with Total Count Display**
+  - "Showing X to Y of Z attendees" display with accurate counts
+  - Next/Previous pagination controls with disabled states
+  - Page indicator showing "Page X of Y"
+  - Dynamic page size selector (10, 25, 50 items per page)
+  - LocalStorage persistence for page size preference
+  - URL param support for page number (`?page=2`)
+  - Cursor-based pagination for efficient large dataset handling
+  - Cursor history management for Previous navigation
+  - Reset to page 1 when filters or search change
+  - Search mode shows results count without pagination controls
+
+- **UI/UX Improvements**
+  - Fixed button and filter height alignment using shadcn Select component
+  - Fixed clear button and loader positioning to prevent overlap
+  - Fixed "Type at least 3 characters" message causing layout twitch with reserved space and fade transition
+  - Standardized all dropdowns to use shadcn Select component for consistency
+
+- **Test Data**
+  - Created seeding mutation to generate 20 realistic test attendees
+  - Generated attendees with varied statuses (60% member, 30% visitor, 10% inactive)
+  - Includes realistic names, emails, phone numbers, addresses, and join dates
+
 - **Task 3.11: Debounced Search with Backend Integration**
   - Added `searchField` column to attendees table (auto-populated on create/update)
   - Search matches across full name (first + last), email, and address
