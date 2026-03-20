@@ -37,21 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - User data retrieval in getCurrentUser query
   - Parse identity.subject to get actual user ID
   - Fetch user from users table properly
-
-### Known Issues
-
-- **Hydration error in Sidebar component** (unfixed)
-  - Location: `src/components/layout/Sidebar.tsx` - `UserDisplay` component
-  - Error: Text content mismatch between server and client
-  - Root cause: Query loading state inconsistency
-    - Server renders: "Loading..."
-    - Client renders: actual email or empty string
-  - Current implementation uses `useQuery` with `isPending` check
-  - Attempted fix: Switching to `useSuspenseQuery` causes import/type issues
-  - Impact: Console warnings, potential UI flicker on page refresh
-  - Workaround: None currently implemented
-  - Priority: Medium - functionality works, but warnings persist
-  - Planned fix: Proper suspense boundary or data prefetching
+- Hydration error in Sidebar component
+  - Fixed nested button elements by removing Button wrapper inside DropdownMenuTrigger
+  - Applied Tailwind classes directly to DropdownMenuTrigger component
+- Hydration error in LoginPage component
+  - Fixed setState during render issue
+  - Wrapped navigation logic in useEffect to defer until after render
 
 ### Changed
 

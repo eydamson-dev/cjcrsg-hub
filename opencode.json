@@ -29,7 +29,7 @@
     ".agents/skills/cjcrsg-hub/common-tasks.md",
     ".agents/skills/cjcrsg-hub/quick-reference.md",
     ".agents/skills/shadcn/SKILL.md",
-    "docs/TASKS.md",
+    "docs/*.md",
     "AGENTS.md"
   ]
 }

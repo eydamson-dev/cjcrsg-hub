@@ -8,49 +8,20 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 1 - Foundation Setup  
-**Current Task:** Phase 1 complete - Ready for Phase 2
-**Status:** ✅ Completed
+**Phase:** Phase 1 Complete (Bug Fixes Done)  
+**Current Task:** Ready for Phase 3
+**Status:** ✅ All Hydration Errors Fixed
 
-**Recent Fixes:**
+**Completed This Session:**
 
-1. ✅ Fixed hydration error in sidebar
-   - Root cause: `getCurrentUser` was returning undefined for user data
-   - Issue: `ctx.auth.getUserIdentity()` returns identity with `subject` containing `"userId|accountId"`
-   - Fix: Parse `identity.subject.split('|')[0]` to get actual user ID
-   - Fetch user from `users` table using the parsed user ID
-   - Now correctly returns user's name, email, and image
-
-2. ✅ Phase 1 fully implemented and tested
-   - Route guard timing issue fixed with auth context
-   - ProtectedRoute component uses `useAuthContext` hook
-   - AuthLoadingScreen component for branded loading state
-   - Attendees and Events routes created with protection
-
-**Completed:**
-
-- ✅ shadcn/ui initialized with canary version
-- ✅ Convex Auth packages installed and configured
-- ✅ Login page created with password + OAuth auth
-- ✅ Environment variables configured
-- ✅ Base layout with navigation created
-  - Desktop sidebar with CJCRSG branding
-  - Mobile navigation with hamburger menu
-  - ProtectedRoute component for auth checking
-  - Responsive design for all screen sizes
-  - Navigation items: Dashboard, Attendees, Events, Attendance, Settings
-- ✅ OAuth providers added to `convex/auth.ts`
-  - Google OAuth provider configured (credentials pending)
-  - Facebook OAuth provider configured (credentials pending)
-  - Auth utilities created in `src/lib/auth.ts`
-  - OAuth buttons show inline error messages
-- ✅ Schema updated with authTables (fixes registration)
-- ✅ Password authentication working
-- ✅ Auth context provider (`AuthProvider`) implemented
-- ✅ Route guards implemented (requireAuth, requireGuest)
-- ✅ ProtectedRoute component improved with AuthLoadingScreen
-- ✅ Attendees and Events routes created with placeholder content
-- ✅ Sign out functionality working on both desktop and mobile
+- ✅ Fixed hydration error in Sidebar (nested button elements)
+  - Removed Button wrapper inside DropdownMenuTrigger
+  - Applied Tailwind classes directly to trigger
+- ✅ Fixed hydration error in LoginPage (setState during render)
+  - Wrapped navigation in useEffect hook
+- ✅ Removed leftover template file (anotherPage.tsx)
+- ✅ Verified fixes with browser console (0 errors)
+- ✅ PR created for fix/hydration-errors branch
 
 **Implementation Notes:**
 
@@ -58,7 +29,6 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - AuthLoadingScreen shows CJCRSG Hub branding with cross icon
 - Attendees and Events pages have placeholder content (Phase 3 features)
 - OAuth credentials still pending (Google/Facebook setup deferred)
-- `getCurrentUser` query follows standard Convex Auth pattern: parse subject → fetch from users table
 
 **Reminders:**
 
@@ -69,8 +39,11 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Next Steps:**
 
-- Move to Phase 2: Database Schema & Auth (already completed)
 - Begin Phase 3: Attendee Management
+  - Create attendee queries (list, get, search)
+  - Create attendee mutations (create, update)
+  - Build AttendeeList and AttendeeForm components
+  - Create routes: /attendees, /attendees/new, /attendees/$id
 
 ---
 
@@ -244,6 +217,21 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
   - [x] Refresh while logged out: Redirect to login
   - [x] Access login while authenticated: Redirect to dashboard
   - [x] No "Already signed in" flash on refresh
+
+### 1.5c Fix Hydration Errors
+
+- [x] Fix Sidebar nested button hydration error
+  - **Issue:** DropdownMenuTrigger contained Button component, creating nested `<button>` elements
+  - **Location:** `src/components/layout/Sidebar.tsx` - lines 84-95
+  - **Fix:** Removed Button wrapper, applied Tailwind classes directly to DropdownMenuTrigger
+  - **Result:** No more HTML nesting errors
+- [x] Fix LoginPage setState during render error
+  - **Issue:** navigate() called during component render phase
+  - **Location:** `src/routes/login.tsx` - lines 26-27
+  - **Fix:** Wrapped navigation in useEffect hook
+  - **Result:** Navigation happens after render, not during
+- [x] Remove leftover template file (anotherPage.tsx)
+- [x] Verify fixes with browser console (0 hydration errors)
 
 ### 1.6 Create Attendees and Events Routes
 

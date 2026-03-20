@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useAuthActions, useAuthToken } from '@convex-dev/auth/react'
 import { useNavigate } from '@tanstack/react-router'
@@ -23,8 +23,13 @@ function LoginPage() {
   const token = useAuthToken()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (token) {
+      navigate({ to: '/' })
+    }
+  }, [token, navigate])
+
   if (token) {
-    navigate({ to: '/' })
     return null
   }
 
