@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-router'
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
+import { TooltipProvider } from '~/components/ui/tooltip'
+import { Toaster } from '~/components/ui/sonner'
 import appCss from '~/styles/app.css?url'
 
 export const Route = createRootRouteWithContext<{
@@ -66,7 +68,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <TooltipProvider>
+          {children}
+          <Toaster />
+        </TooltipProvider>
         <Scripts />
       </body>
     </html>

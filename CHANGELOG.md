@@ -9,7 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing yet
+- Responsive layout system with sidebar and mobile navigation
+  - Layout, Sidebar, MobileNav, Header components in `src/components/layout/`
+  - ProtectedRoute component for authentication in `src/components/auth/`
+  - Navigation configuration with 5 main sections (Dashboard, Attendees, Events, Attendance, Settings)
+  - Mobile-first responsive design with sheet-based drawer navigation
+- CJCRSG blue theme (#304080) as primary color
+  - Applied to both light and dark modes in `src/styles/app.css`
+  - Updated sidebar, buttons, focus rings, and accent colors
+- Dashboard page with stats cards showing member counts, events, and attendance
+- New shadcn components: sidebar, tooltip, collapsible, use-mobile hook
 
 ### Changed
 

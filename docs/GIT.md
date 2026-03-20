@@ -118,6 +118,22 @@ You test the changes locally:
 - Review the code changes
 - Verify everything works as expected
 
+### 3a. Update Changelog
+
+Before committing, update `CHANGELOG.md`:
+
+- Add changes under `[Unreleased]` section
+- Follow Keep a Changelog format
+- Use categories: Added, Changed, Deprecated, Removed, Fixed, Security
+
+Example:
+
+```markdown
+### Added
+
+- Add responsive navigation with sidebar and mobile drawer
+```
+
 ### 4. Approval
 
 Only after your confirmation ("looks good", "approved", "LGTM", etc.):
