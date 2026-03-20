@@ -8,9 +8,11 @@ import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { requireAuth } from '~/lib/auth-guard'
+import { AttendeesErrorBoundary } from '~/features/attendees/components/AttendeesErrorBoundary'
 
 export const Route = createFileRoute('/attendees/new')({
   component: NewAttendeePage,
+  errorComponent: AttendeesErrorBoundary,
   beforeLoad: async ({ context }) => {
     requireAuth(context)
   },

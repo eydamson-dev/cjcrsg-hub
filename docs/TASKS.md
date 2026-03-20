@@ -8,28 +8,42 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.14 Complete | 🔜 Tasks 3.15-3.17 Pending
-**Current Task:** Task 3.15 - ErrorState component with retry/back buttons
-**Status:** ✅ Task 3.14 Complete | 🔜 Task 3.15 Next
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.15 Complete | 🔜 Tasks 3.16-3.17 Pending
+**Current Task:** Task 3.16 - Mobile responsiveness pass
+**Status:** ✅ Task 3.15 Complete | 🔜 Task 3.16 Next
 
-**Completed This Session (Task 3.14 - Ready for PR):**
+**Completed This Session (Task 3.15 - ErrorState Component):**
 
-- ✅ **3.14** AttendeeTableSkeleton component for list view
-  - Created `AttendeeTableSkeleton` component with configurable row count (default: 5)
-  - Shows table headers during loading for better UX
-  - Rounded skeleton for status column to resemble badge shape
-  - Proper skeleton widths matching table column content:
-    - Name: w-32, Email: w-40, Phone: w-28
-    - Status: w-20 with rounded-full, Join Date: w-24
-    - Actions: w-8 h-8 rounded-md for icon button
-  - Replaced loading text placeholder in AttendeeList.tsx
-  - Consistent with existing AttendeeDetailsSkeleton pattern
+- ✅ **3.15** ErrorState component with retry/back buttons
+  - Created reusable `ErrorState` component with 4 error types:
+    - `not-found`: For missing resources (SearchX icon)
+    - `error`: For general errors (AlertCircle icon)
+    - `network`: For connection issues (WifiOff icon)
+    - `unauthorized`: For permission errors (ShieldAlert icon)
+  - Uses shadcn `Empty` component pattern for consistency
+  - Props: `type`, `title`, `description`, `error`, `onRetry`, `onBack`
+  - Retry button reloads page; Back button navigates to `/attendees`
+  - Displays error message if provided
+
+- ✅ **AttendeesErrorBoundary** component
+  - Route-level error boundary using TanStack Router's `errorComponent`
+  - Catches errors from all attendee routes (list, detail, edit, new)
+  - Displays appropriate ErrorState with retry/back actions
+
+- ✅ **Updated error handling across attendee routes:**
+  - `attendees.index.tsx`: Shows ErrorState when list/search/count queries fail
+  - `attendees.$id.index.tsx`: Enhanced AttendeeNotFound with ErrorState
+  - `attendees.$id.tsx`: Added errorComponent prop
+  - `attendees.$id.edit.tsx`: Added errorComponent prop
+  - `attendees.new.tsx`: Added errorComponent prop
 
 **Technical Changes Made:**
 
-- **Component:** Added `AttendeeTableSkeleton.tsx` (`src/features/attendees/components/`)
-- **UI:** Updated `AttendeeList.tsx` to use skeleton instead of text loading state
-- **Pattern:** Follows existing skeleton pattern from AttendeeDetails component
+- **Component:** Added `error-state.tsx` (`src/components/ui/`)
+- **Component:** Added `AttendeesErrorBoundary.tsx` (`src/features/attendees/components/`)
+- **Updated:** `AttendeeDetails.tsx` - Replaced custom NotFound with ErrorState
+- **Updated:** All attendee routes - Added errorComponent and error handling
+- **Pattern:** Follows existing Empty component structure for consistency
 
 **Reminders:**
 
@@ -512,8 +526,8 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 ### 3.15 Improve error states
 
 - [x] Handle "not found" errors with helpful messages
-- [ ] Create ErrorState component with retry/back buttons
-- [ ] Add error boundary for attendee pages
+- [x] Create ErrorState component with retry/back buttons
+- [x] Add error boundary for attendee pages
 
 ### 3.16 Mobile responsiveness pass
 

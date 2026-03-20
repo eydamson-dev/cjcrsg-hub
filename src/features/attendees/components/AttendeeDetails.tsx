@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
-import { AlertCircle, Edit, Archive, ArrowLeft } from 'lucide-react'
+import { ErrorState } from '~/components/ui/error-state'
+import { Edit, Archive, ArrowLeft } from 'lucide-react'
 import type { AttendeeStatus } from '../types'
 
 interface AttendeeDetailsProps {
@@ -207,9 +208,14 @@ export function AttendeeDetailsSkeleton({
 interface AttendeeNotFoundProps {
   error?: Error
   onBack?: () => void
+  onRetry?: () => void
 }
 
-export function AttendeeNotFound({ error, onBack }: AttendeeNotFoundProps) {
+export function AttendeeNotFound({
+  error,
+  onBack,
+  onRetry,
+}: AttendeeNotFoundProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -221,21 +227,18 @@ export function AttendeeNotFound({ error, onBack }: AttendeeNotFoundProps) {
             Attendee Not Found
           </h1>
           <p className="text-muted-foreground">
-            The attendee you're looking for doesn't exist
+            The attendee you're looking for doesn&apos;t exist
           </p>
         </div>
       </div>
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3 text-destructive">
-            <AlertCircle className="h-5 w-5" />
-            <p>Error: {error?.message || 'Attendee not found'}</p>
-          </div>
-          <Button className="mt-4" onClick={onBack}>
-            Back to Attendees
-          </Button>
-        </CardContent>
-      </Card>
+      <ErrorState
+        type="not-found"
+        error={error}
+        onBack={onBack}
+        onRetry={onRetry}
+        title="Attendee Not Found"
+        description="The attendee you're looking for doesn't exist or has been removed."
+      />
     </div>
   )
 }

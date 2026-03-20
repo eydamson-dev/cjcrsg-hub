@@ -27,12 +27,22 @@ function AttendeeDetailPage() {
     navigate({ to: '/attendees' })
   }
 
+  const handleRetry = () => {
+    window.location.reload()
+  }
+
   if (isPending) {
     return <AttendeeDetailsSkeleton onBack={handleBack} />
   }
 
   if (error || !attendee) {
-    return <AttendeeNotFound error={error || undefined} onBack={handleBack} />
+    return (
+      <AttendeeNotFound
+        error={error || undefined}
+        onBack={handleBack}
+        onRetry={handleRetry}
+      />
+    )
   }
 
   return (

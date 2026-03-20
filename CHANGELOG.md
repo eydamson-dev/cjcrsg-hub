@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.15: ErrorState Component with Retry/Back Buttons**
+  - Created reusable ErrorState component with 4 error types: not-found, error, network, unauthorized
+  - Each type has specific Lucide icon: SearchX, AlertCircle, WifiOff, ShieldAlert
+  - Props: type, title, description, error, onRetry, onBack, showRetry, showBack
+  - Retry button reloads the page; Back button navigates to /attendees
+  - Uses shadcn Empty component pattern for consistent styling
+  - Displays error message when provided
+  - AttendeesErrorBoundary component for route-level error handling
+  - Integrated error boundaries into all attendee routes (index, $id, edit, new)
+  - Updated AttendeeNotFound to use ErrorState with retry/back actions
+  - Error handling in attendees.index.tsx for list/search/count query failures
+
 - **Task 3.14: AttendeeTableSkeleton Component for Loading States**
   - Created AttendeeTableSkeleton component with configurable row count (default: 5)
   - Shows table headers during loading for better UX (Name, Email, Phone, Status, Join Date, Actions)
