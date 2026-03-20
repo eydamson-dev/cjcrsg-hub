@@ -15,6 +15,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import { requireAuth } from '~/lib/auth-guard'
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -27,6 +28,9 @@ type SearchParams = z.infer<typeof searchSchema>
 export const Route = createFileRoute('/attendees/')({
   component: AttendeesPage,
   validateSearch: searchSchema,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function AttendeesPage() {

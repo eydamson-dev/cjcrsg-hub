@@ -9,9 +9,13 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { Users, CalendarDays, CheckSquare, TrendingUp } from 'lucide-react'
+import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/')({
   component: Dashboard,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function Dashboard() {

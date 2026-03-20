@@ -1,29 +1,28 @@
 import { useAuthContext } from '~/lib/auth-context'
-import { useNavigate } from '@tanstack/react-router'
-import { useEffect, type ReactNode } from 'react'
 import { AuthLoadingScreen } from './AuthLoadingScreen'
+import type { ReactNode } from 'react'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 
+/**
+ * ProtectedRoute - Visual wrapper for protected pages
+ *
+ * This component provides visual feedback (loading screen) while auth initializes.
+ * The actual authentication protection is handled at the route level via beforeLoad hooks.
+ * This creates a two-layer protection:
+ * 1. beforeLoad: Prevents rendering if not authenticated (runs first)
+ * 2. ProtectedRoute: Shows loading state during auth initialization
+ */
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuthContext()
-  const navigate = useNavigate()
+  const { isLoading } = useAuthContext()
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate({ to: '/login', replace: true })
-    }
-  }, [isAuthenticated, isLoading, navigate])
-
+  // Show loading screen while auth initializes
   if (isLoading) {
     return <AuthLoadingScreen />
   }
 
-  if (!isAuthenticated) {
-    return null
-  }
-
+  // Note: Authentication check is handled by route-level beforeLoad guards
   return <>{children}</>
 }

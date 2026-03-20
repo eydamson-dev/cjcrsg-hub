@@ -5,6 +5,13 @@ import { ConvexQueryClient } from '@convex-dev/react-query'
 import { ConvexAuthProvider } from '@convex-dev/auth/react'
 import { routeTree } from './routeTree.gen'
 
+// Define the router context type including auth
+export interface RouterContext {
+  queryClient: QueryClient
+  isAuthenticated: boolean
+  isLoading: boolean
+}
+
 export function getRouter() {
   const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!
   if (!CONVEX_URL) {
@@ -27,7 +34,11 @@ export function getRouter() {
     createRouter({
       routeTree,
       defaultPreload: 'intent',
-      context: { queryClient },
+      context: {
+        queryClient,
+        isAuthenticated: false,
+        isLoading: true,
+      },
       scrollRestoration: true,
       defaultPreloadStaleTime: 0, // Let React Query handle all caching
       defaultErrorComponent: (err) => <p>{err.error.stack}</p>,
