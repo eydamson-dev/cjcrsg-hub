@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.13: Empty States for Search/Filter Results**
+  - Added shadcn Empty component with proper composition pattern
+  - Three distinct empty states:
+    - **No attendees**: "No attendees yet" with Users icon and "Add Attendee" button
+    - **No search results**: "No results found" with SearchX icon showing search query
+    - **No filter results**: "No matches" with FilterX icon showing active filter
+  - Each state has contextual action button (Add Attendee or Clear filters)
+  - Consistent visual style with icon badges and centered layout
+
 - **Task 3.12: Pagination with Total Count Display**
   - "Showing X to Y of Z attendees" display with accurate counts
   - Next/Previous pagination controls with disabled states

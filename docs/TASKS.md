@@ -8,35 +8,25 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.12 Complete | 🔜 Tasks 3.13-3.17 Pending
-**Current Task:** Task 3.12 - Pagination with Total Count Display
-**Status:** ✅ Task 3.12 implemented and tested | 🔄 Tasks 3.13-3.17 in follow-up PRs
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.13 Complete | 🔜 Tasks 3.14-3.17 Pending
+**Current Task:** Task 3.14 - AttendeeTableSkeleton component
+**Status:** ✅ Task 3.13 PR created | 🔜 Task 3.14 Next
 
-**Completed This Session (Task 3.12 - Ready for PR):**
+**Completed This Session (Task 3.13 - Ready for PR):**
 
-- ✅ **3.12** Pagination with total count display
-  - "Showing X to Y of Z attendees" display with accurate counts
-  - Next/Previous pagination controls with disabled states
-  - Page indicator showing "Page X of Y"
-  - Dynamic page size selector (10, 25, 50 items per page)
-  - LocalStorage persistence for page size preference
-  - URL param support for page number (`?page=2`)
-  - Cursor-based pagination for efficient large dataset handling
-  - Cursor history management for Previous navigation
-  - Reset to page 1 when filters or search change
-  - Fixed count query to return number instead of array
-  - UI alignment fixes: button/filter same height, clear button positioning
-  - Fixed layout twitch with reserved space for search hint message
-  - Standardized all dropdowns to use shadcn Select component
-  - Generated 20 test attendees for pagination testing
+- ✅ **3.13** Empty states for search/filter results
+  - Added shadcn Empty component with proper composition pattern
+  - Three distinct empty states with contextual icons:
+    - No attendees: Users icon with "Add Attendee" button
+    - No search results: SearchX icon showing search query with "Clear search" button
+    - No filter results: FilterX icon showing active filter with "Clear filter" button
+  - Consistent visual style with icon badges and centered layout
 
 **Technical Changes Made:**
 
-- **Backend:** Fixed count query in `convex/attendees/queries.ts` to return number
-- **Hooks:** Added `useAttendeeCount` hook and pageSize parameter to `useAttendees`
-- **Route:** Added pagination state, URL params, cursor history, and localStorage persistence
-- **Component:** Updated AttendeeList with pagination UI, fixed alignment issues
-- **Test Data:** Created seeding mutation in `convex/attendees/seed.ts`
+- **Component:** Added shadcn Empty component (`src/components/ui/empty.tsx`)
+- **UI:** Updated AttendeeList.tsx with Empty component for all empty states
+- **Icons:** Added Users, SearchX, FilterX from lucide-react
 
 **Reminders:**
 
@@ -44,12 +34,12 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - Test before asking to commit
 - Create feature branches
 - Wait for user approval before committing
+- **Update `TASKS.md` "Current Session" section when starting/completing tasks**
 
 **Next Steps (Follow-up PRs):**
 
-- **Complete Phase 3.13-3.17** (Polish & UX):
-  - 3.13 Empty states for search/filter results
-  - 3.14 AttendeeTableSkeleton component
+- **Complete Phase 3.14-3.17** (Polish & UX):
+  - 3.14 AttendeeTableSkeleton component for list view
   - 3.15 ErrorState component with retry/back buttons
   - 3.16 Mobile responsiveness pass (test on 375px viewport)
   - 3.17 Status change without archiving (dropdown submenu)
@@ -503,11 +493,12 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 - [x] Fix UI alignment issues (button/filter height, clear button positioning)
 - [x] Fix layout twitch with reserved space for search hint message
 
-### 3.13 Add empty states for attendee list
+### 3.13 Add empty states for attendee list ✅
 
-- [x] Empty state for no attendees at all ("No attendees found. Add your first attendee!")
-- [ ] Create empty state for no search results
-- [ ] Create empty state for filter with no results
+- [x] Empty state for no attendees at all with Users icon and "Add Attendee" button
+- [x] Empty state for no search results with SearchX icon and "Clear search" button
+- [x] Empty state for filter with no results with FilterX icon and "Clear filter" button
+- [x] Use shadcn Empty component for consistent styling
 
 ### 3.14 Add loading skeletons
 
