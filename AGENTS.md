@@ -17,10 +17,10 @@ We will start development using **Convex local development mode** (no account re
 
 ```bash
 # Start with local development
-npx convex dev
+pnpm dlx convex dev
 
 # Later, deploy to production
-npx convex deploy
+pnpm dlx convex deploy
 ```
 
 ---
@@ -153,14 +153,14 @@ convex/
 
 ```bash
 # Initialize shadcn/ui (requires canary for TanStack Start)
-npx shadcn@canary init
+pnpm dlx shadcn@canary init
 
 # Install auth dependencies
-npm install @convex-dev/better-auth better-auth
+pnpm add @convex-dev/better-auth better-auth
 
 # Add base components
-npx shadcn@canary add button card input form dialog table badge
-npx shadcn@canary add select date-picker tabs toast command
+pnpm dlx shadcn@canary add button card input form dialog table badge
+pnpm dlx shadcn@canary add select date-picker tabs toast command
 ```
 
 ### Phase 2: Database Schema & Auth
@@ -234,49 +234,51 @@ BETTER_AUTH_URL=            # http://localhost:3000 (dev)
 
 ```bash
 # Start development server (runs both Vite + Convex)
-npm run dev
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 
 # Type check
-npm run dev:ts
+pnpm dev:ts
 
 # Format code
-npm run format
+pnpm format
 
 # Lint
-npm run lint
+pnpm lint
 ```
+
+**Note:** We use `pnpm` instead of `npm` for faster, more efficient package management.
 
 ### Convex Commands
 
 ```bash
 # Start convex dev server (local development mode)
-npx convex dev
+pnpm dlx convex dev
 
 # Deploy to production (cloud)
-npx convex deploy
+pnpm dlx convex deploy
 
 # Open convex dashboard (local or cloud)
-npx convex dashboard
+pnpm dlx convex dashboard
 
 # Run specific query for testing
-npx convex run attendees/list
+pnpm dlx convex run attendees/list
 
 # View logs
-npx convex logs
+pnpm dlx convex logs
 ```
 
 **Deployment Strategy:**
 
-1. **Phase 1-3 (Development):** Use `npx convex dev` for local development
+1. **Phase 1-3 (Development):** Use `pnpm dlx convex dev` for local development
    - No account required initially
    - Data stored locally
    - Perfect for rapid iteration
 
 2. **Phase 4+ (Production):** Deploy to Convex cloud
-   - Run `npx convex deploy`
+   - Run `pnpm dlx convex deploy`
    - Update VITE_CONVEX_URL in production
    - BETTER_AUTH_SECRET must be set for production
 
@@ -357,11 +359,56 @@ chore: update dependencies
 
 ### Pre-Commit Checklist
 
-- [ ] Run `npm run lint` - no errors
+- [ ] Run `pnpm lint` - no errors
 - [ ] Run type check - no TypeScript errors
 - [ ] Test the feature manually
 - [ ] Update AGENTS.md if needed
 - [ ] Clear console.log statements
+
+### Development Workflow (Read-Only Mode)
+
+**Important:** I will NOT automatically commit or push changes. Follow this workflow:
+
+1. **Task Assignment**: I create a feature branch for each task
+
+   ```bash
+   git checkout -b feature/descriptive-name
+   ```
+
+2. **Implementation**: I make all code changes on the branch
+
+3. **Review & Test**: You test the changes locally
+   - Run `pnpm dev` to test
+   - Review the code changes
+   - Verify everything works as expected
+
+4. **Approval**: Only after your confirmation ("looks good", "approved", etc.)
+   - I will stage and commit the changes
+   - Create a commit with conventional message format
+
+   ```bash
+   git add .
+   git commit -m "feat: descriptive message"
+   ```
+
+5. **Pull Request**: I push the branch and create a PR
+
+   ```bash
+   git push -u origin feature/descriptive-name
+   ```
+
+6. **Merge**: You manually review and approve the PR on GitHub
+   - Go to GitHub repository
+   - Review the PR
+   - Click "Merge" when satisfied
+
+7. **Cleanup**: After merge, switch back to main
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+**Note:** I will always ask for confirmation before committing. No changes will be committed without your explicit approval.
 
 ---
 
@@ -384,7 +431,7 @@ chore: update dependencies
 
 ### Development Tools
 
-- **Convex Dashboard**: `npx convex dashboard`
+- **Convex Dashboard**: `pnpm dlx convex dashboard`
 - **TanStack Router DevTools**: Route debugging
 - **React Query DevTools**: Cache inspection
 
@@ -474,20 +521,20 @@ export function AttendeeCard({ attendeeId }: Props) {
 ### Adding shadcn Components
 
 ```bash
-npx shadcn@canary add <component-name>
+pnpm dlx shadcn@canary add <component-name>
 ```
 
 ### Convex Operations
 
 ```bash
 # Generate new schema types after schema change
-npx convex dev --once
+pnpm dlx convex dev --once
 
 # Run a specific query for testing
-npx convex run attendees/list
+pnpm dlx convex run attendees/list
 
 # View logs
-npx convex logs
+pnpm dlx convex logs
 ```
 
 ### Git Operations
@@ -512,7 +559,7 @@ git push -u origin feature/attendee-management
 
 1. **Convex connection errors**: Check VITE_CONVEX_URL in .env.local
 2. **Auth not working**: Verify BETTER_AUTH_SECRET is set
-3. **Schema changes not reflecting**: Run `npx convex dev --once`
+3. **Schema changes not reflecting**: Run `pnpm dlx convex dev --once`
 4. **Route not found**: Check file name matches TanStack Router convention
 5. **shadcn components not styling**: Verify Tailwind CSS v4 is configured
 
@@ -520,10 +567,10 @@ git push -u origin feature/attendee-management
 
 ```bash
 # Enable Convex debug logging
-DEBUG=convex:* npm run dev
+DEBUG=convex:* pnpm dev
 
 # Check Convex deployment status
-npx convex status
+pnpm dlx convex status
 ```
 
 ---
