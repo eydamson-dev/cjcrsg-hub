@@ -2,7 +2,6 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { cn } from '~/lib/utils'
 import { navItems, churchName, churchFullName } from '~/lib/navigation'
 import { useAuthActions } from '@convex-dev/auth/react'
-import { Button } from '~/components/ui/button'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import {
   DropdownMenu,
@@ -81,18 +80,13 @@ export function Sidebar() {
 
       <div className="mt-auto border-t p-6">
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              variant="ghost"
-              className="flex h-auto w-full items-center justify-start gap-3 px-0 py-2 hover:bg-muted"
-            >
-              <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <UserDisplay />
-            </Button>
+          <DropdownMenuTrigger className="flex h-auto w-full items-center justify-start gap-3 rounded-lg px-0 py-2 text-left hover:bg-muted">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <UserDisplay />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuGroup>

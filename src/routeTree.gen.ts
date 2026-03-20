@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AnotherPageRouteImport } from './routes/anotherPage'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
@@ -18,11 +17,6 @@ import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnotherPageRoute = AnotherPageRouteImport.update({
-  id: '/anotherPage',
-  path: '/anotherPage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,14 +37,12 @@ const AttendeesIndexRoute = AttendeesIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/login': typeof LoginRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/login': typeof LoginRoute
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
@@ -58,22 +50,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/anotherPage': typeof AnotherPageRoute
   '/login': typeof LoginRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/anotherPage' | '/login' | '/attendees/' | '/events/'
+  fullPaths: '/' | '/login' | '/attendees/' | '/events/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/anotherPage' | '/login' | '/attendees' | '/events'
-  id: '__root__' | '/' | '/anotherPage' | '/login' | '/attendees/' | '/events/'
+  to: '/' | '/login' | '/attendees' | '/events'
+  id: '__root__' | '/' | '/login' | '/attendees/' | '/events/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnotherPageRoute: typeof AnotherPageRoute
   LoginRoute: typeof LoginRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -86,13 +76,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/anotherPage': {
-      id: '/anotherPage'
-      path: '/anotherPage'
-      fullPath: '/anotherPage'
-      preLoaderRoute: typeof AnotherPageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -121,7 +104,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnotherPageRoute: AnotherPageRoute,
   LoginRoute: LoginRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
