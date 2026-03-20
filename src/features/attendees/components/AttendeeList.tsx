@@ -60,6 +60,7 @@ import {
   EmptyContent,
   EmptyMedia,
 } from '~/components/ui/empty'
+import { AttendeeTableSkeleton } from './AttendeeTableSkeleton'
 import type { AttendeeStatus } from '../types'
 
 interface PaginationInfo {
@@ -331,9 +332,7 @@ export function AttendeeList({
         </CardHeader>
         <CardContent>
           {isPending || isSearching ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {isSearching ? 'Searching...' : 'Loading attendees...'}
-            </div>
+            <AttendeeTableSkeleton rowCount={5} />
           ) : attendees.length === 0 ? (
             hasActiveFilters ? (
               searchQuery ? (

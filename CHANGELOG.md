@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.14: AttendeeTableSkeleton Component for Loading States**
+  - Created AttendeeTableSkeleton component with configurable row count (default: 5)
+  - Shows table headers during loading for better UX (Name, Email, Phone, Status, Join Date, Actions)
+  - Rounded skeleton for status column to resemble badge shape
+  - Proper skeleton widths matching table column content:
+    - Name: w-32, Email: w-40, Phone: w-28, Status: w-20 (rounded-full), Join Date: w-24
+    - Actions: w-8 h-8 rounded-md for icon button
+  - Replaced simple loading text placeholder in AttendeeList
+  - Consistent with existing AttendeeDetailsSkeleton pattern
+
 - **Task 3.13: Empty States for Search/Filter Results**
   - Added shadcn Empty component with proper composition pattern
   - Three distinct empty states:
