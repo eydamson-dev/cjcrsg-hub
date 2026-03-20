@@ -8,34 +8,35 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Task 3.11 Complete | 🔜 Tasks 3.12-3.17 Pending
-**Current Task:** Task 3.11 - Debounced Search with Backend Integration
-**Status:** ✅ Task 3.11 implemented and tested | 🔄 Tasks 3.12-3.17 in follow-up PRs
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.12 Complete | 🔜 Tasks 3.13-3.17 Pending
+**Current Task:** Task 3.12 - Pagination with Total Count Display
+**Status:** ✅ Task 3.12 implemented and tested | 🔄 Tasks 3.13-3.17 in follow-up PRs
 
-**Completed This Session (Task 3.11 - Ready for PR):**
+**Completed This Session (Task 3.12 - Ready for PR):**
 
-- ✅ **3.11** Debounced search with backend integration (300ms)
-  - Added `searchField` column to attendees table (auto-populated on create/update)
-  - Search matches across full name (first + last), email, and address
-  - 300ms debounced search using useDebounce hook
-  - Minimum 3 characters required before triggering backend search
-  - Clear search button (X icon) in search input
-  - "Searching..." loading state with spinner
-  - Results count display with active filter indicators
-  - Empty search results state with "Clear filters" button
-  - URL param sync (`?q=search&status=member`) for shareable/searchable URLs
-  - Search + status filter combination support
-  - Search indexes on attendees table for performance
-  - Fallback searchLegacy query for records without searchField
+- ✅ **3.12** Pagination with total count display
+  - "Showing X to Y of Z attendees" display with accurate counts
+  - Next/Previous pagination controls with disabled states
+  - Page indicator showing "Page X of Y"
+  - Dynamic page size selector (10, 25, 50 items per page)
+  - LocalStorage persistence for page size preference
+  - URL param support for page number (`?page=2`)
+  - Cursor-based pagination for efficient large dataset handling
+  - Cursor history management for Previous navigation
+  - Reset to page 1 when filters or search change
+  - Fixed count query to return number instead of array
+  - UI alignment fixes: button/filter same height, clear button positioning
+  - Fixed layout twitch with reserved space for search hint message
+  - Standardized all dropdowns to use shadcn Select component
+  - Generated 20 test attendees for pagination testing
 
 **Technical Changes Made:**
 
-- **Schema:** Added optional `searchField` to attendees table with `search_attendees` index
-- **Mutations:** Auto-compute `searchField` on create/update by combining firstName, lastName, email, address
-- **Queries:** Updated search query to use new index; added searchLegacy for backward compatibility
-- **Frontend:** Updated AttendeeList with new search UI, loading states, empty states
-- **Route:** Updated attendees.index.tsx with URL param handling, debounced search integration
-- **Hooks:** Enhanced useSearchAttendees with proper query keys
+- **Backend:** Fixed count query in `convex/attendees/queries.ts` to return number
+- **Hooks:** Added `useAttendeeCount` hook and pageSize parameter to `useAttendees`
+- **Route:** Added pagination state, URL params, cursor history, and localStorage persistence
+- **Component:** Updated AttendeeList with pagination UI, fixed alignment issues
+- **Test Data:** Created seeding mutation in `convex/attendees/seed.ts`
 
 **Reminders:**
 
@@ -46,8 +47,7 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Next Steps (Follow-up PRs):**
 
-- **Complete Phase 3.12-3.17** (Polish & UX):
-  - 3.12 Pagination display with "Showing X of Y" and URL params
+- **Complete Phase 3.13-3.17** (Polish & UX):
   - 3.13 Empty states for search/filter results
   - 3.14 AttendeeTableSkeleton component
   - 3.15 ErrorState component with retry/back buttons
@@ -465,12 +465,16 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.12 Add pagination with total count display
 
-- [ ] Display "Showing X of Y attendees" text above table
-- [ ] Wire up pagination controls to backend pagination
-- [ ] Handle next/previous page navigation
-- [ ] Show disabled state when on first/last page
-- [ ] Maintain page number in URL params
-- [ ] Reset to page 1 when applying filters/search
+- [x] Display "Showing X to Y of Z attendees" text above table
+- [x] Wire up pagination controls to backend pagination
+- [x] Handle next/previous page navigation
+- [x] Show disabled state when on first/last page
+- [x] Maintain page number in URL params
+- [x] Reset to page 1 when applying filters/search
+- [x] Add dynamic page size selector (10, 25, 50)
+- [x] Add localStorage persistence for page size preference
+- [x] Fix UI alignment issues (button/filter height, clear button positioning)
+- [x] Fix layout twitch with reserved space for search hint message
 
 ### 3.13 Add empty states for attendee list
 
