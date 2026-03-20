@@ -8,25 +8,28 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.13 Complete | 🔜 Tasks 3.14-3.17 Pending
-**Current Task:** Task 3.14 - AttendeeTableSkeleton component
-**Status:** ✅ Task 3.13 PR created | 🔜 Task 3.14 Next
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Tasks 3.11-3.14 Complete | 🔜 Tasks 3.15-3.17 Pending
+**Current Task:** Task 3.15 - ErrorState component with retry/back buttons
+**Status:** ✅ Task 3.14 Complete | 🔜 Task 3.15 Next
 
-**Completed This Session (Task 3.13 - Ready for PR):**
+**Completed This Session (Task 3.14 - Ready for PR):**
 
-- ✅ **3.13** Empty states for search/filter results
-  - Added shadcn Empty component with proper composition pattern
-  - Three distinct empty states with contextual icons:
-    - No attendees: Users icon with "Add Attendee" button
-    - No search results: SearchX icon showing search query with "Clear search" button
-    - No filter results: FilterX icon showing active filter with "Clear filter" button
-  - Consistent visual style with icon badges and centered layout
+- ✅ **3.14** AttendeeTableSkeleton component for list view
+  - Created `AttendeeTableSkeleton` component with configurable row count (default: 5)
+  - Shows table headers during loading for better UX
+  - Rounded skeleton for status column to resemble badge shape
+  - Proper skeleton widths matching table column content:
+    - Name: w-32, Email: w-40, Phone: w-28
+    - Status: w-20 with rounded-full, Join Date: w-24
+    - Actions: w-8 h-8 rounded-md for icon button
+  - Replaced loading text placeholder in AttendeeList.tsx
+  - Consistent with existing AttendeeDetailsSkeleton pattern
 
 **Technical Changes Made:**
 
-- **Component:** Added shadcn Empty component (`src/components/ui/empty.tsx`)
-- **UI:** Updated AttendeeList.tsx with Empty component for all empty states
-- **Icons:** Added Users, SearchX, FilterX from lucide-react
+- **Component:** Added `AttendeeTableSkeleton.tsx` (`src/features/attendees/components/`)
+- **UI:** Updated `AttendeeList.tsx` to use skeleton instead of text loading state
+- **Pattern:** Follows existing skeleton pattern from AttendeeDetails component
 
 **Reminders:**
 
@@ -504,7 +507,7 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 - [x] Loading skeletons in edit form during initial load
 - [x] Loading skeletons in details view during fetch
-- [ ] Create AttendeeTableSkeleton component for list view
+- [x] Create AttendeeTableSkeleton component for list view
 
 ### 3.15 Improve error states
 
