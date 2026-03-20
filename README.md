@@ -31,7 +31,7 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
 ### Additional Features
 
 - **Admin Authentication** 🔐
-  - Secure login with Convex Better Auth
+  - Secure login with Convex Auth (Password + Google + Facebook)
   - Protected routes for admin-only access
   - Session management
 
@@ -46,7 +46,7 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
 | -------------------- | ------------------------------------ |
 | **Frontend**         | TanStack Start (React)               |
 | **Backend**          | Convex (Database + Server Functions) |
-| **Authentication**   | Convex Better Auth                   |
+| **Authentication**   | Convex Auth (Password + OAuth)       |
 | **UI Components**    | shadcn/ui                            |
 | **Styling**          | Tailwind CSS v4                      |
 | **State Management** | TanStack Query + Convex React Query  |
@@ -220,7 +220,7 @@ pnpm dlx convex run attendees/list
 - [x] Project setup
 - [x] Documentation (AGENTS.md)
 - [ ] shadcn/ui initialization
-- [ ] Convex Better Auth setup
+- [ ] Convex Auth setup (Password + Google + Facebook)
 - [ ] Base layout and navigation
 
 ### Phase 2: Attendee Management
