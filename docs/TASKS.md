@@ -36,17 +36,78 @@ Before starting implementation, ensure you have:
   - Verify by checking that shadcn theme variables exist in app.css
   - Test by importing a button component and verifying it renders
 
-### 1.2 Setup Convex Better Auth
+### 1.2 Setup Convex Auth
 
-- [ ] Install auth packages: `pnpm add @convex-dev/better-auth better-auth`
-  - Update `vite.config.ts` to bundle `@convex-dev/better-auth` for SSR
-  - Create `convex/auth.config.ts` with Better Auth provider configuration
-  - Create Better Auth instance in Convex backend
-  - Setup environment variables in `.env.local`:
-    - `BETTER_AUTH_SECRET` (generate random string)
-    - `BETTER_AUTH_URL=http://localhost:3000`
-  - Create auth client configuration in `src/lib/auth.ts`
-  - Test that Convex recognizes the auth configuration
+- [ ] Install Convex Auth packages:
+
+  ```bash
+  pnpm add @convex-dev/auth @auth/core@0.37.0
+  ```
+
+- [ ] Initialize Convex Auth (creates auth tables, configuration):
+
+  ```bash
+  npx @convex-dev/auth
+  ```
+
+  This will:
+  - Add `authTables` to `convex/schema.ts`
+  - Create necessary auth configuration files
+  - Setup initial auth structure
+
+- [ ] Configure authentication providers in Convex:
+  - **Password auth:** Enabled by default (no email verification)
+  - **Google OAuth:** Setup in Convex dashboard
+    - Create Google OAuth credentials in Google Cloud Console
+    - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
+    - Copy Client ID and Secret to Convex environment variables
+  - **Facebook OAuth:** Setup in Convex dashboard
+    - Create Facebook App in Facebook Developers
+    - Add product "Facebook Login"
+    - Configure redirect URI: `http://localhost:3000/api/auth/callback/facebook`
+    - Copy App ID and Secret to Convex environment variables
+
+- [ ] Update React provider in `src/router.tsx`:
+  - Replace `ConvexProvider` with `ConvexAuthProvider` from `@convex-dev/auth/react`
+  - Keep existing TanStack Query integration
+  - Test that auth context is available
+
+- [ ] Create auth client configuration:
+  - Create `src/lib/auth.ts` for auth helper functions
+  - Add `useAuth` hook integration
+  - Setup auth session management
+
+- [ ] Create unified login page at `src/routes/login.tsx`:
+  - Design with tabs or sections:
+    - **Password Login:** Email + password fields
+    - **OAuth Login:** Google and Facebook sign-in buttons
+  - Use shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
+  - Add loading states and error handling
+  - Implement form validation with Zod
+
+- [ ] Create signup page at `src/routes/signup.tsx`:
+  - Password registration form (email + password)
+  - OAuth signup options (Google, Facebook)
+  - No email verification step (as requested)
+  - Redirect to dashboard after successful signup
+
+- [ ] Update environment variables in `.env.local`:
+
+  ```env
+  # Convex
+  VITE_CONVEX_URL=http://127.0.0.1:3210
+
+  # Note: OAuth credentials are configured in Convex dashboard,
+  # not in .env.local (they are server-side secrets)
+  ```
+
+- [ ] Test all three auth methods:
+  - [ ] Password login works (create test account)
+  - [ ] Google OAuth login works (test with Google account)
+  - [ ] Facebook OAuth login works (test with Facebook account)
+  - [ ] Protected routes require authentication
+  - [ ] Session persists after page refresh
+  - [ ] User can sign out and sign back in with different method
 
 ### 1.3 Configure environment variables
 
@@ -57,12 +118,10 @@ Before starting implementation, ensure you have:
     # Convex
     CONVEX_DEPLOYMENT=          # Auto-set by convex dev
     VITE_CONVEX_URL=http://127.0.0.1:3210  # Local Convex URL
-
-    # Auth
-    BETTER_AUTH_SECRET=your-generated-secret
-    BETTER_AUTH_URL=http://localhost:3000
     ```
 
+  - Note: OAuth credentials (Google/Facebook) are configured in the Convex dashboard
+    as server-side environment variables, not in .env.local
   - Create `.env.example` template file for documentation
   - Ensure no sensitive values are committed to git
   - Test that environment variables load correctly in the app
@@ -90,8 +149,8 @@ Before starting implementation, ensure you have:
   - Redirect unauthenticated users to `/login`
   - Add loading state while checking authentication status
   - Create `src/routes/login.tsx` with login form
-  - Use shadcn/ui components: `Card`, `Input`, `Button`, `Form`, `Label`
-  - Implement email/password login with Better Auth
+  - Use shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
+  - Implement multiple auth methods (Password, Google, Facebook)
   - Test that protected routes require authentication
 
 **Commands:**
@@ -100,12 +159,15 @@ Before starting implementation, ensure you have:
 # Initialize shadcn/ui (requires canary for TanStack Start)
 pnpm dlx shadcn@canary init
 
-# Install auth dependencies
-pnpm add @convex-dev/better-auth better-auth
+# Install Convex Auth packages
+pnpm add @convex-dev/auth @auth/core@0.37.0
+
+# Initialize Convex Auth (sets up tables and config)
+npx @convex-dev/auth
 
 # Add base components
 pnpm dlx shadcn@canary add button card input form dialog table badge
-pnpm dlx shadcn@canary add select date-picker tabs toast command
+pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 ```
 
 ---
@@ -125,32 +187,33 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command
   - Run `pnpm dlx convex dev --once` to apply schema
   - Verify schema in Convex dashboard
 
-### 2.2 Configure convex/auth.config.ts
+### 2.2 Configure Convex Auth
 
-- [ ] Create `convex/auth.config.ts` file
-  - Import and configure Better Auth provider
-  - Set up JWT validation configuration
-  - Configure session management settings
+- [ ] Verify `convex/auth.config.ts` exists (created by `npx @convex-dev/auth`)
+  - Configure OAuth providers (Google, Facebook) in the file
+  - Set up password authentication (enabled by default)
+  - Ensure email verification is disabled (as requested)
   - Test that auth configuration loads without errors
+  - Run `pnpm dlx convex dev --once` to apply auth configuration
 
-### 2.3 Setup auth routes at src/routes/api/auth/$.ts
+### 2.3 Verify Convex Auth integration
 
-- [ ] Create catch-all auth API route `src/routes/api/auth/$.ts`
-  - Implement route handlers for Better Auth endpoints
-  - Handle sign-in, sign-up, sign-out, session endpoints
-  - Proxy requests to Convex backend
-  - Set up proper CORS headers
-  - Test all auth endpoints with curl or Postman
+- [ ] Check that Convex Auth is properly integrated
+  - Verify `ConvexAuthProvider` is used in `src/router.tsx`
+  - Confirm auth context is available throughout the app
+  - Test that auth routes are handled automatically by Convex Auth
+  - No custom API routes needed (Convex Auth handles this internally)
 
 ### 2.4 Create login/signup pages
 
 - [ ] Create `src/routes/login.tsx` route file
   - Build login form with email/password fields
-  - Add shadcn/ui components: `Card`, `Input`, `Button`, `Form`
+  - Add OAuth buttons: "Continue with Google" and "Continue with Facebook"
+  - Use shadcn/ui components: `Card`, `Tabs`, `Input`, `Button`, `Form`
   - Implement form validation with react-hook-form + Zod
-  - Integrate with Better Auth client for sign-in
+  - Integrate with Convex Auth using `useAuth` hook
   - Add error handling and display error messages
-  - Create `src/routes/signup.tsx` for registration
+  - Create `src/routes/signup.tsx` for registration (password + OAuth)
 
 ### 2.5 Test authentication flow
 

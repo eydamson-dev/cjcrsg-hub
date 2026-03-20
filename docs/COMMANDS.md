@@ -10,13 +10,15 @@ Quick reference for all CLI commands used in the project.
 # Initialize shadcn/ui (requires canary for TanStack Start)
 pnpm dlx shadcn@canary init
 
-# Install auth dependencies
-pnpm add @convex-dev/better-auth better-auth
+# Install Convex Auth packages
+pnpm add @convex-dev/auth @auth/core@0.37.0
+
+# Initialize Convex Auth (sets up tables and config)
+npx @convex-dev/auth
 
 # Add shadcn components
 pnpm dlx shadcn@canary add button card input form dialog table badge
-pnpm dlx shadcn@canary add select date-picker tabs toast command
-pnpm dlx shadcn@canary add table avatar separator tabs
+pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 ```
 
 ---

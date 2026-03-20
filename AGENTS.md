@@ -13,7 +13,7 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
 
 - **Frontend:** TanStack Start (React), shadcn/ui, Tailwind CSS v4
 - **Backend:** Convex (database + server functions)
-- **Auth:** Convex Better Auth
+- **Auth:** Convex Auth (Password + Google + Facebook OAuth)
 - **State Management:** TanStack Query + Convex React Query
 - **Package Manager:** pnpm
 
@@ -227,7 +227,7 @@ git push -u origin feature-name
 ### 🚧 In Progress (Phase 1)
 
 - [ ] Initialize shadcn/ui with canary version
-- [ ] Setup Convex Better Auth
+- [ ] Setup Convex Auth (Password + Google + Facebook OAuth)
 - [ ] Configure environment variables
 - [ ] Create base layout with navigation
 - [ ] Setup protected routes
@@ -252,7 +252,7 @@ git push -u origin feature-name
 - [TanStack Start Docs](https://tanstack.com/start/latest)
 - [Convex Docs](https://docs.convex.dev)
 - [shadcn/ui Docs](https://ui.shadcn.com)
-- [Better Auth + Convex](https://labs.convex.dev/better-auth)
+- [Convex Auth Setup Guide](https://labs.convex.dev/auth/setup)
 
 ### Community
 
