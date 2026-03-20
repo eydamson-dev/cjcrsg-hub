@@ -9,14 +9,26 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-20
 
 **Phase:** Phase 1 - Foundation Setup  
-**Current Task:** Create base layout with navigation  
-**Status:** ✅ Completed
+**Current Task:** Fix route guard timing issue + Create attendees/events routes  
+**Status:** 🚧 In Progress
 
 **Next Tasks:**
 
-1. Configure OAuth providers (Google, Facebook) in Convex dashboard
-2. Test authentication flow
-3. Create attendee management features
+1. ✅ Fix route guard timing issue (auth check on page refresh)
+   - Create auth context provider for global auth state
+   - Add route-level protection with `beforeLoad` guards
+   - Improve ProtectedRoute component with better loading states
+   - Create branded AuthLoadingScreen component
+2. ✅ Create attendees and events routes
+   - Create `/attendees` route with full protection
+   - Create `/events` route with full protection
+   - Update sidebar navigation links
+   - Add placeholder content for both pages
+
+3. ⏳ Test all auth scenarios
+   - Page refresh while authenticated (should stay on page)
+   - Page refresh while logged out (should redirect to login)
+   - Access login page while authenticated (should redirect to dashboard)
 
 **Completed:**
 
@@ -30,12 +42,27 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
   - ProtectedRoute component for auth checking
   - Responsive design for all screen sizes
   - Navigation items: Dashboard, Attendees, Events, Attendance, Settings
+- ✅ OAuth providers added to `convex/auth.ts`
+  - Google OAuth provider configured (credentials pending)
+  - Facebook OAuth provider configured (credentials pending)
+  - Auth utilities created in `src/lib/auth.ts`
+  - OAuth buttons show inline error messages
+- ✅ Schema updated with authTables (fixes registration)
+- ✅ Password authentication working
+
+**Implementation Notes:**
+
+- Route guards will use double protection: `beforeLoad` (route-level) + ProtectedRoute (component-level)
+- AuthLoadingScreen will show CJCRSG Hub branding with cross icon
+- Attendees and Events pages will have placeholder content (Phase 3 features)
+- OAuth credentials still pending (Google/Facebook setup deferred)
 
 **Reminders:**
 
 - Use `pnpm` (not npm)
 - Test before asking to commit
 - Create feature branches
+- Wait for user approval before committing
 - Wait for user approval before committing
 
 ---
@@ -96,24 +123,21 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
   - Create necessary auth configuration files
   - Setup initial auth structure
 
-- [ ] Configure authentication providers in Convex:
+- [x] Configure authentication providers in Convex:
   - **Password auth:** Enabled by default (no email verification)
-  - **Google OAuth:** Setup in Convex dashboard
-    - Create Google OAuth credentials in Google Cloud Console
-    - Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-    - Copy Client ID and Secret to Convex environment variables
-  - **Facebook OAuth:** Setup in Convex dashboard
-    - Create Facebook App in Facebook Developers
-    - Add product "Facebook Login"
-    - Configure redirect URI: `http://localhost:3000/api/auth/callback/facebook`
-    - Copy App ID and Secret to Convex environment variables
+  - **Google OAuth:** Added to `convex/auth.ts` (credentials pending setup)
+    - Provider configured with environment variables: `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
+    - UI buttons ready, credentials need to be added to Convex dashboard
+  - **Facebook OAuth:** Added to `convex/auth.ts` (credentials pending setup)
+    - Provider configured with environment variables: `AUTH_FACEBOOK_ID`, `AUTH_FACEBOOK_SECRET`
+    - UI buttons ready, credentials need to be added to Convex dashboard
 
 - [x] Update React provider in `src/router.tsx`:
   - Replaced `ConvexProvider` with `ConvexAuthProvider` from `@convex-dev/auth/react`
   - Kept existing TanStack Query integration
   - Auth context is available
 
-- [ ] Create auth client configuration:
+- [x] Create auth client configuration:
   - Create `src/lib/auth.ts` for auth helper functions
   - Add `useAuth` hook integration
   - Setup auth session management
@@ -133,8 +157,8 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
 
 - [ ] Test all three auth methods:
   - [ ] Password login works (create test account)
-  - [ ] Google OAuth login works (test with Google account)
-  - [ ] Facebook OAuth login works (test with Facebook account)
+  - [ ] Google OAuth login works (test with Google account) - requires credentials
+  - [ ] Facebook OAuth login works (test with Facebook account) - requires credentials
   - [ ] Protected routes require authentication
   - [ ] Session persists after page refresh
   - [ ] User can sign out and sign back in with different method
@@ -180,6 +204,58 @@ The shadcn skill is installed at `.agents/skills/shadcn/` for comprehensive guid
   - Redirect unauthenticated users to `/login`
   - Add loading state while checking authentication status
   - Test that protected routes require authentication
+
+### 1.5b Fix Route Guard Timing Issue
+
+- [ ] Create auth context provider (`src/lib/auth-context.tsx`)
+  - Provide auth state globally via React Context
+  - Include `isAuthenticated`, `isLoading`, and `token` values
+  - Wrap app with AuthProvider in root route
+- [ ] Create route guard utilities (`src/lib/auth-guard.ts`)
+  - Implement `requireAuth` guard for protected routes
+  - Implement `requireGuest` guard for auth pages (login/signup)
+  - Handle loading states properly (wait for auth before redirect)
+- [ ] Update router to include auth context
+  - Modify `src/router.tsx` to provide auth context
+  - Ensure auth state is available in `beforeLoad` hooks
+- [ ] Add route-level protection to all protected routes
+  - [x] Dashboard (`/`) - `beforeLoad: requireAuth`
+  - [ ] Attendees (`/attendees`) - `beforeLoad: requireAuth`
+  - [ ] Events (`/events`) - `beforeLoad: requireAuth`
+  - [ ] Login (`/login`) - `beforeLoad: requireGuest`
+- [ ] Update ProtectedRoute component to use auth context
+  - Import and use `useAuthContext` hook
+  - Show loading state during auth initialization
+  - Prevent premature redirects
+- [ ] Create branded AuthLoadingScreen component
+  - Create `src/components/auth/AuthLoadingScreen.tsx`
+  - Include CJCRSG Hub branding with cross icon
+  - Add branded spinner and loading message
+  - Use in ProtectedRoute and route guards
+- [ ] Test page refresh scenarios
+  - [ ] Refresh while authenticated: Stay on page (no login flash)
+  - [ ] Refresh while logged out: Redirect to login
+  - [ ] Access login while authenticated: Redirect to dashboard
+  - [ ] No "Already signed in" flash on refresh
+
+### 1.6 Create Attendees and Events Routes
+
+- [ ] Create `src/routes/attendees.index.tsx`
+  - Route guard: `beforeLoad: requireAuth`
+  - ProtectedRoute wrapper component
+  - Layout wrapper
+  - Placeholder content for attendee management
+  - (Full attendee management comes in Phase 3)
+- [ ] Create `src/routes/events.index.tsx`
+  - Route guard: `beforeLoad: requireAuth`
+  - ProtectedRoute wrapper component
+  - Layout wrapper
+  - Placeholder content for event management
+  - (Full event management comes in Phase 4)
+- [ ] Update sidebar navigation links
+  - Attendees → `/attendees`
+  - Events → `/events`
+  - Ensure links work and navigate properly
 
 **Commands:**
 
