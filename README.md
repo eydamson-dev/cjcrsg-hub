@@ -52,6 +52,15 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
 | **State Management** | TanStack Query + Convex React Query  |
 | **Package Manager**  | pnpm                                 |
 
+### Development Tools & AI
+
+This project uses **OpenCode** with AI-assisted development tools:
+
+- **shadcn MCP** - AI assistant for shadcn/ui component management
+- **shadcn/ui Skill** - Comprehensive shadcn/ui knowledge base (`.agents/skills/shadcn/`)
+
+See [AGENTS.md](AGENTS.md) for detailed configuration.
+
 ## Quick Start
 
 ### Prerequisites
