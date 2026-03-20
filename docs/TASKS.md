@@ -394,27 +394,158 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
   - Add fields: firstName, lastName, email, phone, dateOfBirth, address, status, notes
   - Add DatePicker for dateOfBirth field
   - Implement form submission handler
-  - Show success/error toast notifications
   - Support both create and edit modes
 
-### 3.5 Create routes: /attendees, /attendees/new, /attendees/$id
+### 3.5 Create route files (placeholders)
 
-- [x] Create `src/routes/attendees.index.tsx` - List view
-- [x] Create `src/routes/attendees.new.tsx` - Create new attendee
-- [x] Create `src/routes/attendees.$id.tsx` - View attendee details
-- [x] Create `src/routes/attendees.$id.edit.tsx` - Edit attendee
-  - Set up proper route structure in TanStack Router
-  - Add breadcrumbs for navigation context
-  - Ensure all routes are protected (require auth)
+- [x] Create `src/routes/attendees.index.tsx` - List view with basic wiring
+- [x] Create `src/routes/attendees.new.tsx` - Placeholder route
+- [x] Create `src/routes/attendees.$id.tsx` - Placeholder route
+- [x] Create `src/routes/attendees.$id.edit.tsx` - Placeholder route
+- [x] Ensure all routes are protected (require auth)
 
-### 3.6 Add search functionality
+### 3.6 Wire up /attendees/new route (Create Attendee)
 
-- [ ] Add search input to AttendeeList component
-  - Implement debounced search (300ms delay)
-  - Use Convex `search` query with searchIndex
-  - Show search results in real-time
-  - Add clear search button
-  - Maintain search query in URL params for shareability
+- [ ] Replace placeholder with AttendeeForm component
+- [ ] Integrate `useCreateAttendee` mutation hook
+- [ ] Handle form submission with create mutation
+- [ ] Add validation before submission
+- [ ] Show loading state on submit button
+- [ ] Add success toast notification after creation
+- [ ] Navigate to attendee list on success
+- [ ] Show error toast on failure with specific message
+- [ ] Handle duplicate email error gracefully
+
+### 3.7 Wire up /attendees/$id/edit route (Edit Attendee)
+
+- [ ] Replace placeholder with AttendeeForm component
+- [ ] Fetch attendee data with `useAttendee` hook
+- [ ] Show loading skeleton while fetching data
+- [ ] Handle "not found" error state
+- [ ] Pre-populate form with existing attendee data
+- [ ] Integrate `useUpdateAttendee` mutation hook
+- [ ] Handle form submission with update mutation
+- [ ] Add success toast notification after update
+- [ ] Navigate to attendee details on success
+- [ ] Show error toast on failure
+
+### 3.8 Wire up /attendees/$id route (Attendee Details)
+
+- [ ] Replace placeholder with actual attendee display
+- [ ] Fetch attendee data with `useAttendee` hook
+- [ ] Show loading skeleton while fetching
+- [ ] Display all attendee fields in organized card layout
+  - Personal info card: Name, email, phone, date of birth
+  - Church info card: Status, join date, address
+  - Notes card: Additional notes
+- [ ] Handle "attendee not found" state with helpful message
+- [ ] Add edit button linking to edit route
+- [ ] Add archive button with confirmation
+- [ ] Add "Back to list" navigation
+
+### 3.9 Wire up archive action in AttendeeList
+
+- [ ] Add AlertDialog for archive confirmation
+- [ ] Display attendee name in confirmation message
+- [ ] Integrate `useArchiveAttendee` mutation hook
+- [ ] Call archive mutation on confirmation
+- [ ] Show loading state during archive
+- [ ] Show success toast after archiving
+- [ ] Refresh attendee list after archive (optimistic or refetch)
+- [ ] Handle error cases with error toast
+- [ ] Disable archive button for already inactive attendees
+
+### 3.10 Install and configure toast notification system
+
+- [ ] Install sonner toast library (`pnpm dlx shadcn@canary add toast`)
+- [ ] Add Toaster component to root layout (`src/routes/__root.tsx`)
+- [ ] Create toast helper utility functions:
+  - `toast.success(message)` for success operations
+  - `toast.error(message)` for error operations
+  - `toast.loading(message)` for pending operations
+- [ ] Test toast notifications work across all attendee pages
+
+### 3.11 Implement debounced search functionality
+
+- [ ] Replace local search state with backend search integration
+- [ ] Integrate `useSearchAttendees` hook with 300ms debounce
+- [ ] Add clear search button (X icon) in search input
+- [ ] Show "Searching..." loading state while fetching
+- [ ] Display search results count
+- [ ] Sync search query with URL params (`?q=search-term`)
+- [ ] Read search param from URL on page load
+- [ ] Combine search + status filter (both work together)
+- [ ] Handle empty search results state
+- [ ] Add "No results found" message with clear search option
+
+### 3.12 Add pagination with total count display
+
+- [ ] Display "Showing X of Y attendees" text above table
+- [ ] Wire up pagination controls to backend pagination
+- [ ] Handle next/previous page navigation
+- [ ] Show disabled state when on first/last page
+- [ ] Maintain page number in URL params
+- [ ] Reset to page 1 when applying filters/search
+
+### 3.13 Add empty states for attendee list
+
+- [ ] Create empty state component for no attendees at all
+  - Show friendly illustration or icon
+  - Message: "No attendees yet. Add your first church member!"
+  - Prominent "Add Attendee" CTA button
+- [ ] Create empty state for no search results
+  - Message: "No attendees match your search"
+  - "Clear search" button
+- [ ] Create empty state for filter with no results
+  - Message: "No attendees with selected status"
+  - "Clear filter" button
+
+### 3.14 Add loading skeletons
+
+- [ ] Create AttendeeTableSkeleton component
+  - 5-10 skeleton rows with shimmer effect
+  - Match table column layout
+- [ ] Create AttendeeFormSkeleton component
+  - Skeleton inputs for all form fields
+  - Skeleton buttons
+- [ ] Create AttendeeDetailsSkeleton component
+  - Skeleton cards for different sections
+- [ ] Replace "Loading..." text with proper skeletons
+- [ ] Use skeletons consistently across all attendee pages
+
+### 3.15 Improve error states
+
+- [ ] Create ErrorState component with:
+  - Error icon
+  - Descriptive error message
+  - "Retry" button
+  - "Go back" button
+- [ ] Handle network errors gracefully
+- [ ] Handle Convex query errors with user-friendly messages
+- [ ] Handle mutation errors (duplicate email, validation errors)
+- [ ] Add error boundary for attendee pages
+
+### 3.16 Mobile responsiveness pass
+
+- [ ] Test attendee list on mobile viewport (375px)
+  - Make table horizontally scrollable
+  - Ensure action buttons are touch-friendly (min 44px)
+  - Stack filters vertically on small screens
+- [ ] Test attendee form on mobile
+  - Ensure form fields are easy to tap
+  - Check date picker works on mobile
+  - Test keyboard doesn't cover form fields
+- [ ] Test attendee details on mobile
+  - Ensure cards stack properly
+  - Make action buttons easily accessible
+
+### 3.17 Add attendee status change (without archiving)
+
+- [ ] Add status change option in actions dropdown
+- [ ] Show submenu: Change to Member, Change to Visitor, Change to Inactive
+- [ ] Integrate with update mutation to change status
+- [ ] Show success toast with new status
+- [ ] Refresh list to show updated status badge
 
 ---
 
