@@ -1,21 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '~/components/ui/form'
 import {
   Select,
   SelectContent,
@@ -23,12 +13,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
-import type { AttendeeStatus } from '../types'
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from '~/components/ui/field'
+import { DatePicker } from '~/components/ui/date-picker'
 
 const attendeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  email: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === '') return true
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+    }, 'Invalid email address'),
   phone: z.string().optional(),
   dateOfBirth: z.number().optional(),
   address: z.string().min(1, 'Address is required'),
@@ -76,191 +78,188 @@ export function AttendeeForm({
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <FieldGroup>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
+          <Controller
             name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name *</FormLabel>
-                <FormControl>
-                  <Input placeholder="John" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="firstName">First Name *</FieldLabel>
+                <Input
+                  {...field}
+                  id="firstName"
+                  placeholder="John"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="lastName">Last Name *</FieldLabel>
+                <Input
+                  {...field}
+                  id="lastName"
+                  placeholder="Doe"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
+          <Controller
             name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="john@example.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input type="tel" placeholder="1234567890" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                <Input
+                  {...field}
+                  id="phone"
+                  type="tel"
+                  placeholder="1234567890"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
         </div>
 
-        <FormField
-          control={form.control}
+        <Controller
           name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address *</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="123 Church St, City, State 12345"
-                  {...field}
-                  rows={3}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="address">Address *</FieldLabel>
+              <Textarea
+                {...field}
+                id="address"
+                placeholder="123 Church St, City, State 12345"
+                rows={3}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
+          <Controller
             name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status *</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="status">Status *</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="status" aria-invalid={fieldState.invalid}>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="member">Member</SelectItem>
                     <SelectItem value="visitor">Visitor</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of Birth</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value
-                        ? new Date(field.value).toISOString().split('T')[0]
-                        : ''
-                    }
-                    onChange={(e) => {
-                      const date = e.target.value
-                        ? new Date(e.target.value).getTime()
-                        : undefined
-                      field.onChange(date)
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="dateOfBirth">Date of Birth</FieldLabel>
+                <DatePicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Pick a date"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
 
-          <FormField
-            control={form.control}
+          <Controller
             name="joinDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Join Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value
-                        ? new Date(field.value).toISOString().split('T')[0]
-                        : ''
-                    }
-                    onChange={(e) => {
-                      const date = e.target.value
-                        ? new Date(e.target.value).getTime()
-                        : undefined
-                      field.onChange(date)
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="joinDate">Join Date</FieldLabel>
+                <DatePicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Pick a date"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
             )}
           />
         </div>
 
-        <FormField
-          control={form.control}
+        <Controller
           name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Additional notes about this attendee..."
-                  {...field}
-                  rows={4}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="notes">Notes</FieldLabel>
+              <Textarea
+                {...field}
+                id="notes"
+                placeholder="Additional notes about this attendee..."
+                rows={4}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
         />
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 pt-4">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
@@ -275,7 +274,7 @@ export function AttendeeForm({
             </Button>
           )}
         </div>
-      </form>
-    </Form>
+      </FieldGroup>
+    </form>
   )
 }

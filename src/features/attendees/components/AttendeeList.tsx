@@ -20,6 +20,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '~/components/ui/alert-dialog'
 import type { AttendeeStatus } from '../types'
 
 interface AttendeeListProps {
@@ -39,6 +49,9 @@ export function AttendeeList({
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
   )
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
+  const [attendeeToArchive, setAttendeeToArchive] = useState<any>(null)
+  const [isArchiving, setIsArchiving] = useState(false)
 
   const getStatusBadgeVariant = (status: AttendeeStatus) => {
     switch (status) {
@@ -56,6 +69,24 @@ export function AttendeeList({
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-'
     return new Date(timestamp).toLocaleDateString()
+  }
+
+  const handleArchiveClick = (attendee: any) => {
+    setAttendeeToArchive(attendee)
+    setArchiveDialogOpen(true)
+  }
+
+  const handleConfirmArchive = async () => {
+    if (!attendeeToArchive || !onArchive) return
+
+    setIsArchiving(true)
+    try {
+      await onArchive(attendeeToArchive._id)
+    } finally {
+      setIsArchiving(false)
+      setArchiveDialogOpen(false)
+      setAttendeeToArchive(null)
+    }
   }
 
   return (
@@ -131,7 +162,7 @@ export function AttendeeList({
                     <TableCell>{formatDate(attendee.joinDate)}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -139,7 +170,7 @@ export function AttendeeList({
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             onClick={() =>
-                              onNavigate?.(`/attendees/${attendee._id}`)
+                              onNavigate?.(`/attendees/${attendee._id}/`)
                             }
                           >
                             <Eye className="mr-2 h-4 w-4" />
@@ -156,7 +187,7 @@ export function AttendeeList({
                           {attendee.status !== 'inactive' && (
                             <DropdownMenuItem
                               className="text-destructive"
-                              onClick={() => onArchive?.(attendee._id)}
+                              onClick={() => handleArchiveClick(attendee)}
                             >
                               <Archive className="mr-2 h-4 w-4" />
                               Archive
@@ -172,6 +203,33 @@ export function AttendeeList({
           )}
         </CardContent>
       </Card>
+
+      {/* Archive Confirmation Dialog */}
+      <AlertDialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive Attendee</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to archive {attendeeToArchive?.firstName}{' '}
+              {attendeeToArchive?.lastName}? This will mark them as inactive and
+              they won't appear in active lists. This action can be undone
+              later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setArchiveDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmArchive}
+              disabled={isArchiving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isArchiving ? 'Archiving...' : 'Archive'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
