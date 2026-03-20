@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -14,6 +15,24 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { LogOut, User } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { convexQuery } from '@convex-dev/react-query'
+import { api } from '../../../convex/_generated/api'
+
+function UserDisplay() {
+  const { data, isPending } = useQuery(
+    convexQuery(api.myFunctions.getCurrentUser),
+  )
+
+  return (
+    <div className="flex flex-col items-start text-left">
+      <span className="text-sm font-medium">User</span>
+      <span className="text-xs text-muted-foreground">
+        {isPending ? 'Loading...' : data?.email}
+      </span>
+    </div>
+  )
+}
 
 export function Sidebar() {
   const location = useLocation()
@@ -72,33 +91,30 @@ export function Sidebar() {
                   <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-sm font-medium">Admin User</span>
-                <span className="text-xs text-muted-foreground">
-                  admin@cjcrsg.org
-                </span>
-              </div>
+              <UserDisplay />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                navigate({ to: '/' })
-              }}
-            >
-              <User className="mr-2 h-4 w-4" />
-              Profile Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleSignOut}
-              className="text-destructive focus:text-destructive"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate({ to: '/' })
+                }}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profile Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -1,33 +1,27 @@
-import { useAuthToken } from '@convex-dev/auth/react'
+import { useAuthContext } from '~/lib/auth-context'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, type ReactNode } from 'react'
+import { AuthLoadingScreen } from './AuthLoadingScreen'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const token = useAuthToken()
+  const { isAuthenticated, isLoading } = useAuthContext()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (token === null) {
-      navigate({ to: '/login' })
+    if (!isLoading && !isAuthenticated) {
+      navigate({ to: '/login', replace: true })
     }
-  }, [token, navigate])
+  }, [isAuthenticated, isLoading, navigate])
 
-  if (token === undefined) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
+  if (isLoading) {
+    return <AuthLoadingScreen />
   }
 
-  if (token === null) {
+  if (!isAuthenticated) {
     return null
   }
 

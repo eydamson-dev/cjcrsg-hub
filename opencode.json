@@ -10,6 +10,11 @@
       "type": "local",
       "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--autoConnect"],
       "enabled": true
+    },
+    "convex": {
+      "type": "local",
+      "command": ["npx", "-y", "convex@latest", "mcp", "start"],
+      "enabled": true
     }
   },
   "plugin": ["opencode-agent-skills"],
