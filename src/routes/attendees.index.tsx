@@ -63,10 +63,15 @@ function AttendeesContent() {
   >(searchParams.status)
 
   // Pagination state
-  const [pageSize, setPageSize] = useState(() => {
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+
+  // Load page size from localStorage on client side only
+  useEffect(() => {
     const saved = localStorage.getItem(PAGE_SIZE_KEY)
-    return saved ? parseInt(saved, 10) : DEFAULT_PAGE_SIZE
-  })
+    if (saved) {
+      setPageSize(parseInt(saved, 10))
+    }
+  }, [])
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([null])
   const currentPage = searchParams.page || 1
   const currentCursor = cursorHistory[currentPage - 1] || null

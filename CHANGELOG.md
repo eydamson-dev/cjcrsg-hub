@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.17: Clickable Table Rows for Attendee Navigation**
+  - Made entire table rows clickable to navigate to attendee detail view
+  - Added `cursor-pointer` and `hover:bg-muted/50` styling for visual feedback
+  - Removed redundant "View" option from dropdown menu
+  - Added `e.stopPropagation()` to dropdown trigger and items to prevent navigation conflicts
+  - Users can now click anywhere on a row to view attendee details
+
 - **Task 3.16: Mobile Responsiveness Pass for Attendee Pages**
   - Fixed table overflow on mobile with horizontal scrolling (`overflow-x-auto`)
   - Updated page headers to stack vertically on mobile (`flex-col sm:flex-row`)
@@ -145,6 +152,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `/attendees/$id/edit` as child route (edit form)
   - Fixed layout not showing header and sidebar on view/edit pages
     - Added ProtectedRoute and Layout wrappers to attendees.$id.tsx
+
+- **Hydration and SSR errors (Task 3.17)**
+  - Fixed nested button hydration error in attendee table
+    - Removed `<Button>` inside `<DropdownMenuTrigger>` (both render `<button>`)
+    - Replaced with styled `<div>` using Tailwind classes for same appearance
+    - Error: "In HTML, <button> cannot be a descendant of <button>"
+  - Fixed localStorage SSR error in attendees.index.tsx
+    - Moved localStorage access from useState initializer to useEffect
+    - Prevents "localStorage is not defined" error during server-side rendering
+  - Fixed TypeScript errors in form.tsx and seed.ts
+    - Updated useFormField hook to use proper react-hook-form API (getFieldState)
+    - Fixed FormLabel and FormDescription components
+    - Removed unused `statuses` variable from seed.ts
 
 ### Changed
 
