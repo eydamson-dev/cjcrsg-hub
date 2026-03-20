@@ -39,9 +39,13 @@ export const search = query({
     status: v.optional(attendeeStatus),
   },
   handler: async (ctx, args) => {
+    const normalizedQuery = args.query.toLowerCase().trim()
+
     let results = await ctx.db
       .query('attendees')
-      .withSearchIndex('search_name', (q) => q.search('firstName', args.query))
+      .withSearchIndex('search_attendees', (q) =>
+        q.search('searchField', normalizedQuery),
+      )
       .take(50)
 
     if (args.status) {
@@ -49,6 +53,40 @@ export const search = query({
     }
 
     return results
+  },
+})
+
+export const searchLegacy = query({
+  args: {
+    query: v.string(),
+    status: v.optional(attendeeStatus),
+  },
+  handler: async (ctx, args) => {
+    const normalizedQuery = args.query.toLowerCase().trim()
+
+    let results = await ctx.db.query('attendees').take(100)
+
+    // Filter by searchable fields
+    results = results.filter((attendee) => {
+      const searchableText = [
+        attendee.firstName,
+        attendee.lastName,
+        attendee.email,
+        attendee.address,
+        attendee.searchField,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return searchableText.includes(normalizedQuery)
+    })
+
+    if (args.status) {
+      results = results.filter((attendee) => attendee.status === args.status)
+    }
+
+    return results.slice(0, 50)
   },
 })
 

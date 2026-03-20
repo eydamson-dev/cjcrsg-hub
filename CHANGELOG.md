@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Task 3.11: Debounced Search with Backend Integration**
+  - Added `searchField` column to attendees table (auto-populated on create/update)
+  - Search matches across full name (first + last), email, and address
+  - 300ms debounced search using useDebounce hook
+  - Minimum 3 characters required before triggering backend search
+  - Clear search button (X icon) in search input
+  - "Searching..." loading state with spinner
+  - Results count display with active filter indicators
+  - Empty search results state with "Clear filters" button
+  - URL param sync (`?q=search&status=member`) for shareable/searchable URLs
+  - Search + status filter combination support
+  - Search indexes on attendees table for performance
+  - Fallback searchLegacy query for records without searchField
+
 - **Complete Phase 3: Attendee Management - Wired and Functional**
   - `/attendees/new` - Fully functional create attendee form
     - Integrated AttendeeForm with useCreateAttendee mutation

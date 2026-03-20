@@ -8,45 +8,34 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-20
 
-**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | 🔜 Polish Pending (3.11-3.17)
-**Current Task:** Phase 3 Core Features - Create, Read, Update, Archive fully functional
-**Status:** ✅ Core attendee management (3.6-3.10) wired and tested | 🔄 Polish items (3.11-3.17) in next PR
+**Phase:** Phase 3 - ⚡ Core CRUD Complete (3.1-3.10) | ✅ Task 3.11 Complete | 🔜 Tasks 3.12-3.17 Pending
+**Current Task:** Task 3.11 - Debounced Search with Backend Integration
+**Status:** ✅ Task 3.11 implemented and tested | 🔄 Tasks 3.12-3.17 in follow-up PRs
 
-**Completed This Session (Phase 3 Core - Ready to Merge):**
+**Completed This Session (Task 3.11 - Ready for PR):**
 
-- ✅ **3.6** Wire up `/attendees/new` - Fully functional create attendee
-  - AttendeeForm integrated with useCreateAttendee mutation
-  - Toast notifications on success/error
-  - Navigation to attendees list after creation
-  - Handles duplicate email errors gracefully
-- ✅ **3.7** Wire up `/attendees/$id/edit` - Fully functional edit attendee
-  - Fetches attendee data with useAttendee hook
-  - Pre-populates form with existing data
-  - Integrated useUpdateAttendee mutation
-  - Loading skeleton during initial load
-  - Toast notifications and navigation on success
-- ✅ **3.8** Wire up `/attendees/$id/` - Complete attendee details view
-  - Personal info card (name, email, phone, date of birth)
-  - Church info card (status, join date, address)
-  - Notes display
-  - Edit and Archive action buttons
-  - Loading skeleton and "not found" error state
-- ✅ **3.9** Wire up archive action in AttendeeList
-  - AlertDialog confirmation with attendee name
-  - useArchiveAttendee mutation integration
-  - Loading state during archive operation
-  - Success/error toast notifications
-  - List refreshes after archive
-- ✅ **3.10** Toast notifications - Already installed, now working across all operations
+- ✅ **3.11** Debounced search with backend integration (300ms)
+  - Added `searchField` column to attendees table (auto-populated on create/update)
+  - Search matches across full name (first + last), email, and address
+  - 300ms debounced search using useDebounce hook
+  - Minimum 3 characters required before triggering backend search
+  - Clear search button (X icon) in search input
+  - "Searching..." loading state with spinner
+  - Results count display with active filter indicators
+  - Empty search results state with "Clear filters" button
+  - URL param sync (`?q=search&status=member`) for shareable/searchable URLs
+  - Search + status filter combination support
+  - Search indexes on attendees table for performance
+  - Fallback searchLegacy query for records without searchField
 
-**Technical Improvements Made:**
+**Technical Changes Made:**
 
-- Fixed mutation hooks to use useConvexMutation from @convex-dev/react-query
-- Implemented modern shadcn/ui form pattern with Field components (replaced broken Form component)
-- Fixed TanStack Router nested route structure for attendees
-- Added field, calendar, popover, alert-dialog shadcn components
-- Created DatePicker component for date inputs
-- Created useDebounce hook for future search functionality
+- **Schema:** Added optional `searchField` to attendees table with `search_attendees` index
+- **Mutations:** Auto-compute `searchField` on create/update by combining firstName, lastName, email, address
+- **Queries:** Updated search query to use new index; added searchLegacy for backward compatibility
+- **Frontend:** Updated AttendeeList with new search UI, loading states, empty states
+- **Route:** Updated attendees.index.tsx with URL param handling, debounced search integration
+- **Hooks:** Enhanced useSearchAttendees with proper query keys
 
 **Reminders:**
 
@@ -55,10 +44,9 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - Create feature branches
 - Wait for user approval before committing
 
-**Next Steps (Follow-up PR):**
+**Next Steps (Follow-up PRs):**
 
-- **Complete Phase 3.11-3.17** (Polish & UX):
-  - 3.11 Debounced search with backend integration (300ms)
+- **Complete Phase 3.12-3.17** (Polish & UX):
   - 3.12 Pagination display with "Showing X of Y" and URL params
   - 3.13 Empty states for search/filter results
   - 3.14 AttendeeTableSkeleton component
@@ -464,16 +452,16 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ### 3.11 Implement debounced search functionality
 
-- [ ] Replace local search state with backend search integration
-- [ ] Integrate `useSearchAttendees` hook with 300ms debounce
-- [ ] Add clear search button (X icon) in search input
-- [ ] Show "Searching..." loading state while fetching
-- [ ] Display search results count
-- [ ] Sync search query with URL params (`?q=search-term`)
-- [ ] Read search param from URL on page load
-- [ ] Combine search + status filter (both work together)
-- [ ] Handle empty search results state
-- [ ] Add "No results found" message with clear search option
+- [x] Replace local search state with backend search integration
+- [x] Integrate `useSearchAttendees` hook with 300ms debounce
+- [x] Add clear search button (X icon) in search input
+- [x] Show "Searching..." loading state while fetching
+- [x] Display search results count
+- [x] Sync search query with URL params (`?q=search-term`)
+- [x] Read search param from URL on page load
+- [x] Combine search + status filter (both work together)
+- [x] Handle empty search results state
+- [x] Add "No results found" message with clear search option
 
 ### 3.12 Add pagination with total count display
 

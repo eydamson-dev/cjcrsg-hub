@@ -11,6 +11,7 @@ export default defineSchema({
     phone: v.optional(v.string()),
     dateOfBirth: v.optional(v.number()),
     address: v.optional(v.string()),
+    searchField: v.optional(v.string()),
     status: v.union(
       v.literal('member'),
       v.literal('visitor'),
@@ -24,8 +25,8 @@ export default defineSchema({
     .index('by_status', ['status'])
     .index('by_email', ['email'])
     .index('by_phone', ['phone'])
-    .searchIndex('search_name', {
-      searchField: 'firstName',
+    .searchIndex('search_attendees', {
+      searchField: 'searchField',
       filterFields: ['status'],
     }),
   eventTypes: defineTable({
