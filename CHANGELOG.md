@@ -82,6 +82,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Page reload authentication issues**
+  - Fixed redirect to index on page reload for all protected routes (dashboard, events, attendees)
+  - Implemented two-layer authentication protection:
+    - Route-level `beforeLoad` guards using `requireAuth()` for protected routes
+    - Route-level `beforeLoad` guards using `requireGuest()` for login page
+    - Component-level `ProtectedRoute` wrapper for visual loading states
+  - Added auth context injection into router context via `AuthContextInjector` component
+  - Protected routes now properly maintain state after page refresh
+  - Login page now redirects authenticated users to dashboard
+  - Auth state updates are synchronized between React context and router context
+
 - **Navigation and routing issues**
   - Fixed edit button not working on attendee details page
   - Implemented proper TanStack Router nested route structure

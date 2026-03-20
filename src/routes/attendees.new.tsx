@@ -7,9 +7,13 @@ import { Button } from '~/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/attendees/new')({
   component: NewAttendeePage,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function NewAttendeePage() {

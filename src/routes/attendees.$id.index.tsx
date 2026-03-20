@@ -5,9 +5,13 @@ import {
   AttendeeNotFound,
 } from '~/features/attendees/components/AttendeeDetails'
 import { useAttendee } from '~/features/attendees/hooks/useAttendees'
+import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/attendees/$id/')({
   component: AttendeeDetailPage,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function AttendeeDetailPage() {

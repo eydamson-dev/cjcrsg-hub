@@ -10,9 +10,13 @@ import {
 } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Plus } from 'lucide-react'
+import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/events/')({
   component: EventsPage,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function EventsPage() {

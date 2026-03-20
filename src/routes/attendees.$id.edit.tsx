@@ -7,9 +7,13 @@ import {
 import { Button } from '~/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
+import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/attendees/$id/edit')({
   component: EditAttendeePage,
+  beforeLoad: async ({ context }) => {
+    requireAuth(context)
+  },
 })
 
 function EditAttendeePage() {

@@ -3,17 +3,24 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useRouter,
 } from '@tanstack/react-router'
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { TooltipProvider } from '~/components/ui/tooltip'
 import { Toaster } from '~/components/ui/sonner'
 import appCss from '~/styles/app.css?url'
-import { AuthProvider } from '~/lib/auth-context'
+import { AuthProvider, useAuthContext } from '~/lib/auth-context'
+import { AuthLoadingScreen } from '~/components/auth/AuthLoadingScreen'
 
-export const Route = createRootRouteWithContext<{
+// Define the router context type including auth
+export interface RouterContext {
   queryClient: QueryClient
-}>()({
+  isAuthenticated: boolean
+  isLoading: boolean
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       {
@@ -52,16 +59,53 @@ export const Route = createRootRouteWithContext<{
   }),
   notFoundComponent: () => <div>Route not found</div>,
   component: RootComponent,
+  // Inject auth context into router context for beforeLoad hooks
+  beforeLoad: async () => {
+    // This will be called with the actual auth context from AuthContextInjector
+    return {}
+  },
+  loader: async ({ context }) => {
+    return {
+      isAuthenticated: context.isAuthenticated,
+      isLoading: context.isLoading,
+    }
+  },
 })
 
 function RootComponent() {
   return (
     <AuthProvider>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
+      <AuthContextInjector>
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </AuthContextInjector>
     </AuthProvider>
   )
+}
+
+// Component that injects auth context into the router context
+function AuthContextInjector({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuthContext()
+  const router = useRouter()
+
+  // Update router context with auth state
+  React.useEffect(() => {
+    router.update({
+      context: {
+        ...router.options.context,
+        isAuthenticated,
+        isLoading,
+      },
+    })
+  }, [isAuthenticated, isLoading, router])
+
+  // Show loading screen while auth initializes
+  if (isLoading) {
+    return <AuthLoadingScreen />
+  }
+
+  return <>{children}</>
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {

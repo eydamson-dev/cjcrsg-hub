@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useAuthActions, useAuthToken } from '@convex-dev/auth/react'
-import { useNavigate } from '@tanstack/react-router'
 import { Button } from '~/components/ui/button'
 import {
   Card,
@@ -14,21 +13,34 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { Separator } from '~/components/ui/separator'
+import { requireGuest } from '~/lib/auth-guard'
+import { AuthLoadingScreen } from '~/components/auth/AuthLoadingScreen'
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
+  beforeLoad: async ({ context }) => {
+    requireGuest(context)
+  },
 })
 
 function LoginPage() {
   const token = useAuthToken()
   const navigate = useNavigate()
 
+  // Handle the case where beforeLoad didn't catch authenticated state
+  // (due to timing issues with context initialization)
   useEffect(() => {
     if (token) {
-      navigate({ to: '/' })
+      navigate({ to: '/', replace: true })
     }
   }, [token, navigate])
 
+  // Show loading screen while checking auth state
+  if (token === undefined) {
+    return <AuthLoadingScreen />
+  }
+
+  // If authenticated, don't render login form
   if (token) {
     return null
   }
