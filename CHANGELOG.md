@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Complete Convex Auth authentication system
+  - Google and Facebook OAuth providers configured
+  - Auth helper functions in `src/lib/auth.ts`
+  - Global auth context in `src/lib/auth-context.tsx`
+  - Route-level protection in `src/lib/auth-guard.ts`
+  - Improved login page with better OAuth handling
+- Protected route system
+  - AuthLoadingScreen component with CJCRSG Hub branding
+  - Double protection: beforeLoad guard + ProtectedRoute component
+  - Proper loading state handling during auth initialization
+- Attendees and Events placeholder routes
+  - `/attendees` and `/events` routes created
+  - Protected with requireAuth guard
 - Responsive layout system with sidebar and mobile navigation
   - Layout, Sidebar, MobileNav, Header components in `src/components/layout/`
   - ProtectedRoute component for authentication in `src/components/auth/`
@@ -17,8 +30,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CJCRSG blue theme (#304080) as primary color
   - Applied to both light and dark modes in `src/styles/app.css`
   - Updated sidebar, buttons, focus rings, and accent colors
-- Dashboard page with stats cards showing member counts, events, and attendance
 - New shadcn components: sidebar, tooltip, collapsible, use-mobile hook
+
+### Fixed
+
+- User data retrieval in getCurrentUser query
+  - Parse identity.subject to get actual user ID
+  - Fetch user from users table properly
+
+### Known Issues
+
+- **Hydration error in Sidebar component** (unfixed)
+  - Location: `src/components/layout/Sidebar.tsx` - `UserDisplay` component
+  - Error: Text content mismatch between server and client
+  - Root cause: Query loading state inconsistency
+    - Server renders: "Loading..."
+    - Client renders: actual email or empty string
+  - Current implementation uses `useQuery` with `isPending` check
+  - Attempted fix: Switching to `useSuspenseQuery` causes import/type issues
+  - Impact: Console warnings, potential UI flicker on page refresh
+  - Workaround: None currently implemented
+  - Priority: Medium - functionality works, but warnings persist
+  - Planned fix: Proper suspense boundary or data prefetching
 
 ### Changed
 
