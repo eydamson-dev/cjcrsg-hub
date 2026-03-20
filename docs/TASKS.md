@@ -1,0 +1,465 @@
+# Implementation Tasks
+
+Complete checklist of all implementation tasks for CJCRSG-Hub.
+
+## Prerequisites
+
+Before starting implementation, ensure you have:
+
+- [x] Node.js 18+ installed (`node -v` to check)
+- [x] pnpm installed globally (`npm install -g pnpm`)
+- [x] Git configured with GitHub SSH keys
+- [x] Repository cloned: `git clone git@github.com:eydamson-dev/cjcrsg-hub.git`
+- [x] Convex CLI available (`pnpm dlx convex -h` to verify)
+
+---
+
+## ✅ Completed Setup
+
+- [x] Initialize git repository
+- [x] Setup GitHub remote (git@github.com:eydamson-dev/cjcrsg-hub.git)
+- [x] Configure .gitignore
+- [x] Create comprehensive AGENTS.md documentation
+- [x] Create README.md with project overview
+
+---
+
+## Phase 1: Foundation Setup
+
+### 1.1 Initialize shadcn/ui with canary version
+
+- [ ] Run `pnpm dlx shadcn@canary init` to initialize the component library
+  - This will configure Tailwind CSS v4 with the new @tailwindcss/vite plugin
+  - Creates `components.json` configuration file with project settings
+  - Sets up CSS variables and theme system in `src/styles/app.css`
+  - During setup: Choose "New York" style and "Zinc" base color
+  - Verify by checking that shadcn theme variables exist in app.css
+  - Test by importing a button component and verifying it renders
+
+### 1.2 Setup Convex Better Auth
+
+- [ ] Install auth packages: `pnpm add @convex-dev/better-auth better-auth`
+  - Update `vite.config.ts` to bundle `@convex-dev/better-auth` for SSR
+  - Create `convex/auth.config.ts` with Better Auth provider configuration
+  - Create Better Auth instance in Convex backend
+  - Setup environment variables in `.env.local`:
+    - `BETTER_AUTH_SECRET` (generate random string)
+    - `BETTER_AUTH_URL=http://localhost:3000`
+  - Create auth client configuration in `src/lib/auth.ts`
+  - Test that Convex recognizes the auth configuration
+
+### 1.3 Configure environment variables
+
+- [ ] Verify `.env.local` exists and is in `.gitignore`
+  - Add required variables:
+
+    ```
+    # Convex
+    CONVEX_DEPLOYMENT=          # Auto-set by convex dev
+    VITE_CONVEX_URL=http://127.0.0.1:3210  # Local Convex URL
+
+    # Auth
+    BETTER_AUTH_SECRET=your-generated-secret
+    BETTER_AUTH_URL=http://localhost:3000
+    ```
+
+  - Create `.env.example` template file for documentation
+  - Ensure no sensitive values are committed to git
+  - Test that environment variables load correctly in the app
+
+### 1.4 Create base layout with navigation
+
+- [ ] Create `src/components/layout/Layout.tsx` component
+  - Design responsive sidebar navigation for desktop
+  - Create mobile bottom navigation for screens < 768px
+  - Add navigation items with icons:
+    - Dashboard (LayoutDashboard icon)
+    - Attendees (Users icon)
+    - Events (CalendarDays icon)
+    - Attendance (CheckSquare icon)
+    - Settings (Settings icon)
+  - Install and use shadcn/ui: `Sidebar`, `Button`, `Separator`, `Sheet` (mobile)
+  - Add church branding/logo area in header
+  - Create `src/routes/_layout.tsx` route wrapper
+  - Test responsive behavior by resizing browser window
+
+### 1.5 Setup protected routes
+
+- [ ] Create `src/components/auth/ProtectedRoute.tsx` wrapper component
+  - Implement auth check using Convex `useAuth` hook
+  - Redirect unauthenticated users to `/login`
+  - Add loading state while checking authentication status
+  - Create `src/routes/login.tsx` with login form
+  - Use shadcn/ui components: `Card`, `Input`, `Button`, `Form`, `Label`
+  - Implement email/password login with Better Auth
+  - Test that protected routes require authentication
+
+**Commands:**
+
+```bash
+# Initialize shadcn/ui (requires canary for TanStack Start)
+pnpm dlx shadcn@canary init
+
+# Install auth dependencies
+pnpm add @convex-dev/better-auth better-auth
+
+# Add base components
+pnpm dlx shadcn@canary add button card input form dialog table badge
+pnpm dlx shadcn@canary add select date-picker tabs toast command
+```
+
+---
+
+## Phase 2: Database Schema & Auth
+
+### 2.1 Create schema.ts with all tables
+
+- [ ] Update `convex/schema.ts` with complete database schema
+  - Define all four core tables with proper validators
+  - Add indexes for efficient queries:
+    - attendees: by_status, by_email, by_phone
+    - events: by_date, by_eventTypeId
+    - attendance_records: by_eventId, by_attendeeId
+  - Use `v.id()` for foreign key references
+  - Add `searchIndex` for attendee full-text search
+  - Run `pnpm dlx convex dev --once` to apply schema
+  - Verify schema in Convex dashboard
+
+### 2.2 Configure convex/auth.config.ts
+
+- [ ] Create `convex/auth.config.ts` file
+  - Import and configure Better Auth provider
+  - Set up JWT validation configuration
+  - Configure session management settings
+  - Test that auth configuration loads without errors
+
+### 2.3 Setup auth routes at src/routes/api/auth/$.ts
+
+- [ ] Create catch-all auth API route `src/routes/api/auth/$.ts`
+  - Implement route handlers for Better Auth endpoints
+  - Handle sign-in, sign-up, sign-out, session endpoints
+  - Proxy requests to Convex backend
+  - Set up proper CORS headers
+  - Test all auth endpoints with curl or Postman
+
+### 2.4 Create login/signup pages
+
+- [ ] Create `src/routes/login.tsx` route file
+  - Build login form with email/password fields
+  - Add shadcn/ui components: `Card`, `Input`, `Button`, `Form`
+  - Implement form validation with react-hook-form + Zod
+  - Integrate with Better Auth client for sign-in
+  - Add error handling and display error messages
+  - Create `src/routes/signup.tsx` for registration
+
+### 2.5 Test authentication flow
+
+- [ ] Manually test complete auth flow:
+  - Sign up new user
+  - Sign in with credentials
+  - Access protected routes
+  - Sign out
+  - Verify redirect to login when unauthenticated
+- [ ] Test edge cases:
+  - Wrong password shows error
+  - Non-existent user shows error
+  - Session persists after page refresh
+
+---
+
+## Phase 3: Attendee Management
+
+### 3.1 Create attendee queries (list, get, search)
+
+- [ ] Create `convex/attendees/queries.ts` file
+  - Implement `list` query with pagination support
+  - Add `getById` query to fetch single attendee
+  - Create `search` query using Convex searchIndex
+  - Support filtering by status (member, visitor, inactive)
+  - Add sorting options (by name, by joinDate)
+  - Write corresponding validators in `convex/attendees/validators.ts`
+
+### 3.2 Create attendee mutations (create, update)
+
+- [ ] Create `convex/attendees/mutations.ts` file
+  - Implement `create` mutation for new attendees
+  - Add `update` mutation for existing attendees
+  - Create `archive` mutation to soft-delete (set inactive)
+  - Add input validation with validators
+  - Set `updatedAt` timestamp on every update
+  - Generate unique IDs automatically
+
+### 3.3 Build AttendeeList component with data table
+
+- [ ] Create `src/features/attendees/components/AttendeeList.tsx`
+  - Use shadcn/ui `Table` component as base
+  - Implement TanStack Table for sorting/filtering
+  - Add columns: Name, Email, Phone, Status, Join Date, Actions
+  - Add status badges with color coding
+  - Implement pagination controls
+  - Add "New Attendee" button linking to creation form
+
+### 3.4 Build AttendeeForm component
+
+- [ ] Create `src/features/attendees/components/AttendeeForm.tsx`
+  - Use shadcn/ui form components: `Form`, `Input`, `Label`, `Select`
+  - Implement react-hook-form with Zod validation schema
+  - Add fields: firstName, lastName, email, phone, dateOfBirth, address, status, notes
+  - Add DatePicker for dateOfBirth field
+  - Implement form submission handler
+  - Show success/error toast notifications
+  - Support both create and edit modes
+
+### 3.5 Create routes: /attendees, /attendees/new, /attendees/$id
+
+- [ ] Create `src/routes/attendees.index.tsx` - List view
+- [ ] Create `src/routes/attendees.new.tsx` - Create new attendee
+- [ ] Create `src/routes/attendees.$id.tsx` - View attendee details
+- [ ] Create `src/routes/attendees.$id.edit.tsx` - Edit attendee
+  - Set up proper route structure in TanStack Router
+  - Add breadcrumbs for navigation context
+  - Ensure all routes are protected (require auth)
+
+### 3.6 Add search functionality
+
+- [ ] Add search input to AttendeeList component
+  - Implement debounced search (300ms delay)
+  - Use Convex `search` query with searchIndex
+  - Show search results in real-time
+  - Add clear search button
+  - Maintain search query in URL params for shareability
+
+---
+
+## Phase 4: Event Types (Admin)
+
+### 4.1 Create event type queries
+
+- [ ] Create `convex/eventTypes/queries.ts`
+  - Implement `list` query to get all active event types
+  - Add `getById` query for single event type
+  - Support filtering by isActive status
+  - Order by name alphabetically
+  - Create validators in `convex/eventTypes/validators.ts`
+
+### 4.2 Create event type mutations
+
+- [ ] Create `convex/eventTypes/mutations.ts`
+  - Implement `create` mutation with name, description, color
+  - Add `update` mutation for modifying existing types
+  - Create `toggleActive` mutation to soft-delete
+  - Ensure only admins can modify event types
+
+### 4.3 Build EventTypeList component
+
+- [ ] Create `src/features/events/components/EventTypeList.tsx`
+  - Display event types as cards or table rows
+  - Show color indicator for each type
+  - Add "Edit" and "Delete" action buttons
+  - Implement confirmation dialog for delete
+  - Add "New Event Type" button
+  - Handle empty state
+
+### 4.4 Build EventTypeForm component
+
+- [ ] Create `src/features/events/components/EventTypeForm.tsx`
+  - Form fields: name, description, color picker
+  - Use shadcn/ui `Form`, `Input`, `ColorPicker` (or custom)
+  - Validate that name is unique
+  - Support create and edit modes
+
+### 4.5 Create settings page for admin
+
+- [ ] Create `src/routes/settings.tsx` route
+  - Add tabs: Event Types, General Settings, Admin Users
+  - Implement Event Types tab with list and form
+  - Add access control (admin only)
+  - Style with shadcn/ui `Tabs` component
+
+---
+
+## Phase 5: Event Management
+
+### 5.1 Create event queries
+
+- [ ] Create `convex/events/queries.ts`
+  - Implement `listUpcoming` for future events
+  - Add `listPast` for historical events
+  - Create `getById` for single event details
+  - Add `listByType` filter
+  - Support date range filtering
+  - Order by date (upcoming: asc, past: desc)
+
+### 5.2 Create event mutations
+
+- [ ] Create `convex/events/mutations.ts`
+  - Implement `create` mutation
+  - Add `update` mutation
+  - Create `cancel` mutation (set isActive false)
+  - Validate that event type exists
+  - Ensure date is in the future for new events
+
+### 5.3 Build EventList component
+
+- [ ] Create `src/features/events/components/EventList.tsx`
+  - Display events in card or table format
+  - Show: name, date, time, location, type (with color)
+  - Add filter tabs: Upcoming, Past, All
+  - Implement sorting (by date, by name)
+  - Add "New Event" button
+  - Show attendance count per event
+
+### 5.4 Build EventForm component
+
+- [ ] Create `src/features/events/components/EventForm.tsx`
+  - Form fields: name, description, eventType (select), date, startTime, endTime, location
+  - Use shadcn/ui `Select` for event type dropdown
+  - Add DatePicker for date selection
+  - Validate date is not in the past
+  - Ensure end time is after start time
+  - Support create and edit modes
+
+### 5.5 Create routes: /events, /events/new, /events/$id
+
+- [ ] Create `src/routes/events.index.tsx` - Event list
+- [ ] Create `src/routes/events.new.tsx` - Create event
+- [ ] Create `src/routes/events.$id.tsx` - Event details
+- [ ] Create `src/routes/events.$id.edit.tsx` - Edit event
+  - Set up route tree with proper nesting
+  - Add breadcrumbs
+
+### 5.6 Add event filtering by type
+
+- [ ] Add dropdown filter to EventList
+  - Populate filter options from event types
+  - Filter events dynamically on selection
+  - Show "Clear Filter" button when active
+  - Update URL params with filter state
+
+---
+
+## Phase 6: Attendance Tracking
+
+### 6.1 Create attendance queries
+
+- [ ] Create `convex/attendance/queries.ts`
+  - Implement `getByEvent` to list all attendees for an event
+  - Add `getByAttendee` to show attendance history
+  - Create `getStats` for event attendance statistics
+  - Support date range queries
+  - Add pagination for large events
+
+### 6.2 Create attendance mutations
+
+- [ ] Create `convex/attendance/mutations.ts`
+  - Implement `checkIn` mutation
+  - Add `unCheckIn` mutation (remove attendance)
+  - Create `bulkCheckIn` for multiple attendees
+  - Validate event exists and is active
+  - Prevent duplicate check-ins
+  - Set checkedInAt to current timestamp
+  - Record checkedInBy (admin user ID)
+
+### 6.3 Build AttendanceRecorder component
+
+- [ ] Create `src/features/attendance/components/AttendanceRecorder.tsx`
+  - Display current event info at top
+  - Show real-time attendee list with checkboxes
+  - Add "Select All" functionality
+  - Display current attendance count
+  - Add "Save" button to persist changes
+  - Auto-refresh when others check in (Convex real-time)
+
+### 6.4 Build AttendeeSelector (search & select)
+
+- [ ] Create `src/features/attendance/components/AttendeeSelector.tsx`
+  - Implement search input with debounce
+  - Show search results in dropdown/command palette
+  - Display attendee info: name, email, phone
+  - Add "Quick Check-in" button next to results
+  - Use shadcn/ui `Command` component
+
+### 6.5 Build EventAttendanceList (real-time view)
+
+- [ ] Create `src/features/attendance/components/EventAttendanceList.tsx`
+  - Display all attendees who checked in
+  - Show check-in time and checked-in-by user
+  - Update in real-time via Convex subscriptions
+  - Add option to remove check-in (undo)
+  - Export to CSV button
+
+### 6.6 Create routes: /attendance, /attendance/$eventId
+
+- [ ] Create `src/routes/attendance.index.tsx` - Select event to record
+- [ ] Create `src/routes/attendance.$eventId.tsx` - Record attendance
+  - Show list of today's/upcoming events on index
+  - Add navigation back to events list
+
+### 6.7 Implement quick check-in flow
+
+- [ ] Optimize for mobile/tablet usage
+  - Large tap targets for easy selection
+  - Auto-save on check (optional setting)
+  - Sound or visual feedback on check-in
+  - Test with actual check-in scenarios
+
+---
+
+## Phase 7: Dashboard & Polish
+
+### 7.1 Create dashboard with stats
+
+- [ ] Create `src/routes/dashboard.tsx` as default route
+  - Implement grid layout for stat cards
+  - Show metrics:
+    - Total members count
+    - Today's attendance (if event today)
+    - This week's total attendance
+    - New members this month
+  - Use shadcn/ui `Card` components
+  - Add icons to each stat
+  - Fetch data from multiple Convex queries
+
+### 7.2 Add recent attendance widget
+
+- [ ] Create `src/features/dashboard/components/RecentAttendanceWidget.tsx`
+  - Show last 5-10 attendance records
+  - Display: attendee name, event name, check-in time
+  - Link to full attendance page
+  - Update in real-time
+
+### 7.3 Add upcoming events widget
+
+- [ ] Create `src/features/dashboard/components/UpcomingEventsWidget.tsx`
+  - Show next 3-5 upcoming events
+  - Display: event name, date, time, location
+  - Add "Record Attendance" quick action button
+  - Color-code by event type
+
+### 7.4 Implement toast notifications
+
+- [ ] Install and configure `sonner` or `@radix-ui/react-toast`
+  - Add `src/components/ui/toaster.tsx`
+  - Add toast calls for: Success, Error, Info operations
+  - Position toasts top-right
+  - Ensure auto-dismiss after 3-5 seconds
+
+### 7.5 Add loading states
+
+- [ ] Create `src/components/ui/skeleton.tsx` with shadcn
+  - Add skeleton screens for: Attendee list, Event list, Form submission, Dashboard
+  - Use appropriate skeleton shapes for content
+  - Add loading spinners for buttons during submission
+
+### 7.6 Responsive design pass
+
+- [ ] Test all pages on mobile (375px), tablet (768px), desktop (1024px+)
+  - Fix overflow issues on small screens
+  - Ensure tables are scrollable horizontally on mobile
+  - Test navigation on touch devices
+  - Optimize images and assets
+  - Test on actual mobile device if possible
+
+---
+
+_Last Updated: 2026-03-20_
