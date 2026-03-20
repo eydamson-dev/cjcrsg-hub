@@ -3,13 +3,25 @@ import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { api } from '../../../../convex/_generated/api'
 import type { Id } from '../../../../convex/_generated/dataModel'
 
-export function useAttendees(status?: string) {
+export function useAttendees(
+  status?: string,
+  cursor?: string | null,
+  pageSize: number = 10,
+) {
   return useQuery(
     convexQuery(api.attendees.queries.list, {
       paginationOpts: {
-        numItems: 10,
-        cursor: null,
+        numItems: pageSize,
+        cursor: cursor || null,
       },
+      status: status as any,
+    }),
+  )
+}
+
+export function useAttendeeCount(status?: string) {
+  return useQuery(
+    convexQuery(api.attendees.queries.count, {
       status: status as any,
     }),
   )

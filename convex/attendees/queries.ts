@@ -95,14 +95,14 @@ export const count = query({
     status: v.optional(attendeeStatus),
   },
   handler: async (ctx, args) => {
-    let attendeesQuery = ctx.db.query('attendees')
-
     if (args.status) {
-      return await attendeesQuery
+      const results = await ctx.db
+        .query('attendees')
         .withIndex('by_status', (q) => q.eq('status', args.status!))
         .collect()
+      return results.length
     }
 
-    return await attendeesQuery.collect()
+    return (await ctx.db.query('attendees').collect()).length
   },
 })
