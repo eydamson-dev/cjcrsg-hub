@@ -503,11 +503,12 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 - [x] Fix UI alignment issues (button/filter height, clear button positioning)
 - [x] Fix layout twitch with reserved space for search hint message
 
-### 3.13 Add empty states for attendee list
+### 3.13 Add empty states for attendee list ✅
 
-- [x] Empty state for no attendees at all ("No attendees found. Add your first attendee!")
-- [ ] Create empty state for no search results
-- [ ] Create empty state for filter with no results
+- [x] Empty state for no attendees at all with Users icon and "Add Attendee" button
+- [x] Empty state for no search results with SearchX icon and "Clear search" button
+- [x] Empty state for filter with no results with FilterX icon and "Clear filter" button
+- [x] Use shadcn Empty component for consistent styling
 
 ### 3.14 Add loading skeletons
 

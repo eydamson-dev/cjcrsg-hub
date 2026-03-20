@@ -25,6 +25,9 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Users,
+  SearchX,
+  FilterX,
 } from 'lucide-react'
 import {
   Select,
@@ -49,6 +52,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+  EmptyMedia,
+} from '~/components/ui/empty'
 import type { AttendeeStatus } from '../types'
 
 interface PaginationInfo {
@@ -324,41 +335,61 @@ export function AttendeeList({
               {isSearching ? 'Searching...' : 'Loading attendees...'}
             </div>
           ) : attendees.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {hasActiveFilters ? (
-                <div className="space-y-2">
-                  <p className="font-medium">No results found</p>
-                  <p className="text-sm">
-                    {searchQuery
-                      ? `No attendees match your search "${searchQuery}"`
-                      : 'No attendees match your filters'}
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onClearSearch}
-                    className="mt-2"
-                  >
-                    Clear filters
-                  </Button>
-                </div>
+            hasActiveFilters ? (
+              searchQuery ? (
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <SearchX />
+                    </EmptyMedia>
+                    <EmptyTitle>No results found</EmptyTitle>
+                    <EmptyDescription>
+                      No attendees match "{searchQuery}"
+                    </EmptyDescription>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    <Button variant="outline" onClick={onClearSearch}>
+                      Clear search
+                    </Button>
+                  </EmptyContent>
+                </Empty>
               ) : (
-                <>
-                  <p>
-                    No attendees found. Add your first attendee to get started.
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onNavigate?.('/attendees/new')}
-                    className="mt-2"
-                  >
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <FilterX />
+                    </EmptyMedia>
+                    <EmptyTitle>No matches</EmptyTitle>
+                    <EmptyDescription>
+                      No {statusFilter} attendees found
+                    </EmptyDescription>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    <Button variant="outline" onClick={onClearSearch}>
+                      Clear filter
+                    </Button>
+                  </EmptyContent>
+                </Empty>
+              )
+            ) : (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Users />
+                  </EmptyMedia>
+                  <EmptyTitle>No attendees yet</EmptyTitle>
+                  <EmptyDescription>
+                    Get started by adding your first church member
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Button onClick={() => onNavigate?.('/attendees/new')}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Attendee
                   </Button>
-                </>
-              )}
-            </div>
+                </EmptyContent>
+              </Empty>
+            )
           ) : (
             <Table>
               <TableHeader>
