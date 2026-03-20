@@ -85,8 +85,6 @@ const domains = [
   'email.com',
 ]
 
-const statuses = ['member', 'visitor', 'inactive'] as const
-
 function getRandomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
