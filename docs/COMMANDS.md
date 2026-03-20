@@ -83,6 +83,8 @@ DEBUG=convex:* pnpm dev
 
 ## Git Operations
 
+**Important:** We use native Git CLI commands only. Do NOT use `gh` CLI.
+
 ```bash
 # Create new feature branch
 git checkout -b feature/descriptive-name
