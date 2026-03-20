@@ -9,6 +9,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { TooltipProvider } from '~/components/ui/tooltip'
 import { Toaster } from '~/components/ui/sonner'
 import appCss from '~/styles/app.css?url'
+import { AuthProvider } from '~/lib/auth-context'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -55,9 +56,11 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <AuthProvider>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </AuthProvider>
   )
 }
 
