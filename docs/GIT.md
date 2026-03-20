@@ -168,10 +168,94 @@ Before committing, ensure:
 
 - [ ] Run `pnpm lint` - no errors
 - [ ] Run type check - no TypeScript errors
-- [ ] Test the feature manually
-- [ ] Update AGENTS.md if needed
+- [ ] Test the feature manually (`pnpm dev`)
+- [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
 - [ ] Clear console.log statements
 - [ ] Review your own changes (diff)
+- [ ] Update AGENTS.md if needed
+
+---
+
+## Changelog Workflow
+
+Every significant change must be documented in `CHANGELOG.md` under the `[Unreleased]` section.
+
+### When to Update Changelog
+
+| Change Type     | Example              | Update Changelog? |
+| --------------- | -------------------- | ----------------- |
+| New feature     | Add attendee search  | ✅ Required       |
+| Bug fix         | Fix login redirect   | ✅ Required       |
+| Breaking change | Rename field         | ✅ Required       |
+| Documentation   | Update README        | ❌ No             |
+| Refactor        | Simplify queries     | ❌ No             |
+| Dependencies    | Update packages      | ❌ No             |
+| Code style      | Format with prettier | ❌ No             |
+
+### Changelog Update Process
+
+1. **Before committing**, add entry under `[Unreleased]`:
+
+   ```markdown
+   ### Added
+
+   - Add attendee search functionality with name and email filters
+   ```
+
+2. **Use present tense and imperative mood:**
+   - ✅ "Add search functionality"
+   - ❌ "Added search functionality"
+
+3. **Be specific and concise:**
+   - ✅ "Add Google OAuth authentication"
+   - ❌ "Added stuff"
+
+4. **Group related changes** under the same category
+
+### Version Release Process
+
+When releasing a version (e.g., v0.2.0):
+
+1. Replace `[Unreleased]` with version number and date:
+
+   ```markdown
+   ## [0.2.0] - 2026-03-25
+   ```
+
+2. Add new empty `[Unreleased]` section at top
+
+3. Create git tag:
+
+   ```bash
+   git tag -a v0.2.0 -m "Release v0.2.0"
+   ```
+
+4. Push tag:
+
+   ```bash
+   git push origin v0.2.0
+   ```
+
+5. Create GitHub release with changelog content
+
+### Changelog Categories (in order)
+
+1. **Added** - New features
+2. **Changed** - Changes to existing functionality
+3. **Deprecated** - Features marked for removal
+4. **Removed** - Deleted features
+5. **Fixed** - Bug fixes
+6. **Security** - Security fixes
+
+### Breaking Changes
+
+Mark breaking changes with `[BREAKING]` prefix:
+
+```markdown
+### Changed
+
+- [BREAKING] Rename `attendee.status` field to `attendee.membershipStatus`
+```
 
 ---
 
