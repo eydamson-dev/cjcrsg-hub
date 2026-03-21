@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 1.3: Configure Playwright**
+  - Created `playwright.config.ts` with multi-browser support (Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari)
+  - Configured automatic dev server management with webServer option
+  - Added parallel test execution with retry logic for CI
+  - Set up screenshot capture on failure and trace recording for debugging
+  - Installed all Playwright browsers (Chromium, Firefox, WebKit)
+  - Added npm scripts: `pnpm test:e2e`, `pnpm test:e2e:ui`
+  - Created example E2E test (`tests/e2e/specs/setup.spec.ts`)
+
 - **TDD Task 1.2: Configure Vitest**
   - Created `vitest.config.ts` with React plugin and TypeScript path support
   - Added `tests/unit/setup.ts` with jest-dom matchers for DOM assertions

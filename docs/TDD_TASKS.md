@@ -180,29 +180,84 @@ export default defineConfig({
 
 **Verification:** All tests pass (3/3). Configuration supports React components and Convex backend tests.
 
-### Task 1.3: Configure Playwright
+### ✅ Task 1.3: Configure Playwright
 
-**Time:** 20 minutes
+**Time:** 20 minutes  
+**Status:** Completed ✓
 
-Create `playwright.config.ts`:
+Created `playwright.config.ts`:
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests/e2e/specs',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
+    },
+  ],
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
   },
 })
 ```
+
+**Installed browsers:**
+
+- Chromium (Chrome)
+- Firefox
+- WebKit (Safari)
+- Mobile Chrome (Pixel 5)
+- Mobile Safari (iPhone 12)
+
+**Created files:**
+
+- `playwright.config.ts` - Playwright configuration
+- `tests/e2e/specs/setup.spec.ts` - Example E2E validation test
+
+**Added npm scripts:**
+
+- `pnpm test:e2e` - Run E2E tests headless
+- `pnpm test:e2e:ui` - Run E2E tests with interactive UI
+
+**Configuration features:**
+
+- Parallel test execution
+- Automatic dev server management
+- Screenshot capture on failure
+- Trace recording for debugging
+- Multi-browser support (desktop + mobile)
 
 ### Task 1.4: Create Test Folder Structure
 
