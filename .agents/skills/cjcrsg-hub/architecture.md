@@ -18,33 +18,72 @@ src/
 │   │   ├── components/         # React components
 │   │   │   ├── AttendeeList.tsx
 │   │   │   ├── AttendeeForm.tsx
-│   │   │   └── AttendeeCard.tsx
+│   │   │   ├── AttendeeCard.tsx
+│   │   │   └── AttendeeTable.tsx
 │   │   ├── hooks/             # Feature-specific hooks
 │   │   │   ├── useAttendees.ts
+│   │   │   ├── useAttendee.ts
 │   │   │   └── useAttendeeMutations.ts
 │   │   ├── types.ts           # TypeScript types
 │   │   └── routes/            # Route files (TanStack Router)
 │   │       ├── attendees.index.tsx
 │   │       ├── attendees.new.tsx
-│   │       └── attendees.$id.tsx
+│   │       ├── attendees.$id.tsx
+│   │       └── attendees.$id.edit.tsx
 │   ├── events/                 # Event management
+│   │   ├── components/
+│   │   │   ├── EventTypeForm.tsx
+│   │   │   ├── EventTypeList.tsx
+│   │   │   └── EventTypeTable.tsx
+│   │   ├── hooks/
+│   │   │   ├── useEventTypes.ts
+│   │   │   └── useEventTypeMutations.ts
+│   │   ├── types.ts
+│   │   └── routes/
+│   │       └── event-types.tsx
 │   ├── attendance/             # Attendance tracking
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   └── routes/
 │   └── auth/                   # Authentication
+│       ├── components/
+│       │   ├── AuthLoadingScreen.tsx
+│       │   └── ProtectedRoute.tsx
+│       └── hooks/
 ├── components/                 # Shared UI components
 │   ├── layout/                # Layout components
 │   │   ├── Layout.tsx
+│   │   ├── Header.tsx
 │   │   ├── Sidebar.tsx
 │   │   └── MobileNav.tsx
 │   ├── ui/                    # shadcn/ui components
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── dialog.tsx
+│   │   ├── form.tsx
+│   │   ├── input.tsx
+│   │   ├── select.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── table.tsx
+│   │   └── toast.tsx
 │   └── auth/                  # Auth components
 ├── lib/                       # Utilities
 │   ├── utils.ts               # General utilities
-│   └── auth.ts                # Auth helpers
+│   ├── auth.ts                # Auth helpers
+│   ├── auth-context.tsx       # Auth context provider
+│   ├── auth-guard.ts          # Route guards
+│   └── navigation.ts          # Navigation config
 ├── hooks/                     # Shared hooks
+│   └── use-toast.ts
 ├── types/                     # Shared types
-└── routes/                    # Route definitions
-    ├── __root.tsx            # Root route with layout
-    └── index.tsx             # Home/dashboard
+├── routes/                    # Route definitions
+│   ├── __root.tsx            # Root route with layout
+│   ├── index.tsx             # Home/dashboard
+│   ├── login.tsx             # Login page
+│   ├── attendees.tsx         # Attendees layout
+│   └── events.tsx            # Events layout
+└── styles/
+    └── app.css               # Global styles
 ```
 
 ## Backend Structure (convex/)
@@ -61,13 +100,43 @@ convex/
 │   ├── queries.ts
 │   ├── mutations.ts
 │   └── validators.ts
-├── attendance/               # Attendance feature
+├── eventTypes/               # Event types (admin)
 │   ├── queries.ts
 │   ├── mutations.ts
 │   └── validators.ts
-└── eventTypes/               # Event types (admin)
+└── attendance/               # Attendance feature
     ├── queries.ts
-    └── mutations.ts
+    ├── mutations.ts
+    └── validators.ts
+```
+
+## Test Structure (tests/)
+
+```
+tests/
+├── unit/                      # Unit tests
+│   ├── convex/               # Convex backend tests
+│   │   ├── attendees/
+│   │   │   ├── queries.test.ts
+│   │   │   └── mutations.test.ts
+│   │   └── eventTypes/
+│   │       ├── queries.test.ts
+│   │       └── mutations.test.ts
+│   └── components/           # Component tests
+│       ├── ui/
+│       │   ├── form.test.tsx
+│       │   ├── error-state.test.tsx
+│       │   └── layout.test.tsx
+│       └── events/
+│           ├── EventTypeForm.test.tsx
+│           └── EventTypeList.test.tsx
+├── e2e/                       # E2E tests
+│   └── specs/
+│       ├── auth.spec.ts
+│       ├── attendees-crud.spec.ts
+│       └── event-types.spec.ts
+└── setup/                     # Test setup
+    └── test.setup.ts
 ```
 
 ## Key Principles
@@ -241,4 +310,4 @@ All admin routes are protected:
 
 ---
 
-_Last Updated: 2026-03-20_
+_Last Updated: 2026-03-21_

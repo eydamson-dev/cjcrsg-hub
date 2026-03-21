@@ -271,6 +271,27 @@ export const bulkCheckIn = mutation({
 
 ---
 
+## Components (New in Convex)
+
+Convex Components are self-contained building blocks that package related queries, mutations, and state:
+
+```typescript
+// convex/myComponent/index.ts
+import { component } from 'convex/component'
+
+export const MyComponent = component({
+  // Define component exports here
+})
+```
+
+**Use Cases:**
+
+- Reusable functionality across projects
+- Third-party integrations
+- Complex feature modules
+
+---
+
 ## Authentication Patterns
 
 ### Check Authentication
@@ -435,6 +456,213 @@ const checkIn = useMutation(api.attendance.checkIn, {
 
 ---
 
+## Testing with convex-test
+
+### Basic Test Setup
+
+```typescript
+// tests/unit/convex/attendees/mutations.test.ts
+import { convexTest } from 'convex-test'
+import { describe, it, expect } from 'vitest'
+import schema from '../../../convex/schema'
+
+const modules = import.meta.glob('../../../convex/**/*.ts')
+
+describe('attendees mutations', () => {
+  it('creates attendee with valid data', async () => {
+    const t = convexTest(schema, modules)
+
+    const id = await t.mutation(api.attendees.create, {
+      firstName: 'John',
+      lastName: 'Doe',
+      status: 'member',
+    })
+
+    expect(id).toBeDefined()
+
+    // Verify the attendee was created
+    const attendee = await t.query(api.attendees.getById, { id })
+    expect(attendee).toMatchObject({
+      firstName: 'John',
+      lastName: 'Doe',
+      status: 'member',
+    })
+  })
+})
+```
+
+### Testing with Authentication
+
+```typescript
+import { convexTest } from 'convex-test'
+import { describe, it, expect } from 'vitest'
+import { api } from '../../../convex/_generated/api'
+import schema from '../../../convex/schema'
+
+const modules = import.meta.glob('../../../convex/**/*.ts')
+
+describe('authenticated operations', () => {
+  it('creates attendance record as authenticated user', async () => {
+    const t = convexTest(schema, modules)
+
+    // Create authenticated context
+    const asAdmin = t.withIdentity({
+      name: 'Admin User',
+      email: 'admin@church.com',
+    })
+
+    // Create event
+    const eventId = await asAdmin.mutation(api.events.create, {
+      name: 'Sunday Service',
+      date: Date.now(),
+    })
+
+    // Create attendee
+    const attendeeId = await asAdmin.mutation(api.attendees.create, {
+      firstName: 'Jane',
+      lastName: 'Smith',
+      status: 'member',
+    })
+
+    // Check in attendee (requires auth)
+    const recordId = await asAdmin.mutation(api.attendance.checkIn, {
+      eventId,
+      attendeeId,
+    })
+
+    expect(recordId).toBeDefined()
+
+    // Verify checkedInBy is set to our admin
+    const record = await asAdmin.query(api.attendance.getById, { id: recordId })
+    expect(record.checkedInBy).toBeDefined()
+  })
+
+  it('rejects check-in when not authenticated', async () => {
+    const t = convexTest(schema, modules)
+
+    // Create data without auth
+    const eventId = await t.mutation(api.events.create, {
+      name: 'Sunday Service',
+      date: Date.now(),
+    })
+
+    const attendeeId = await t.mutation(api.attendees.create, {
+      firstName: 'Jane',
+      lastName: 'Smith',
+      status: 'member',
+    })
+
+    // Attempt check-in without auth should fail
+    await expect(
+      t.mutation(api.attendance.checkIn, { eventId, attendeeId }),
+    ).rejects.toThrow('Not authenticated')
+  })
+})
+```
+
+### Testing Scheduled Functions
+
+```typescript
+import { convexTest } from 'convex-test'
+import { describe, it, expect, vi } from 'vitest'
+import { api } from '../../../convex/_generated/api'
+import schema from '../../../convex/schema'
+
+const modules = import.meta.glob('../../../convex/**/*.ts')
+
+describe('scheduled functions', () => {
+  it('schedules and runs reminder notification', async () => {
+    // Enable fake timers
+    vi.useFakeTimers()
+
+    const t = convexTest(schema, modules)
+
+    // Schedule a reminder
+    const scheduledId = await t.mutation(api.reminders.schedule, {
+      eventId: 'some-event-id',
+      delayMs: 10000, // 10 seconds
+    })
+
+    // Fast forward time
+    vi.advanceTimersByTime(15000)
+
+    // Wait for scheduled function to complete
+    await t.finishInProgressScheduledFunctions()
+
+    // Verify the reminder was sent
+    const reminder = await t.run(async (ctx) => {
+      return await ctx.db.system.get('_scheduled_functions', scheduledId)
+    })
+
+    expect(reminder.state).toMatchObject({ kind: 'success' })
+
+    // Reset timers
+    vi.useRealTimers()
+  })
+})
+```
+
+### Testing Inline Queries/Mutations
+
+```typescript
+import { convexTest } from 'convex-test'
+import { describe, it, expect } from 'vitest'
+import schema from '../../../convex/schema'
+
+const modules = import.meta.glob('../../../convex/**/*.ts')
+
+describe('helper functions', () => {
+  it('tests helper with inline mutation', async () => {
+    const t = convexTest(schema, modules)
+
+    // Test a helper function by passing inline mutation
+    const attendeeCount = await t.mutation(async (ctx) => {
+      // Insert test data
+      await ctx.db.insert('attendees', {
+        firstName: 'Test',
+        lastName: 'User',
+        status: 'member',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+
+      // Query and return count
+      return await ctx.db.query('attendees').collect().length
+    })
+
+    expect(attendeeCount).toBe(1)
+  })
+})
+```
+
+### HTTP Actions Testing
+
+```typescript
+import { convexTest } from 'convex-test'
+import { describe, it, expect } from 'vitest'
+import schema from '../../../convex/schema'
+
+const modules = import.meta.glob('../../../convex/**/*.ts')
+
+describe('http actions', () => {
+  it('handles webhook', async () => {
+    const t = convexTest(schema, modules)
+
+    const response = await t.fetch('/webhooks/stripe', {
+      method: 'POST',
+      body: JSON.stringify({ event: 'payment.success' }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    expect(response.status).toBe(200)
+  })
+})
+```
+
+---
+
 ## Error Handling
 
 ### Convex Errors
@@ -492,4 +720,4 @@ try {
 
 ---
 
-_Last Updated: 2026-03-20_
+_Last Updated: 2026-03-21_

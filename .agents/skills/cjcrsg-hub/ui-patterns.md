@@ -11,6 +11,7 @@
 | `Tabs`      | Content organization           | `pnpm dlx shadcn@canary add tabs`      |
 | `Sheet`     | Mobile navigation, side panels | `pnpm dlx shadcn@canary add sheet`     |
 | `Sidebar`   | Desktop navigation             | `pnpm dlx shadcn@canary add sidebar`   |
+| `Resizable` | Resizable panels               | `pnpm dlx shadcn@canary add resizable` |
 
 ### Forms
 
@@ -24,6 +25,8 @@
 | `Textarea`   | Multi-line text              | `pnpm dlx shadcn@canary add textarea`    |
 | `Checkbox`   | Boolean options              | `pnpm dlx shadcn@canary add checkbox`    |
 | `RadioGroup` | Single selection             | `pnpm dlx shadcn@canary add radio-group` |
+| `Switch`     | Toggle switches              | `pnpm dlx shadcn@canary add switch`      |
+| `Combobox`   | Searchable dropdowns         | `pnpm dlx shadcn@canary add combobox`    |
 
 ### Actions
 
@@ -33,15 +36,19 @@
 | `Dialog`       | Modal dialogs        | `pnpm dlx shadcn@canary add dialog`        |
 | `DropdownMenu` | Context menus        | `pnpm dlx shadcn@canary add dropdown-menu` |
 | `AlertDialog`  | Confirmation dialogs | `pnpm dlx shadcn@canary add alert-dialog`  |
+| `Drawer`       | Slide-out panels     | `pnpm dlx shadcn@canary add drawer`        |
 
 ### Data Display
 
-| Component  | Use For           | shadcn Command                        |
-| ---------- | ----------------- | ------------------------------------- |
-| `Table`    | Data tables       | `pnpm dlx shadcn@canary add table`    |
-| `Badge`    | Status indicators | `pnpm dlx shadcn@canary add badge`    |
-| `Avatar`   | User images       | `pnpm dlx shadcn@canary add avatar`   |
-| `Skeleton` | Loading states    | `pnpm dlx shadcn@canary add skeleton` |
+| Component   | Use For            | shadcn Command                          |
+| ----------- | ------------------ | --------------------------------------- |
+| `Table`     | Data tables        | `pnpm dlx shadcn@canary add table`      |
+| `Badge`     | Status indicators  | `pnpm dlx shadcn@canary add badge`      |
+| `Avatar`    | User images        | `pnpm dlx shadcn@canary add avatar`     |
+| `Skeleton`  | Loading states     | `pnpm dlx shadcn@canary add skeleton`   |
+| `DataTable` | Advanced tables    | `pnpm dlx shadcn@canary add data-table` |
+| `Empty`     | Empty states       | `pnpm dlx shadcn@canary add empty`      |
+| `Kbd`       | Keyboard shortcuts | `pnpm dlx shadcn@canary add kbd`        |
 
 ### Feedback
 
@@ -50,6 +57,106 @@
 | `Toast`    | Notifications         | `pnpm dlx shadcn@canary add toast` (uses sonner) |
 | `Progress` | Progress bars         | `pnpm dlx shadcn@canary add progress`            |
 | `Alert`    | Warning/info messages | `pnpm dlx shadcn@canary add alert`               |
+| `Spinner`  | Loading indicators    | `pnpm dlx shadcn@canary add spinner`             |
+
+### Navigation
+
+| Component        | Use For          | shadcn Command                               |
+| ---------------- | ---------------- | -------------------------------------------- |
+| `Breadcrumb`     | Navigation paths | `pnpm dlx shadcn@canary add breadcrumb`      |
+| `NavigationMenu` | Top navigation   | `pnpm dlx shadcn@canary add navigation-menu` |
+| `Pagination`     | Page navigation  | `pnpm dlx shadcn@canary add pagination`      |
+| `Command`        | Command palette  | `pnpm dlx shadcn@canary add command`         |
+| `Menubar`        | Application menu | `pnpm dlx shadcn@canary add menubar`         |
+
+---
+
+## New Component Examples
+
+### Empty State Component
+
+```typescript
+import { Empty } from '@/components/ui/empty';
+import { Users } from 'lucide-react';
+
+export function NoAttendees() {
+  return (
+    <Empty
+      title="No attendees yet"
+      description="Get started by adding your first church member or visitor."
+      icon={Users}
+      action={{
+        label: 'Add Attendee',
+        onClick: () => navigate('/attendees/new'),
+      }}
+    />
+  );
+}
+```
+
+### Spinner Component
+
+```typescript
+import { Spinner } from '@/components/ui/spinner';
+
+// Button with loading state
+<Button disabled={isLoading}>
+  {isLoading ? (
+    <>
+      <Spinner className="mr-2 h-4 w-4" />
+      Saving...
+    </>
+  ) : (
+    'Save'
+  )}
+</Button>
+
+// Page loading
+<div className="flex items-center justify-center h-screen">
+  <Spinner size="lg" />
+</div>
+```
+
+### Kbd (Keyboard Shortcut) Component
+
+```typescript
+import { Kbd } from '@/components/ui/kbd';
+
+// In help dialog or tooltips
+<p>
+  Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> to open search
+</p>
+
+// Shortcut list
+<div className="space-y-2">
+  <div className="flex justify-between">
+    <span>Save</span>
+    <div className="space-x-1">
+      <Kbd>Ctrl</Kbd>
+      <Kbd>S</Kbd>
+    </div>
+  </div>
+</div>
+```
+
+### Field Component (Form Composition)
+
+```typescript
+import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
+
+export function AttendeeForm() {
+  return (
+    <Field name="email">
+      <FieldLabel>Email Address</FieldLabel>
+      <Input type="email" placeholder="john@example.com" />
+      <FieldDescription>
+        We'll never share your email with anyone.
+      </FieldDescription>
+      <FieldError />
+    </Field>
+  );
+}
+```
 
 ---
 
@@ -470,6 +577,20 @@ export function AttendeeListSkeleton() {
 
 ---
 
+## Registry System
+
+shadcn/ui now supports custom component registries for reusable components across projects:
+
+```bash
+# Add from a custom registry
+pnpm dlx shadcn@canary add @mycompany/analytics
+
+# Create your own registry
+# See: https://ui.shadcn.com/docs/registry
+```
+
+---
+
 ## Best Practices
 
 1. **Use shadcn components** - Don't reinvent the wheel
@@ -482,7 +603,9 @@ export function AttendeeListSkeleton() {
 8. **Accessibility** - Use proper ARIA labels
 9. **Theme colors** - Use `bg-primary`, `text-primary`, etc.
 10. **Icons** - Use Lucide React icons
+11. **Empty states** - Always provide Empty component for no data
+12. **Keyboard shortcuts** - Document with Kbd component
 
 ---
 
-_Last Updated: 2026-03-20_
+_Last Updated: 2026-03-21_

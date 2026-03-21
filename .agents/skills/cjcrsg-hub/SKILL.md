@@ -28,14 +28,30 @@ Use this skill when:
 | Code conventions            | [conventions.md](./conventions.md)           |
 | UI patterns & shadcn        | [ui-patterns.md](./ui-patterns.md)           |
 | Convex patterns             | [convex-patterns.md](./convex-patterns.md)   |
+| TDD workflow                | [tdd-workflow.md](./tdd-workflow.md)         |
 | Common "how to" guides      | [common-tasks.md](./common-tasks.md)         |
 | Commands & quick ref        | [quick-reference.md](./quick-reference.md)   |
 
 ## Project Status
 
-**Current Phase:** Phase 1 - Foundation Setup  
-**Status:** ⏳ Ready to start implementation  
-**Next Task:** Initialize shadcn/ui with canary version
+**Current Phase:** Phase 4 - Event Types (Admin) - In Progress  
+**Status:** 🚧 Task 4.10 - Create Event Types Route Page  
+**Last Updated:** 2026-03-21
+
+**Recently Completed:**
+
+- ✅ Event Types backend (queries, mutations, validators)
+- ✅ useEventTypes hooks with tests (9 tests)
+- ✅ useEventTypeMutations hooks with tests (12 tests)
+- ✅ EventTypeForm component with tests (15 tests)
+- ✅ EventTypeList component with tests (12 tests)
+- **Total: 48 new tests added, 138 tests passing**
+
+**Next Up:**
+
+- 🚧 Create Event Types route page
+- ⏳ Add navigation link for Event Types
+- ⏳ E2E testing for Event Types
 
 ## Core Technologies
 
@@ -43,7 +59,17 @@ Use this skill when:
 - **Backend:** Convex (database + server functions)
 - **Auth:** Convex Auth (Password + Google + Facebook OAuth)
 - **State:** TanStack Query + Convex React Query
+- **Testing:** Vitest + convex-test + Playwright
 - **Package Manager:** pnpm
+
+## Testing Status
+
+| Category        | Count   | Status             |
+| --------------- | ------- | ------------------ |
+| Convex Unit     | 37      | ✅ All passing     |
+| Component Tests | 92      | ✅ All passing     |
+| E2E Tests       | 9       | ✅ All passing     |
+| **Total**       | **138** | **✅ All passing** |
 
 ## Quick Tips
 
@@ -53,7 +79,9 @@ Use this skill when:
 - Wait for user approval before committing
 - Use feature-based folder structure
 - Follow established patterns in existing code
+- Write tests **after** implementation (Implementation-First workflow)
+- Update TASKS.md or TDD_TASKS.md when completing tasks
 
 ---
 
-_Last Updated: 2026-03-20_
+_Last Updated: 2026-03-21_
