@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 2.2: Test Attendee Queries**
+  - Created comprehensive unit tests for attendee queries
+  - Tests cover list, getById, search, and count operations
+  - List tests: pagination with cursor, status filter, ordering by date descending
+  - getById tests: returns attendee by valid ID, returns null for non-existent
+  - Search tests: first name, last name, email, status filter, case insensitive, result limiting to 50
+  - Count tests: total count, filtered by status, zero results when empty
+  - All 15 tests passing (22 total with mutations)
+  - Tests use convex-test with in-memory database for fast execution
+
 - **TDD Task 2.1: Test Attendee Mutations**
   - Created comprehensive unit tests for attendee mutations
   - Tests cover create, update, and archive operations
