@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 4: Event Types Tests (Tasks 4.6-4.9)**
+  - Task 4.6: Created hooks query tests (`tests/unit/events/hooks/useEventTypes.test.ts`)
+    - 9 tests covering: list filtering, loading states, getById, checkAssociations
+    - Tests verify query enabling/disabling based on ID presence
+  - Task 4.7: Created hooks mutation tests (`tests/unit/events/hooks/useEventTypeMutations.test.ts`)
+    - 12 tests covering: create, update, delete mutations
+    - Tests verify toast notifications, query invalidation, error handling
+  - Task 4.8: Created EventTypeForm component tests (`tests/unit/events/components/EventTypeForm.test.tsx`)
+    - 15 tests covering: form rendering, validation, color picker, submission
+    - Mocked react-colorful for isolated component testing
+  - Task 4.9: Created EventTypeList component tests (`tests/unit/events/components/EventTypeList.test.tsx`)
+    - 12 tests covering: loading, error, empty states, table rendering
+    - 6 AlertDialog tests skipped (require Radix UI test setup)
+  - Total: 48 new tests added (156 passing, 6 skipped)
+
 - **Phase 4: Event Types Backend (Tasks 4.1-4.4)**
   - Task 4.1: Installed `react-colorful` v5.6.1 for color picker functionality
   - Task 4.2: Created validators (`convex/eventTypes/validators.ts`)
