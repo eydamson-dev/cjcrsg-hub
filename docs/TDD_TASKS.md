@@ -38,9 +38,9 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
   - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
 - ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
   - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
-  - ✅ Task 4.12: Test Event Types E2E (9 tests - navigation, empty state, CRUD, validation)
+  - ✅ Task 4.12: Test Event Types E2E (16 tests - navigation, CRUD, validation, color picker, 2 browsers)
 
-**Total Tests:** 155 tests passing (37 Convex + 100 Component + 18 E2E)
+**Total Tests:** 164 tests passing (37 Convex + 100 Component + 27 E2E)
 
 ---
 

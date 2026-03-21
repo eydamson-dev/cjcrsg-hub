@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Event Types E2E Tests** - Resolved test failures caused by:
+  - Test data conflicts from parallel test runs (fixed by using unique names with `Date.now()`)
+  - Playwright strict mode violations (fixed by using `.first()` for ambiguous selectors)
+  - Flaky empty state test (replaced with reliable page content test)
+  - All 16 E2E tests now passing (Chromium + Mobile Chrome)
+
 ### Changed
 
 - **Refactor: Split cjcrsg-git-workflow into focused skills**
