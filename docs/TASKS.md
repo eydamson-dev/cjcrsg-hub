@@ -12,6 +12,15 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Current Task:** Phase 4 - Event Types (Admin) - Task 4.10  
 **Status:** 🚧 In Progress | Create Event Types Route Page
 
+**Recently Completed:**
+
+- ✅ Tasks 4.6-4.9: Event Types hooks and components **with comprehensive unit tests**
+  - Task 4.6: useEventTypes hooks (9 tests) - `useEventTypesList`, `useEventType`, `useCheckEventTypeAssociations`
+  - Task 4.7: useEventTypeMutations hooks (12 tests) - `useCreateEventType`, `useUpdateEventType`, `useDeleteEventType`
+  - Task 4.8: EventTypeForm component (15 tests) - rendering, validation, color picker
+  - Task 4.9: EventTypeList component (12 tests) - loading, error, empty states, table rendering
+  - **Total: 48 new tests added, 156 tests passing**
+
 ---
 
 ## 🔄 Development Workflow (Updated 2026-03-21)
@@ -694,21 +703,23 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.6: Create Frontend Hooks - Queries
 
-- [x] Create `src/features/events/hooks/useEventTypes.ts` (implemented ✓, tests pending)
+- [x] Create `src/features/events/hooks/useEventTypes.ts` (implemented ✓, **9 tests passing**)
   - `useEventTypesList()` - Hook for listing event types
   - `useEventType(id)` - Hook for getting single event type
   - `useCheckEventTypeAssociations(id)` - Hook for checking if deletable
+  - Tests: `tests/unit/events/hooks/useEventTypes.test.ts`
 
 ### Task 4.7: Create Frontend Hooks - Mutations
 
-- [x] Create `src/features/events/hooks/useEventTypeMutations.ts` (implemented ✓, tests pending)
+- [x] Create `src/features/events/hooks/useEventTypeMutations.ts` (implemented ✓, **12 tests passing**)
   - `useCreateEventType()` - Create mutation with toast notifications
   - `useUpdateEventType()` - Update mutation with toast notifications
   - `useDeleteEventType()` - Delete mutation with confirmation dialog
+  - Tests: `tests/unit/events/hooks/useEventTypeMutations.test.ts`
 
 ### Task 4.8: Create EventTypeForm Component
 
-- [x] Create `src/features/events/components/EventTypeForm.tsx` (implemented ✓, tests pending)
+- [x] Create `src/features/events/components/EventTypeForm.tsx` (implemented ✓, **15 tests passing**)
   - Form with react-hook-form + zod validation
   - Name field (required, min 2 chars)
   - Description field (optional)
@@ -721,10 +732,11 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
   - Sync between hex input and color picker
   - Support create and edit modes
   - Submit handler with loading states
+  - Tests: `tests/unit/events/components/EventTypeForm.test.tsx`
 
 ### Task 4.9: Create EventTypeList Component
 
-- [x] Create `src/features/events/components/EventTypeList.tsx` (implemented ✓, tests pending)
+- [x] Create `src/features/events/components/EventTypeList.tsx` (implemented ✓, **12 tests passing**)
   - shadcn Table component
   - Columns: Color (colored circle + hex value), Name, Description, Actions (trash icon)
   - Click row opens edit modal
@@ -733,6 +745,7 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
   - "Add Event Type" button at top
   - Loading skeleton state
   - Error state with retry button
+  - Tests: `tests/unit/events/components/EventTypeList.test.tsx` (6 AlertDialog tests skipped)
 
 ### Task 4.10: Create Event Types Route Page
 

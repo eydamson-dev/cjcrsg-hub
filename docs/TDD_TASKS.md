@@ -11,14 +11,14 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 4 - E2E Critical Flows  
-**Status:** ✅ Completed | All Tasks Done  
-**Current Task:** All TDD phases complete - 10 E2E tests added
+**Phase:** Phase 4 - Event Types Unit Tests  
+**Status:** ✅ Completed | Tasks 4.6-4.9 Done  
+**Current Task:** Event Types hooks and components tests added
 
 **Summary:**
 
 - ✅ Phase 1: Infrastructure (6/6 tasks complete)
-- ✅ Phase 2: Critical Convex Unit Tests (3/3 tasks complete, 37 tests passing)
+- ✅ Phase 2: Critical Convex Unit Tests (4/4 tasks complete, 37 tests passing)
   - ✅ Task 2.1: Test Attendee Mutations (7/7 tests passing)
   - ✅ Task 2.2: Test Attendee Queries (15/15 tests passing)
   - ✅ Task 2.3: Test Event Types Queries (6/6 tests passing)
@@ -31,8 +31,13 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
   - ✅ Task 4.1: Create Auth Tests (3 tests - signup/login, invalid credentials, session persistence)
   - ✅ Task 4.2: Create Attendee CRUD Tests (4 tests - navigation, form submission, validation, list view)
   - ✅ Setup tests (2 tests - homepage loads, login page accessible)
+- ✅ Phase 4b: Event Types Unit Tests (4/4 tasks complete, 48 tests added)
+  - ✅ Task 4.6: Test useEventTypes hooks (9 tests - list, getById, checkAssociations)
+  - ✅ Task 4.7: Test useEventTypeMutations hooks (12 tests - create, update, delete with toast notifications)
+  - ✅ Task 4.8: Test EventTypeForm component (15 tests - rendering, validation, color picker, submission)
+  - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
 
-**Total Tests:** 90 tests passing (37 Convex + 44 Component + 9 E2E)
+**Total Tests:** 138 tests passing (37 Convex + 92 Component + 9 E2E)
 
 ---
 
@@ -869,10 +874,11 @@ Tests to add after core features are stable:
 | Phase       | Tasks          | Est. Time     | Tests             |
 | ----------- | -------------- | ------------- | ----------------- |
 | **Phase 1** | Infrastructure | 2 hours       | 1 validation test |
-| **Phase 2** | Convex Unit    | 2.5 hours     | 22 tests          |
+| **Phase 2** | Convex Unit    | 2.5 hours     | 37 tests          |
 | **Phase 3** | Component Unit | 2 hours       | 44 tests          |
 | **Phase 4** | E2E Tests      | 3 hours       | 9 tests           |
-| **Total**   |                | **9.5 hours** | **75 tests**      |
+| **Phase 4b**| Event Types    | 1.5 hours     | 48 tests          |
+| **Total**   |                | **11 hours**  | **138 tests**     |
 
 ---
 
