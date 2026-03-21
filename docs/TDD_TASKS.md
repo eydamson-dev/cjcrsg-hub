@@ -7,6 +7,44 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 ---
 
+## Current Progress
+
+**Updated:** 2026-03-21
+
+**Phase:** Phase 2 - Critical Convex Unit Tests  
+**Status:** ✅ Completed | 22/22 tests passing  
+**Current Task:** Phase 2 Complete - Ready for Phase 3 or Phase 4
+
+**Summary:**
+
+- ✅ Phase 1: Infrastructure (6/6 tasks complete)
+- ✅ Phase 2: Critical Convex Unit Tests (2/2 tasks complete, 22 tests passing)
+- ⏳ Phase 3: Shared Component Tests (next)
+- ⏳ Phase 4: E2E Critical Flows (pending)
+
+---
+
+## Documentation Note
+
+**This file tracks TDD and testing-related tasks only.**
+
+For feature implementation tasks (Event Types, Attendee management, etc.), see `docs/TASKS.md`.
+
+**Update this file when:**
+
+- Working on test infrastructure (Vitest, Playwright, convex-test)
+- Writing unit tests for Convex queries/mutations
+- Creating E2E test specs
+- Setting up test utilities or helpers
+
+**Do NOT update this file for:**
+
+- Feature implementation (UI components, backend logic)
+- Bug fixes unrelated to tests
+- Documentation updates
+
+---
+
 ## 📋 Table of Contents
 
 1. [TDD Overview & Strategy](#tdd-overview--strategy)

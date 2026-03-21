@@ -186,11 +186,45 @@ Before committing, ensure:
 - [ ] Run type check - no TypeScript errors
 - [ ] Test the feature manually (`pnpm dev`)
 - [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
-- [ ] **Update `TASKS.md`** - mark tasks complete or document bug fixes
-- [ ] **Update `TASKS.md` "Current Session" section** - reflect current task status and date
+- [ ] **Update Task Documentation** (choose based on work type):
+  - **Feature work** (Phase 4 Event Types, UI components, etc.) → Update `docs/TASKS.md` "Current Session"
+  - **TDD/Testing work** (test infrastructure, unit tests, E2E) → Update `docs/TDD_TASKS.md` "Current Progress"
+- [ ] **Update "Current Session" or "Current Progress" section** - reflect current task status and date
 - [ ] Clear console.log statements
 - [ ] Review your own changes (diff)
 - [ ] Update AGENTS.md if needed
+
+---
+
+## Task Documentation Workflow
+
+### Documentation Separation
+
+We maintain two separate task tracking files:
+
+| File                | Purpose                | Update When...                               |
+| ------------------- | ---------------------- | -------------------------------------------- |
+| `docs/TASKS.md`     | Feature implementation | Working on UI, backend features, bug fixes   |
+| `docs/TDD_TASKS.md` | Testing & TDD          | Working on test setup, unit tests, E2E tests |
+
+### Current Session Section
+
+Both files have a "Current Session" (or "Current Progress") section at the top:
+
+- Must be updated **before committing**
+- Include date, current task, status
+- Reference specific sub-tasks completed
+
+### Examples
+
+- **Feature work** → TASKS.md "Current Session"
+  - Phase 4 Event Types
+  - Creating components
+  - Bug fixes
+- **TDD work** → TDD_TASKS.md "Current Progress"
+  - Test infrastructure setup
+  - Writing unit tests
+  - E2E test implementation
 
 ---
 
