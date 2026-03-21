@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 1.2: Configure Vitest**
+  - Created `vitest.config.ts` with React plugin and TypeScript path support
+  - Added `tests/unit/setup.ts` with jest-dom matchers for DOM assertions
+  - Configured jsdom environment for browser-like testing
+  - Added coverage reporting with v8 provider (includes src/ and convex/ directories)
+  - Added npm scripts: `pnpm test`, `pnpm test:watch`, `pnpm test:coverage`
+  - Verified configuration works with existing validation tests (3/3 passing)
+
 - **TDD Task 1.1: Install Core Testing Dependencies**
   - Installed Vitest testing framework with coverage support (`@vitest/coverage-v8`)
   - Installed Convex testing utilities (`convex-test`, `@edge-runtime/vm`) for backend unit tests
