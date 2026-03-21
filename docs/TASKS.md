@@ -9,20 +9,20 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** TDD Phase 2 - Critical Convex Unit Tests (Task 2.1)  
-**Status:** ✅ Completed | Attendee Mutation Tests Done
+**Current Task:** TDD Phase 2 - Critical Convex Unit Tests (Task 2.2)  
+**Status:** ✅ Completed | All Attendee Query Tests Done
 
-**TDD Implementation (Task 2.1):**
+**TDD Implementation (Task 2.2):**
 
-Completed comprehensive unit tests for attendee mutations:
+Completed comprehensive unit tests for attendee queries:
 
-- ✅ Created `tests/unit/convex/attendees/mutations.test.ts`
-- ✅ 7 tests covering create, update, and archive operations
-- ✅ Create tests: valid data, minimal fields, all fields
-- ✅ Update tests: single field, multiple fields, non-existent attendee error
-- ✅ Archive tests: status change, timestamp update, idempotency, field preservation
-- ✅ All tests passing using convex-test with in-memory database
-- ✅ Tests use direct function imports for better type safety
+- ✅ Created `tests/unit/convex/attendees/queries.test.ts`
+- ✅ 15 tests covering list, getById, search, and count operations
+- ✅ List tests: pagination, status filter, ordering by date
+- ✅ getById tests: returns attendee, returns null for non-existent
+- ✅ Search tests: first name, last name, email, status filter, case insensitive, result limiting
+- ✅ Count tests: total count, filtered by status, zero results
+- ✅ All tests passing (22 total tests for attendee queries + mutations)
 
 **TDD Progress:**
 
@@ -30,12 +30,13 @@ Completed comprehensive unit tests for attendee mutations:
 
 - ✅ Tasks 1.1-1.6: All infrastructure setup complete
 
-**Phase 2 - Critical Convex Unit Tests (In Progress):**
+**Phase 2 - Critical Convex Unit Tests (Completed):**
 
 - ✅ Task 2.1: Test Attendee Mutations (7/7 tests passing)
-- ⏳ Task 2.2: Test Attendee Queries (next)
+- ✅ Task 2.2: Test Attendee Queries (15/15 tests passing)
+- **Total: 22/22 tests passing**
 
-**Next:** Task 2.2 - Test Attendee Queries (search, pagination)
+**Next:** Phase 3 - Shared Component Tests OR Phase 4 - Event Types
 
 **Starting Phase 4 (Event Types):**
 

@@ -388,68 +388,63 @@ Created `tests/unit/convex/attendees/mutations.test.ts` with comprehensive tests
 
 ````
 
-### Task 2.2: Test Attendee Queries
+### ✅ Task 2.2: Test Attendee Queries
 
 **Time:** 1 hour
+**Status:** Completed ✓
 
-Create `tests/unit/convex/attendees/queries.test.ts`:
+Created `tests/unit/convex/attendees/queries.test.ts` with comprehensive tests:
 
-```typescript
-import { describe, it, expect } from 'vitest'
-import { convexTest } from 'convex-test'
-import schema from '../../../convex/schema'
+**Test Coverage:**
 
-const modules = import.meta.glob('../../../convex/**/*.ts')
+**List Query (3 tests):**
 
-describe('attendees queries', () => {
-  it('search returns matching attendees', async () => {
-    const t = convexTest(schema, modules)
+- ✅ Returns paginated results with cursor
+- ✅ Filters by status (member/visitor/inactive)
+- ✅ Orders by creation date descending
 
-    await t.mutation(api.attendees.create, {
-      firstName: 'Johnathan',
-      lastName: 'Doe',
-      status: 'visitor',
-    })
+**getById Query (2 tests):**
 
-    await t.mutation(api.attendees.create, {
-      firstName: 'Jane',
-      lastName: 'Smith',
-      status: 'visitor',
-    })
+- ✅ Returns attendee by valid ID
+- ✅ Returns null for non-existent attendee ID
 
-    const results = await t.query(api.attendees.search, { query: 'John' })
+**Search Query (7 tests):**
 
-    expect(results).toHaveLength(1)
-    expect(results[0].firstName).toBe('Johnathan')
-  })
+- ✅ Finds attendees by first name
+- ✅ Finds attendees by last name
+- ✅ Finds attendees by email
+- ✅ Filters search results by status
+- ✅ Returns empty array when no matches found
+- ✅ Case insensitive search
+- ✅ Limits results to 50 maximum
 
-  it('pagination returns correct page', async () => {
-    const t = convexTest(schema, modules)
+**Count Query (3 tests):**
 
-    // Create 5 attendees
-    for (let i = 0; i < 5; i++) {
-      await t.mutation(api.attendees.create, {
-        firstName: `User${i}`,
-        lastName: 'Test',
-        status: 'visitor',
-      })
-    }
+- ✅ Returns total count of all attendees
+- ✅ Returns count filtered by status
+- ✅ Returns 0 when no attendees exist
 
-    const page1 = await t.query(api.attendees.list, {
-      paginationOpts: { numItems: 2, cursor: null },
-    })
+**Total:** 15 tests, all passing ✓
 
-    expect(page1.page).toHaveLength(2)
-    expect(page1.isDone).toBe(false)
-  })
-})
-````
+**Phase 2 Summary:**
+
+- ✅ Task 2.1: 7 mutation tests passing
+- ✅ Task 2.2: 15 query tests passing
+- **Total: 22/22 Convex unit tests passing**
+- Execution time: ~900ms
+
+**Implementation Notes:**
+
+- Used convex-test with in-memory database for fast execution
+- Tests follow the same pattern as mutations (direct function imports)
+- Tests are isolated and create their own test data
+- All edge cases covered (empty results, non-existent IDs, filtering)`
 
 ---
 
 ## Phase 3: Shared Component Tests
 
-**Estimated Time:** 2 hours  
+**Estimated Time:** 2 hours
 **Goal:** Test components used by many features
 
 ### Task 3.1: Test Form Component
@@ -599,7 +594,7 @@ describe('Layout', () => {
 
 ## Phase 4: E2E Critical Flows
 
-**Estimated Time:** 3 hours  
+**Estimated Time:** 3 hours
 **Goal:** Test complete user workflows
 
 ### Task 4.1: Create Auth Tests
@@ -832,3 +827,4 @@ Tests to add after core features are stable:
 
 **Last Updated:** 2026-03-21
 **Status:** Ready for implementation
+````
