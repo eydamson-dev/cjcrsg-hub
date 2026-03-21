@@ -8,23 +8,27 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** Phase 4 - Event Types (Admin) - Task 4.12  
-**Status:** 🚧 In Progress | Manual Testing
+**Phase:** Phase 4 - Event Types (Admin) - ✅ COMPLETE  
+**Current Task:** Phase 5 - Event Management  
+**Status:** 🚧 Ready to start
 
 **Recently Completed:**
 
+- ✅ Task 4.12: Event Types E2E Tests - Fixed test failures
+  - Resolved test data conflicts using unique names with `Date.now()`
+  - Fixed Playwright strict mode violations with `.first()` selector
+  - All 16 E2E tests passing (Chromium + Mobile Chrome)
+  - All 164 tests passing
 - ✅ Tasks 4.10-4.11: Event Types route page and navigation
   - Task 4.10: Created `/event-types` route page with modal-based CRUD interface
   - Task 4.11: Added "Event Types" nav item with Palette icon
   - Integrated EventTypeList and EventTypeForm components with Dialog
-  - All 156 tests passing
 - ✅ Tasks 4.6-4.9: Event Types hooks and components **with comprehensive unit tests**
   - Task 4.6: useEventTypes hooks (9 tests) - `useEventTypesList`, `useEventType`, `useCheckEventTypeAssociations`
   - Task 4.7: useEventTypeMutations hooks (12 tests) - `useCreateEventType`, `useUpdateEventType`, `useDeleteEventType`
   - Task 4.8: EventTypeForm component (15 tests) - rendering, validation, color picker
   - Task 4.9: EventTypeList component (12 tests) - loading, error, empty states, table rendering
-  - **Total: 48 new tests added, 156 tests passing**
+  - **Total: 48 new tests added, 164 tests passing**
 
 ---
 
@@ -781,9 +785,10 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 - [x] Created route page tests (`tests/unit/events/routes/event-types.test.tsx`)
   - 8 tests covering: initial render, dialog management, form submission
 - [x] Created E2E tests (`tests/e2e/specs/event-types.spec.ts`)
-  - 9 tests covering: navigation, empty state, CRUD operations, validation
-- [x] All 156 unit tests passing
-- [x] TypeScript compiles without errors
+  - 16 tests covering: navigation, CRUD, validation, color picker, 2 browsers
+  - Fixed: unique names for parallel test runs, `.first()` for strict mode
+- [x] All 164 unit tests passing
+- [x] All 16 E2E tests passing
 
 ---
 
