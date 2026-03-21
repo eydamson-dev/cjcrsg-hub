@@ -169,7 +169,7 @@ export default defineConfig({
 
 **Created files:**
 
-- `vitest.config.ts` - Vitest configuration
+- `vitest.config.ts` - Vitest configuration (excludes e2e tests directory)
 - `tests/unit/setup.ts` - Test setup file with jest-dom matchers
 
 **Added npm scripts:**
@@ -179,6 +179,8 @@ export default defineConfig({
 - `pnpm test:coverage` - Run tests with coverage report
 
 **Verification:** All tests pass (3/3). Configuration supports React components and Convex backend tests.
+
+- Updated vitest.config.ts to exclude `tests/e2e/**/*` to prevent Vitest from running Playwright tests
 
 ### ✅ Task 1.3: Configure Playwright
 
@@ -259,9 +261,12 @@ export default defineConfig({
 - Trace recording for debugging
 - Multi-browser support (desktop + mobile)
 
-### Task 1.4: Create Test Folder Structure
+### ✅ Task 1.4: Create Test Folder Structure
 
-**Time:** 15 minutes
+**Time:** 15 minutes  
+**Status:** Completed ✓
+
+Created test directory structure:
 
 ```bash
 mkdir -p tests/unit/convex/attendees
@@ -270,9 +275,19 @@ mkdir -p tests/e2e/specs
 mkdir -p tests/e2e/setup
 ```
 
-### Task 1.5: Update package.json Scripts
+**Created directories:**
 
-**Time:** 5 minutes
+- `tests/unit/convex/attendees/` - For Convex backend unit tests
+- `tests/unit/components/ui/` - For shared UI component tests
+- `tests/e2e/specs/` - For E2E test specifications
+- `tests/e2e/setup/` - For E2E test setup files
+
+### ✅ Task 1.5: Update package.json Scripts
+
+**Time:** 5 minutes  
+**Status:** Completed ✓
+
+Added test scripts to package.json:
 
 ```json
 {
@@ -286,11 +301,20 @@ mkdir -p tests/e2e/setup
 }
 ```
 
-### Task 1.6: Validate Setup
+**Scripts added:**
 
-**Time:** 15 minutes
+- `pnpm test` - Run unit tests once
+- `pnpm test:watch` - Run unit tests in watch mode
+- `pnpm test:coverage` - Run unit tests with coverage report
+- `pnpm test:e2e` - Run E2E tests headless
+- `pnpm test:e2e:ui` - Run E2E tests with interactive UI
 
-Create `tests/unit/example.test.ts`:
+### ✅ Task 1.6: Validate Setup
+
+**Time:** 15 minutes  
+**Status:** Completed ✓
+
+Created validation test at `tests/unit/example.test.ts`:
 
 ```typescript
 import { describe, it, expect } from 'vitest'
@@ -299,10 +323,22 @@ describe('Setup', () => {
   it('vitest works', () => {
     expect(true).toBe(true)
   })
+
+  it('can import testing-library', () => {
+    expect(() => require('@testing-library/react')).not.toThrow()
+  })
+
+  it('can import convex-test', () => {
+    expect(() => require('convex-test')).not.toThrow()
+  })
 })
 ```
 
-Run: `pnpm test` - should pass
+**Verification:**
+
+- ✅ `pnpm test` passes (3/3 tests)
+- ✅ Vitest excludes e2e directory (configured in vitest.config.ts)
+- ✅ All test runners working correctly
 
 ---
 

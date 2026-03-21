@@ -9,30 +9,37 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** TDD Task 1.3 - Configure Playwright  
-**Status:** ✅ Completed | E2E Testing Infrastructure Ready
+**Current Task:** TDD Phase 1 - Infrastructure Setup (Tasks 1.4-1.6)  
+**Status:** ✅ Completed | All Phase 1 Tasks Done
 
-**TDD Implementation (Task 1.3):**
+**TDD Implementation (Tasks 1.4-1.6):**
 
-Completed Playwright configuration:
+Completed remaining Phase 1 infrastructure tasks:
 
-- Created `playwright.config.ts` with multi-browser support
-- Installed all Playwright browsers (Chromium, Firefox, WebKit)
-- Configured automatic dev server management
-- Added parallel test execution with retry logic
-- Set up screenshot capture on failure and trace recording
-- Added npm scripts: `pnpm test:e2e`, `pnpm test:e2e:ui`
-- Created example E2E test (`tests/e2e/specs/setup.spec.ts`)
+- ✅ Task 1.4: Created complete test folder structure
+  - tests/unit/convex/attendees/ for backend tests
+  - tests/unit/components/ui/ for component tests
+  - tests/e2e/specs/ for E2E specifications
+  - tests/e2e/setup/ for E2E setup files
+- ✅ Task 1.5: All npm scripts configured
+  - Unit tests: pnpm test, pnpm test:watch, pnpm test:coverage
+  - E2E tests: pnpm test:e2e, pnpm test:e2e:ui
+- ✅ Task 1.6: Setup validation complete
+  - Validation tests passing (3/3)
+  - Fixed Vitest to exclude e2e directory
+  - All test runners working correctly
 
-**Phase 1 Infrastructure Complete:**
-
-All Phase 1 TDD tasks completed:
+**Phase 1 Complete:**
+All TDD Phase 1 infrastructure tasks completed (1.1-1.6):
 
 - ✅ Task 1.1: Install Core Dependencies
 - ✅ Task 1.2: Configure Vitest
 - ✅ Task 1.3: Configure Playwright
+- ✅ Task 1.4: Create Test Folder Structure
+- ✅ Task 1.5: Update package.json Scripts
+- ✅ Task 1.6: Validate Setup
 
-**Next:** Task 1.4 - Create Test Folder Structure (if not already done), then proceed to Phase 2 (Critical Convex Unit Tests).
+**Next:** Phase 2 - Critical Convex Unit Tests (Task 2.1: Test Attendee Mutations)
 
 **Starting Phase 4 (Event Types):**
 

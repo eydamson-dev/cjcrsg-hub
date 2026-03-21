@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Phase 1: Complete Infrastructure Setup (Tasks 1.1-1.6)**
+  - ✅ Task 1.4: Created test folder structure (tests/unit/convex/attendees, tests/unit/components/ui, tests/e2e/specs, tests/e2e/setup)
+  - ✅ Task 1.5: Added all test scripts to package.json (test, test:watch, test:coverage, test:e2e, test:e2e:ui)
+  - ✅ Task 1.6: Validated setup with passing tests (3/3)
+  - Fixed Vitest configuration to exclude e2e directory (prevents running Playwright tests in Vitest)
+
 - **TDD Task 1.3: Configure Playwright**
   - Created `playwright.config.ts` with multi-browser support (Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari)
   - Configured automatic dev server management with webServer option
