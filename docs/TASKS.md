@@ -8,9 +8,34 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 4 - Event Types (Admin) - In Progress
-**Current Task:** Task 4.1 - Install Dependencies
-**Status:** 🚧 Phase 4 Started | Ready to begin implementation
+**Phase:** Phase 4 - Event Types (Admin) - In Progress  
+**Current Task:** TDD Task 1.1 - Install Core Dependencies  
+**Status:** ✅ Completed | TDD Infrastructure Setup
+
+**TDD Implementation (Task 1.1):**
+
+Completed installation of core testing dependencies:
+
+- Vitest testing framework with coverage support
+- Convex testing utilities (convex-test, @edge-runtime/vm)
+- React Testing Library (@testing-library/react, @testing-library/jest-dom, jsdom)
+- Playwright for E2E testing
+- Created test folder structure and validation tests
+
+All tests passing (3/3). Ready to proceed with Task 1.2 (Configure Vitest).
+
+**Starting Phase 4 (Event Types):**
+
+Phase 4 plan has been detailed in TASKS.md with 12 specific tasks:
+
+- Task 4.1: Install react-colorful dependency
+- Task 4.2-4.4: Backend (validators, queries, mutations)
+- Task 4.5: Generate Convex types
+- Task 4.6-4.7: Frontend hooks
+- Task 4.8-4.9: UI components (EventTypeForm, EventTypeList)
+- Task 4.10: Route page
+- Task 4.11: Navigation
+- Task 4.12: Testing
 
 **Starting Phase 4 (Event Types):**
 

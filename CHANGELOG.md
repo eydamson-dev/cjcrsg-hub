@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 1.1: Install Core Testing Dependencies**
+  - Installed Vitest testing framework with coverage support (`@vitest/coverage-v8`)
+  - Installed Convex testing utilities (`convex-test`, `@edge-runtime/vm`) for backend unit tests
+  - Installed React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`, `jsdom`) for component tests
+  - Installed Playwright (`@playwright/test`) for E2E testing
+  - Created test folder structure: `tests/unit/`, `tests/e2e/`
+  - Added validation test (`tests/unit/example.test.ts`) confirming all packages load correctly
+  - Updated TDD_TASKS.md to mark Task 1.1 as completed
+
 - **Task 3.17: Clickable Table Rows for Attendee Navigation**
   - Made entire table rows clickable to navigate to attendee detail view
   - Added `cursor-pointer` and `hover:bg-muted/50` styling for visual feedback
