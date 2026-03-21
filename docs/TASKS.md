@@ -9,37 +9,33 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** TDD Phase 1 - Infrastructure Setup (Tasks 1.4-1.6)  
-**Status:** ✅ Completed | All Phase 1 Tasks Done
+**Current Task:** TDD Phase 2 - Critical Convex Unit Tests (Task 2.1)  
+**Status:** ✅ Completed | Attendee Mutation Tests Done
 
-**TDD Implementation (Tasks 1.4-1.6):**
+**TDD Implementation (Task 2.1):**
 
-Completed remaining Phase 1 infrastructure tasks:
+Completed comprehensive unit tests for attendee mutations:
 
-- ✅ Task 1.4: Created complete test folder structure
-  - tests/unit/convex/attendees/ for backend tests
-  - tests/unit/components/ui/ for component tests
-  - tests/e2e/specs/ for E2E specifications
-  - tests/e2e/setup/ for E2E setup files
-- ✅ Task 1.5: All npm scripts configured
-  - Unit tests: pnpm test, pnpm test:watch, pnpm test:coverage
-  - E2E tests: pnpm test:e2e, pnpm test:e2e:ui
-- ✅ Task 1.6: Setup validation complete
-  - Validation tests passing (3/3)
-  - Fixed Vitest to exclude e2e directory
-  - All test runners working correctly
+- ✅ Created `tests/unit/convex/attendees/mutations.test.ts`
+- ✅ 7 tests covering create, update, and archive operations
+- ✅ Create tests: valid data, minimal fields, all fields
+- ✅ Update tests: single field, multiple fields, non-existent attendee error
+- ✅ Archive tests: status change, timestamp update, idempotency, field preservation
+- ✅ All tests passing using convex-test with in-memory database
+- ✅ Tests use direct function imports for better type safety
 
-**Phase 1 Complete:**
-All TDD Phase 1 infrastructure tasks completed (1.1-1.6):
+**TDD Progress:**
 
-- ✅ Task 1.1: Install Core Dependencies
-- ✅ Task 1.2: Configure Vitest
-- ✅ Task 1.3: Configure Playwright
-- ✅ Task 1.4: Create Test Folder Structure
-- ✅ Task 1.5: Update package.json Scripts
-- ✅ Task 1.6: Validate Setup
+**Phase 1 - Infrastructure (Completed):**
 
-**Next:** Phase 2 - Critical Convex Unit Tests (Task 2.1: Test Attendee Mutations)
+- ✅ Tasks 1.1-1.6: All infrastructure setup complete
+
+**Phase 2 - Critical Convex Unit Tests (In Progress):**
+
+- ✅ Task 2.1: Test Attendee Mutations (7/7 tests passing)
+- ⏳ Task 2.2: Test Attendee Queries (next)
+
+**Next:** Task 2.2 - Test Attendee Queries (search, pagination)
 
 **Starting Phase 4 (Event Types):**
 
