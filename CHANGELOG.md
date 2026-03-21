@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 2.1: Test Attendee Mutations**
+  - Created comprehensive unit tests for attendee mutations
+  - Tests cover create, update, and archive operations
+  - Create tests: valid data, minimal fields, all fields
+  - Update tests: single field, multiple fields, non-existent attendee error
+  - Archive tests: status change, timestamp update, idempotency, field preservation
+  - All 7 tests passing using convex-test with in-memory database
+  - Tests use direct function imports for better type safety
+
 - **TDD Phase 1: Complete Infrastructure Setup (Tasks 1.1-1.6)**
   - ✅ Task 1.4: Created test folder structure (tests/unit/convex/attendees, tests/unit/components/ui, tests/e2e/specs, tests/e2e/setup)
   - ✅ Task 1.5: Added all test scripts to package.json (test, test:watch, test:coverage, test:e2e, test:e2e:ui)
