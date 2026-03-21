@@ -9,8 +9,8 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
-**Current Task:** Task 5.4 - Event Detail View UI (UI completed, mock data integrated)  
-**Status:** Ready for PR
+**Current Task:** Task 5.5 - Event Form UI (Section-based editing)  
+**Status:** Planning complete, ready to implement
 
 **Design Decisions (Phase 5):**
 
@@ -19,6 +19,13 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 - **Media:** Banner supports URL + file upload, other media are file uploads
 - **Attendee Search:** Search + dropdown (type to filter)
 - **Priority:** UI with mock data first, then backend integration
+- **Edit Pattern:** Section-based inline editing with modals (NOT full-page form)
+  - Basic Info: Edit button → Modal
+  - Description: Edit button → Modal
+  - Banner: Click image or Upload button → Direct upload
+  - Media Gallery: Upload button + trash icons per item
+  - Create page: Full-page form (all sections editable)
+  - **Removed:** `/events/$id/edit` route (no longer needed)
 
 **Recently Completed:**
 
@@ -38,10 +45,10 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Upcoming Tasks (Phase 5):**
 
-- Task 5.5: Event Form UI (Create/Edit)
-- Task 5.6: Dashboard UI (Active Event with attendance)
-- Task 5.7: Backend Integration (Schema, queries, mutations)
-- Task 5.8: Testing
+- 🚧 Task 5.5: Event Form UI (Section-based editing with modals)
+- ⏳ Task 5.6: Dashboard UI (Active Event with attendance)
+- ⏳ Task 5.7: Backend Integration (Schema, queries, mutations)
+- ⏳ Task 5.8: Testing
 
 ---
 
@@ -852,9 +859,10 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 /events                 → Current event dashboard or empty state
 /events/archive         → Past events archive (table/card views)
 /events/new             → Create event form
-/events/:id             → View event details (past events)
-/events/:id/edit         → Edit event form
+/events/:id             → View event details (with inline editing)
 ```
+
+**Note:** Edit functionality is handled inline on the detail page via modals (not a separate route)
 
 ---
 
@@ -1207,15 +1215,30 @@ Note: "Delete Event" requires confirmation dialog
 
 **Status:** Pending
 
-**Description:** Create event creation and edit form with all fields.
+**Description:** Create event forms using section-based editing. Detail page has editable blocks with modals, create page uses full form layout.
+
+**Architecture:**
+
+- **Event Detail Page (`/events/$id`)**: Display event in editable sections. Each section has inline edit capability:
+  - Basic Info: Edit button opens modal
+  - Description: Edit button opens modal
+  - Banner: Click to upload (no modal, direct upload)
+  - Media Gallery: Upload button + trash icons on items
+- **Create Event Page (`/events/new`)**: Full-page form with all sections displayed as editable inputs (same layout as detail view but all fields editable)
 
 **Files to Create:**
 
-- `src/routes/events.new.tsx` - Create route
-- `src/routes/events.$id.edit.tsx` - Edit route
-- `src/features/events/components/EventForm.tsx` - Main form component
-- `src/features/events/components/BannerUploader.tsx` - Banner upload/input
-- `src/features/events/components/MediaUploader.tsx` - Media gallery upload
+**Routes:**
+
+- `src/routes/events.new.tsx` - Create route (full-page form)
+- ~~`src/routes/events.$id.edit.tsx`~~ - **REMOVED** (editing happens via modals on detail page)
+
+**Components:**
+
+- `src/features/events/components/BasicInfoEditModal.tsx` - Modal for editing name, type, date, time, location
+- `src/features/events/components/DescriptionEditModal.tsx` - Modal for editing description textarea
+- `src/features/events/components/BannerUploader.tsx` - Banner upload trigger + preview
+- `src/features/events/components/MediaGallery.tsx` - Grid with upload button + delete icons
 
 **Form Fields:**
 
@@ -1238,64 +1261,90 @@ interface EventFormData {
 }
 ```
 
-**UI Specification:**
+**Event Detail Page Layout:**
 
 ```
-Form Layout (two-column on desktop, single on mobile):
+┌─────────────────────────────────────────────────────────────┐
+│ Sunday Service                                    [Edit ✏️] │ ← Basic Info Block
+│ March 23, 2026 • 9:00 AM - 11:00 AM • Main Sanctuary       │
+│ [Sunday Service Badge]                                      │
+└─────────────────────────────────────────────────────────────┘
 
+┌─────────────────────────────────────────────────────────────┐
+│ Description                                         [Edit ✏️] │ ← Description Block
+│ ───────────────────────────────────────────────────────    │
+│ Weekly Sunday service with worship, teaching...            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ Banner Image                                              │ ← Banner Block
+│ ───────────────────────────────────────────────────────    │
+│ [████████████████████████████████████████████]            │
+│ Click image or [Upload 📤] button to change                │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ Media Gallery (6)                               [+ Upload] │ ← Gallery Block
+│ ───────────────────────────────────────────────────────    │
+│ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐                 │
+│ │ [img1] │ │ [img2] │ │ [img3] │ │ [vid] ▶│                 │
+│ │  🗑️   │ │  🗑️   │ │  🗑️   │ │  🗑️   │                 │ ← Trash icon per item
+│ └────────┘ └────────┘ └────────┘ └────────┘                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Modal Layout (Basic Info Example):**
+
+```
+┌──────────────────────────────────────────────┐
+│ Edit Basic Info                         [×] │
+│ ─────────────────────────────────────────── │
+│                                              │
+│ Event Name *                                 │
+│ ┌────────────────────────────────────────┐  │
+│ │ Sunday Service                          │  │
+│ └────────────────────────────────────────┘  │
+│                                              │
+│ Event Type *          Date *                 │
+│ ┌───────────────┐    ┌───────────────┐      │
+│ │ Sunday Svc ▼ │    │ Mar 23, 2026 │      │
+│ └───────────────┘    └───────────────┘      │
+│                                              │
+│ Start Time    End Time    Location           │
+│ ┌──────────┐ ┌──────────┐ ┌──────────────┐  │
+│ │ 9:00 AM ▼│ │11:00 AM ▼│ │Main Sanctuary│  │
+│ └──────────┘ └──────────┘ └──────────────┘  │
+│                                              │
+│        [Cancel]  [Save Changes]              │
+└──────────────────────────────────────────────┘
+```
+
+**Create Event Page Layout:**
+
+Same sections as detail page, but all fields are editable inputs (not display + modal):
+
+```
 ┌──────────────────────────────────────────────────────────────┐
-│  Create New Event / Edit Event                               │
-│  ═══════════════════════════════════════════════════════════│
+│ Create New Event                                             │
+│ ═══════════════════════════════════════════════════════════ │
 │                                                              │
-│  Event Name *                                                │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ Sunday Service                                          │  │
-│  └────────────────────────────────────────────────────────┘  │
+│ Event Name *                                                 │
+│ ┌────────────────────────────────────────────────────────┐  │
+│ │                                                        │  │
+│ └────────────────────────────────────────────────────────┘  │
 │                                                              │
-│  Event Type *              Date *                            │
-│  ┌─────────────────────┐    ┌─────────────────────┐         │
-│  │ Sunday Service     ▼ │    │ March 23, 2026     📅│         │
-│  └─────────────────────┘    └─────────────────────┘         │
+│ Event Type *              Date *                             │
+│ ┌─────────────────────┐    ┌─────────────────────┐          │
+│ │                     │    │                     │          │
+│ └─────────────────────┘    └─────────────────────┘          │
 │                                                              │
-│  Start Time           End Time           Location             │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │
-│  │ 9:00 AM       ▼ │ │ 11:00 AM      ▼ │ │ Main Sanctuary │ │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘ │
+│ [Description textarea]                                      │
 │                                                              │
-│  Description                                                 │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ Weekly Sunday service with worship, teaching, and       │  │
-│  │ communion...                                           │  │
-│  └────────────────────────────────────────────────────────┘  │
+│ [Banner upload area]                                        │
 │                                                              │
-│  Banner Image                                                │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ Current: [Banner Preview]                              │  │
-│  │                                                        │  │
-│  │ [Enter URL]  or  [Upload Image]                       │  │
-│  │ ┌────────────────────────────────────────────────────┐ │  │
-│  │ │ https://images.unsplash.com/...                   │ │  │
-│  │ └────────────────────────────────────────────────────┘ │  │
-│  │                                                        │  │
-│  │ Preview: [████████████████████████████]               │  │
-│  └────────────────────────────────────────────────────────┘  │
+│ [Media gallery (empty with upload button)]                  │
 │                                                              │
-│  Media Gallery                                               │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ + Add Image  + Add Video                              │  │
-│  │ ┌────────┐ ┌────────┐ ┌────────┐                       │  │
-│  │ │ [img1] │ │ [img2] │ │ [vid] ▶│                       │  │
-│  │ │   ✕   │ │   ✕   │ │   ✕   │                       │  │
-│  │ └────────┘ └────────┘ └────────┘                       │  │
-│  └────────────────────────────────────────────────────────┘  │
-│                                                              │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ ⚠️ Creating event in the past                         │  │
-│  │    This event date has already passed.                  │  │
-│  └────────────────────────────────────────────────────────┘  │
-│  (Shown only if date < today)                               │
-│                                                              │
-│              [Cancel]  [Create Event / Save Changes]          │
+│        [Cancel]  [Create Event]                              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -1308,20 +1357,43 @@ Form Layout (two-column on desktop, single on mobile):
 - Banner URL: Valid URL format or empty
 - Past Date Warning: Show alert if date < today
 
+**Modal Behavior:**
+
+- All modals have [Cancel] and [Save] buttons
+- Cancel: Closes modal, discards changes
+- Save: Validates, saves changes (mock), closes modal, shows toast
+
+**Section Edit Behavior:**
+
+| Section       | Edit Trigger                 | Action                            |
+| ------------- | ---------------------------- | --------------------------------- |
+| Basic Info    | Edit ✏️ button               | Opens modal with all basic fields |
+| Description   | Edit ✏️ button               | Opens modal with textarea         |
+| Banner        | Click image or Upload button | Opens file picker (no modal)      |
+| Media Gallery | + Upload button              | Opens file picker                 |
+| Media Item    | 🗑️ Trash icon                | Removes item with confirmation    |
+
 **Success Criteria:**
 
-- [ ] All form fields render correctly
+- [ ] Basic Info block displays with Edit button
+- [ ] Description block displays with Edit button
+- [ ] Banner displays with click-to-upload and upload button
+- [ ] Media Gallery displays with Upload button and trash icons
+- [ ] Basic Info modal opens with all fields
+- [ ] Description modal opens with textarea
+- [ ] Modals have Cancel and Save buttons
 - [ ] Date picker works and defaults to today
 - [ ] Time pickers work
 - [ ] Event type dropdown populated (mock data)
-- [ ] Banner URL input with preview
-- [ ] Banner file upload button (mock - shows placeholder)
-- [ ] Media gallery with add/remove (mock uploads)
+- [ ] Banner file upload shows placeholder
+- [ ] Media upload shows placeholder
+- [ ] Delete item shows confirmation dialog
 - [ ] Validation messages display correctly
 - [ ] Past date warning shows when appropriate
-- [ ] Form submission shows loading state (mock)
-- [ ] Cancel button navigates back
-- [ ] Routes: `/events/new` and `/events/:id/edit` work
+- [ ] Create page has all sections as editable form
+- [ ] Create page Cancel navigates back
+- [ ] Route `/events/new` works
+- [ ] Route `/events/$id/edit` removed
 
 ---
 
