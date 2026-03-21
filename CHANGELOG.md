@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Phase 5: Event Management UI (Tasks 5.0-5.4)** - Complete UI implementation with mock data
+  - Task 5.0: Types and Mock Data
+    - Created TypeScript types: Event, EventType, AttendanceRecord, CreateEventInput, UpdateEventInput
+    - 15 mock events (2 active, 5 upcoming, 8 completed) with realistic data
+    - 25 mock attendance records with check-in times and member/visitor status
+    - 4 event types: Sunday Service, Youth Night, Prayer Meeting, Retreat
+  - Task 5.1: Empty State UI
+    - "Start New Event" page with centered card layout
+    - Large circular plus button with hover effects
+    - Quick stats display: events this month, total events, last event, next scheduled
+    - "View Event Archive" button
+  - Task 5.2: Navigation Components
+    - Breadcrumb navigation with Home > Events > Archive pattern
+    - Back link component with chevron icon
+    - Integrated into all event routes
+  - Task 5.3: Archive Page UI
+    - Table view with columns: Banner, Event Name, Date, Type, Attendance, Actions
+    - Card view with 3-column grid (responsive: 2 cols tablet, 1 col mobile)
+    - Toggle button group (Table/Cards) with clear active state
+    - Event type filter dropdown with color indicators
+    - Search input with clear button
+    - Pagination with items per page selector (10, 25, 50)
+    - Click any row/card to navigate to event detail
+    - Empty state for no results
+  - Task 5.4: Event Detail View UI
+    - Banner image header with 5:1 aspect ratio
+    - Event info: name, status badge, date/time, location, event type badge
+    - Description section in bordered card
+    - Media gallery with 3-6 column responsive grid and lightbox
+    - Attendance summary with stats (Total, Members, Visitors)
+    - Paginated attendee table with search and add/delete buttons
+    - Action buttons: Edit Event, Restore Event (for completed), Delete Event with confirmation
+  - New routes: `/events/archive`, `/events/$id`
+  - Added shadcn components: breadcrumb, pagination
+  - All navigation working with proper TypeScript route types
+
 ### Fixed
 
 - **Event Types E2E Tests** - Resolved test failures caused by:

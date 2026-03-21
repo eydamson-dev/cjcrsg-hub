@@ -1,16 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Plus } from 'lucide-react'
 import { requireAuth } from '~/lib/auth-guard'
+import { EmptyEventState } from '~/features/events/components/EmptyEventState'
 
 export const Route = createFileRoute('/events/')({
   component: EventsPage,
@@ -45,25 +39,7 @@ function EventsContent() {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming Events</CardTitle>
-          <CardDescription>
-            Full event management coming in Phase 4
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border p-8 text-center">
-            <p className="text-muted-foreground">
-              Event management features coming soon...
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              This includes: Event creation, scheduling, event types, and
-              attendance tracking
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <EmptyEventState />
     </div>
   )
 }
