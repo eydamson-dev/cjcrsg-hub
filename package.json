@@ -49,18 +49,26 @@
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^1.2.0",
+    "@edge-runtime/vm": "^5.0.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/eslint-config": "^0.4.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/coverage-v8": "^4.1.0",
     "concurrently": "~9.2.1",
+    "convex-test": "^0.0.43",
+    "jsdom": "^29.0.1",
     "prettier": "^3.8.1",
     "shadcn": "^4.1.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.0"
   }
 }
