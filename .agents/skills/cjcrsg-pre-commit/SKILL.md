@@ -16,6 +16,17 @@ Quality gates and enforcement rules before every commit.
 
 ---
 
+## Important: Git CLI vs GitHub CLI
+
+**This project uses native `git` CLI only** - NOT `gh` CLI.
+
+- ✅ Use: `git add`, `git commit`, `git push`, `git checkout -b`
+- ❌ Don't use: `gh pr create`, `gh issue create`, `gh repo clone`
+
+**Exception:** You may use `gh` for viewing PRs/issues, but create them via GitHub web UI instead.
+
+---
+
 ## Pre-Commit Checklist
 
 **MANDATORY - Must complete before every commit:**
@@ -78,6 +89,27 @@ git commit -m "fix: critical login bug [HOTFIX]"
 # Documentation only
 git commit -m "docs: update README"
 ```
+
+---
+
+## Creating Pull Requests
+
+After pushing your branch, create the PR via GitHub web UI:
+
+1. **Push your branch:**
+
+   ```bash
+   git push -u origin feature/your-feature-name
+   ```
+
+2. **Open GitHub in browser:**
+   Navigate to: `https://github.com/eydamson-dev/cjcrsg-hub/pull/new/feature/your-feature-name`
+
+3. **Fill in PR template:**
+   - Title: Use conventional commit format (e.g., "feat: add event types management")
+   - Description: Summarize changes, link to related issues
+
+4. **Submit PR** via the GitHub web interface.
 
 ---
 
