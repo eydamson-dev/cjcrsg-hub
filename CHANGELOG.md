@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Refactor: Split cjcrsg-git-workflow into focused skills**
+  - Created `cjcrsg-git-conventions` - Branch naming and commit message standards
+  - Created `cjcrsg-pre-commit` - Quality checklist and enforcement rules
+  - Created `cjcrsg-docs-workflow` - Task tracking and changelog management
+  - Created `cjcrsg-testing-workflow` - Test requirements and locations
+  - Created `cjcrsg-dev-workflow` - Implementation-First methodology
+  - Deprecated monolithic `cjcrsg-git-workflow` skill (redirects to new skills)
+  - Each skill now has single, clear responsibility for better maintainability
+
 ### Added
 
 - **Phase 4: Event Types Tests (Tasks 4.6-4.9)**
