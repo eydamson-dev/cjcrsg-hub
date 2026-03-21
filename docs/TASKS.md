@@ -9,20 +9,21 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** TDD Task 1.1 - Install Core Dependencies  
-**Status:** ✅ Completed | TDD Infrastructure Setup
+**Current Task:** TDD Task 1.2 - Configure Vitest  
+**Status:** ✅ Completed | Test Runner Configured
 
-**TDD Implementation (Task 1.1):**
+**TDD Implementation (Task 1.2):**
 
-Completed installation of core testing dependencies:
+Completed Vitest configuration:
 
-- Vitest testing framework with coverage support
-- Convex testing utilities (convex-test, @edge-runtime/vm)
-- React Testing Library (@testing-library/react, @testing-library/jest-dom, jsdom)
-- Playwright for E2E testing
-- Created test folder structure and validation tests
+- Created `vitest.config.ts` with React plugin and TypeScript path support
+- Added `tests/unit/setup.ts` with jest-dom matchers
+- Configured jsdom environment for browser-like testing
+- Added coverage reporting with v8 provider
+- Added npm scripts: `pnpm test`, `pnpm test:watch`, `pnpm test:coverage`
+- All tests passing (3/3)
 
-All tests passing (3/3). Ready to proceed with Task 1.2 (Configure Vitest).
+Ready to proceed with Task 1.3 (Configure Playwright).
 
 **Starting Phase 4 (Event Types):**
 
