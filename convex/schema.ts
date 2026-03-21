@@ -35,7 +35,9 @@ export default defineSchema({
     color: v.optional(v.string()),
     isActive: v.boolean(),
     createdAt: v.number(),
-  }).index('by_active', ['isActive']),
+  })
+    .index('by_active', ['isActive'])
+    .index('by_name', ['name']),
   events: defineTable({
     name: v.string(),
     eventTypeId: v.id('eventTypes'),
