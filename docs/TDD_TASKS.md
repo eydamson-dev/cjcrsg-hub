@@ -72,47 +72,64 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 
 ---
 
-## 🎯 TDD Overview & Strategy
+## 🎯 Testing Strategy (Updated 2026-03-21)
+
+### Implementation-First Workflow
+
+**Step 1: IMPLEMENT**
+
+- Build the feature (backend + frontend)
+- Focus on functionality first
+- Make it work in the browser
+
+**Step 2: MANUAL TEST**
+
+- User tests the feature manually
+- Confirm requirements are met
+- Report any issues or adjustments needed
+
+**Step 3: ADD TESTS** (After user confirmation)
+
+- Backend: Unit tests with convex-test
+- Frontend: Component tests OR E2E tests
+- Update documentation with test counts
 
 ### Testing Philosophy
 
-**Focus on critical flows only.** We test what can break the app, not every file.
+**Focus on critical flows.** We test what can break the app.
 
-**What We Test:**
+**Backend (Unit Tests):**
 
-- Authentication (if auth breaks, nobody can use the app)
-- Attendee CRUD (core functionality)
-- Schema validation (data integrity)
-- Shared components (used by many features)
+- ✅ All queries and mutations
+- Schema validation
+- Business logic
+
+**Frontend (E2E + Selective Unit Tests):**
+
+- Critical user flows (via E2E)
+- Shared components (via unit tests)
+- Complex logic (via unit tests)
 
 **What We Skip:**
 
-- Every single component (high maintenance, low value)
-- Non-critical utilities
-- Simple UI-only components
-
-### TDD Workflow (Red-Green-Refactor)
-
-```
-1. RED: Write a failing test first
-2. GREEN: Write minimal code to make it pass
-3. REFACTOR: Improve code while keeping tests green
-```
+- Simple presentational components
+- Component tests that require heavy mocking
+- Tests for rapidly changing UI
 
 ### When to Write Tests
 
-**Write tests FIRST for:**
+**Write tests AFTER implementation for:**
 
-- Critical Convex mutations (create, update, archive)
+- Backend queries and mutations (convex-test)
 - Form validation logic
-- Bug fixes (reproduce the bug first)
-- Schema validation
+- Bug fixes (reproduce the bug first in implementation)
+- E2E tests for critical flows
 
 **Skip testing:**
 
 - Simple UI components (pure rendering)
 - Non-shared components (tested via E2E)
-- Refactoring (test after if needed)
+- Heavy-mocked component tests
 
 ---
 
