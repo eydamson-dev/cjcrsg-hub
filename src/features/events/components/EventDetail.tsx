@@ -1,4 +1,5 @@
-import { Pencil, RotateCcw, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { RotateCcw, Trash2, Pencil } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Separator } from '~/components/ui/separator'
 import {
@@ -12,17 +13,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '~/components/ui/alert-dialog'
+import { toast } from 'sonner'
 import { EventsBreadcrumb, BackLink } from './EventsBreadcrumb'
 import { EventDetailHeader } from './EventDetailHeader'
-import { EventMediaGallery } from './EventMediaGallery'
 import { EventAttendanceSummary } from './EventAttendanceSummary'
-import type { Event, AttendanceRecord } from '../types'
+import { BasicInfoEditModal } from './BasicInfoEditModal'
+import { DescriptionEditModal } from './DescriptionEditModal'
+import { BannerUploader } from './BannerUploader'
+import { MediaGallery, type MediaItem } from './MediaGallery'
+import { mockEventTypes } from '../mocks'
+import type { Event, AttendanceRecord, UpdateEventInput } from '../types'
 
 interface EventDetailProps {
   event: Event
   attendance?: AttendanceRecord[]
   showBackLink?: boolean
-  onEdit?: () => void
+  onUpdate?: (updates: UpdateEventInput) => void
   onRestore?: () => void
   onDelete?: () => void
   onAddAttendee?: () => void
@@ -33,39 +39,111 @@ export function EventDetail({
   event,
   attendance = [],
   showBackLink = false,
-  onEdit,
+  onUpdate,
   onRestore,
   onDelete,
   onAddAttendee,
   onDeleteAttendee,
 }: EventDetailProps) {
-  const formatDescription = (text: string | undefined) => {
-    if (!text) return null
-    return (
-      <div className="rounded-lg border p-4">
-        <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-          Description
-        </h3>
-        <p className="text-sm leading-relaxed">{text}</p>
-      </div>
-    )
+  const [currentEvent, setCurrentEvent] = useState<Event>(event)
+  const [showBannerUploader, setShowBannerUploader] = useState(false)
+  const [showBasicInfoModal, setShowBasicInfoModal] = useState(false)
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false)
+  const [showMediaGallery, setShowMediaGallery] = useState(false)
+
+  const handleUpdateBasicInfo = (updates: {
+    name: string
+    eventTypeId: string
+    date: number
+    startTime?: string
+    endTime?: string
+    location?: string
+  }) => {
+    const updatedEvent: Event = {
+      ...currentEvent,
+      ...updates,
+      eventType:
+        mockEventTypes.find((t) => t._id === updates.eventTypeId) ||
+        currentEvent.eventType,
+    }
+    setCurrentEvent(updatedEvent)
+
+    if (onUpdate) {
+      onUpdate({ id: event._id, ...updates })
+    }
+
+    toast.success('Event basic info updated')
+    setShowBasicInfoModal(false)
   }
 
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit()
-    } else {
-      // TODO: Navigate to edit route when created
-      console.log('Edit event:', event._id)
+  const handleUpdateDescription = (description: string) => {
+    const updatedEvent: Event = {
+      ...currentEvent,
+      description,
     }
+    setCurrentEvent(updatedEvent)
+
+    if (onUpdate) {
+      onUpdate({ id: event._id, description })
+    }
+
+    toast.success('Event description updated')
+    setShowDescriptionModal(false)
+  }
+
+  const handleUpdateBanner = (bannerImage: string) => {
+    const updatedEvent: Event = {
+      ...currentEvent,
+      bannerImage,
+    }
+    setCurrentEvent(updatedEvent)
+
+    if (onUpdate) {
+      onUpdate({ id: event._id, bannerImage })
+    }
+
+    toast.success('Event banner updated')
+    setShowBannerUploader(false)
+  }
+
+  const handleAddMedia = (item: MediaItem) => {
+    const updatedMedia = [...(currentEvent.media || []), item]
+    const updatedEvent: Event = {
+      ...currentEvent,
+      media: updatedMedia,
+    }
+    setCurrentEvent(updatedEvent)
+
+    if (onUpdate) {
+      onUpdate({ id: event._id, media: updatedMedia })
+    }
+
+    toast.success('Media added')
+  }
+
+  const handleDeleteMedia = (index: number) => {
+    const updatedMedia = (currentEvent.media || []).filter(
+      (_, i) => i !== index,
+    )
+    const updatedEvent: Event = {
+      ...currentEvent,
+      media: updatedMedia,
+    }
+    setCurrentEvent(updatedEvent)
+
+    if (onUpdate) {
+      onUpdate({ id: event._id, media: updatedMedia })
+    }
+
+    toast.success('Media removed')
   }
 
   const handleRestore = () => {
     if (onRestore) {
       onRestore()
     } else {
-      // TODO: Call restore mutation
-      console.log('Restore event:', event._id)
+      console.log('Restore event:', currentEvent._id)
+      toast.success('Event restored')
     }
   }
 
@@ -73,8 +151,8 @@ export function EventDetail({
     if (onDelete) {
       onDelete()
     } else {
-      // TODO: Call delete mutation
-      console.log('Delete event:', event._id)
+      console.log('Delete event:', currentEvent._id)
+      toast.success('Event deleted')
     }
   }
 
@@ -83,7 +161,7 @@ export function EventDetail({
       <EventsBreadcrumb
         items={[
           { label: 'Archive', href: '/events/archive' },
-          { label: event.name },
+          { label: currentEvent.name },
         ]}
       />
 
@@ -91,28 +169,93 @@ export function EventDetail({
         <BackLink href="/events/archive" label="Back to Archive" />
       )}
 
-      <EventDetailHeader event={event} />
+      {/* Basic Info - Header with Banner */}
+      <EventDetailHeader
+        event={currentEvent}
+        onEdit={() => setShowBasicInfoModal(true)}
+        onBannerClick={() => setShowBannerUploader(true)}
+      />
 
-      {formatDescription(event.description)}
+      {/* Description Section - Simple box with edit button beside title */}
+      <div className="rounded-lg border p-4">
+        <div className="mb-2 flex items-center justify-start gap-3">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Description
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDescriptionModal(true)}
+            className="size-8 rounded-full bg-muted/50 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:opacity-100"
+          >
+            <Pencil className="mr-1 size-3" />
+          </Button>
+        </div>
+        <p className="text-sm leading-relaxed">
+          {currentEvent.description || 'No description provided.'}
+        </p>
+      </div>
 
-      <EventMediaGallery event={event} />
+      {/* Media Gallery Section - Simple box with edit button beside title */}
+      <div className="rounded-lg border p-4">
+        <div className="mb-2 flex items-center justify-start gap-3">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Media Gallery ({currentEvent.media?.length || 0})
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowMediaGallery(true)}
+            className="size-8 rounded-full bg-muted/50 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:opacity-100"
+          >
+            <Pencil className="mr-1 size-3" />
+          </Button>
+        </div>
+        {currentEvent.media && currentEvent.media.length > 0 ? (
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {currentEvent.media.slice(0, 6).map((item, index) => (
+              <div
+                key={index}
+                className="relative aspect-square w-20 flex-shrink-0 overflow-hidden rounded-md border"
+              >
+                {item.type === 'video' ? (
+                  <div className="flex h-full w-full items-center justify-center bg-muted">
+                    <span className="text-xs text-muted-foreground">Video</span>
+                  </div>
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={item.caption || `Media ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </div>
+            ))}
+            {(currentEvent.media?.length || 0) > 6 && (
+              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border bg-muted">
+                <span className="text-sm text-muted-foreground">
+                  +{currentEvent.media.length - 6}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No media uploaded.</p>
+        )}
+      </div>
 
       <EventAttendanceSummary
         attendance={attendance}
-        totalCount={event.attendanceCount || attendance.length}
+        totalCount={currentEvent.attendanceCount || attendance.length}
         onAddAttendee={onAddAttendee}
         onDeleteAttendee={onDeleteAttendee}
       />
 
       <Separator />
 
+      {/* Action Buttons */}
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" onClick={handleEdit}>
-          <Pencil className="mr-2 size-4" />
-          Edit Event
-        </Button>
-
-        {event.status === 'completed' && (
+        {currentEvent.status === 'completed' && (
           <Button variant="outline" onClick={handleRestore}>
             <RotateCcw className="mr-2 size-4" />
             Restore Event
@@ -131,8 +274,8 @@ export function EventDetail({
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete the
-                event &quot;{event.name}&quot; and all associated attendance
-                records.
+                event &quot;{currentEvent.name}&quot; and all associated
+                attendance records.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -147,6 +290,38 @@ export function EventDetail({
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      {/* Modals */}
+      <BasicInfoEditModal
+        open={showBasicInfoModal}
+        event={currentEvent}
+        eventTypes={mockEventTypes}
+        onSave={handleUpdateBasicInfo}
+        onClose={() => setShowBasicInfoModal(false)}
+      />
+
+      <DescriptionEditModal
+        open={showDescriptionModal}
+        description={currentEvent.description || ''}
+        onSave={handleUpdateDescription}
+        onClose={() => setShowDescriptionModal(false)}
+      />
+
+      <BannerUploader
+        open={showBannerUploader}
+        bannerImage={currentEvent.bannerImage}
+        onUpload={handleUpdateBanner}
+        onClose={() => setShowBannerUploader(false)}
+      />
+
+      <MediaGallery
+        open={showMediaGallery}
+        media={currentEvent.media || []}
+        onAdd={handleAddMedia}
+        onDelete={handleDeleteMedia}
+        editable={true}
+        onClose={() => setShowMediaGallery(false)}
+      />
     </div>
   )
 }

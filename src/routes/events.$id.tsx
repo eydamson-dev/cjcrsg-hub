@@ -37,6 +37,26 @@ function EventDetailPage() {
     )
   }
 
+  const handleUpdate = (updates: {
+    id: string
+    name?: string
+    eventTypeId?: string
+    description?: string
+    date?: number
+    startTime?: string
+    endTime?: string
+    location?: string
+    bannerImage?: string
+    media?: Array<{
+      url: string
+      type: 'image' | 'video'
+      caption?: string
+    }>
+  }) => {
+    // TODO: Implement update API call
+    console.log('Update event:', updates)
+  }
+
   const handleAddAttendee = () => {
     // TODO: Implement add attendee modal/navigation
     console.log('Add attendee clicked')
@@ -54,6 +74,7 @@ function EventDetailPage() {
           event={event}
           attendance={attendance}
           showBackLink
+          onUpdate={handleUpdate}
           onAddAttendee={handleAddAttendee}
           onDeleteAttendee={handleDeleteAttendee}
         />

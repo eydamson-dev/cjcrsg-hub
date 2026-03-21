@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Phase 5: Event Management UI (Tasks 5.0-5.4)** - Complete UI implementation with mock data
+- **Phase 5: Event Management UI (Tasks 5.0-5.5)** - Complete UI implementation with mock data
   - Task 5.0: Types and Mock Data
     - Created TypeScript types: Event, EventType, AttendanceRecord, CreateEventInput, UpdateEventInput
     - 15 mock events (2 active, 5 upcoming, 8 completed) with realistic data
@@ -44,6 +44,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New routes: `/events/archive`, `/events/$id`
   - Added shadcn components: breadcrumb, pagination
   - All navigation working with proper TypeScript route types
+  - Task 5.5: Event Form UI (Section-based editing)
+    - BasicInfoEditModal: Edit name, type, date, time, location
+    - DescriptionEditModal: Edit description textarea
+    - BannerUploader: Upload banner via file or URL
+    - MediaGallery: Manage media (add/delete) with confirmation dialogs
+    - EventDetailHeader: Clickable banner for upload, edit button beside title
+    - EventDetail: Section-based layout with Edit buttons beside titles
+    - events.new route: Full-page create event form
+  - New routes: `/events/new`
 
 ### Fixed
 
