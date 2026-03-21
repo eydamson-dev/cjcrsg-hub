@@ -9,8 +9,8 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** TDD Phase 2 - Critical Convex Unit Tests (Task 2.2)  
-**Status:** ✅ Completed | All Attendee Query Tests Done
+**Current Task:** Phase 4 - Event Types (Admin) - Task 4.5  
+**Status:** 🚧 In Progress | Generate Convex Types
 
 **TDD Implementation (Task 2.2):**
 
@@ -633,26 +633,26 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.1: Install Dependencies
 
-- [ ] Install `react-colorful` color picker library
-- [ ] Verify installation and TypeScript types
+- [x] Install `react-colorful` color picker library
+- [x] Verify installation and TypeScript types
 
 ### Task 4.2: Create Backend Validators
 
-- [ ] Create `convex/eventTypes/validators.ts`
+- [x] Create `convex/eventTypes/validators.ts`
   - Define eventTypeName validator (string, min 1 char)
   - Define eventTypeDescription validator (optional string)
   - Define eventTypeColor validator (optional hex color string)
 
 ### Task 4.3: Create Backend Queries
 
-- [ ] Create `convex/eventTypes/queries.ts`
+- [x] Create `convex/eventTypes/queries.ts`
   - `list` query: Get all event types, order by name, filter by isActive
   - `getById` query: Get single event type by ID
   - `checkAssociations` query: Check if event type is used by any events
 
 ### Task 4.4: Create Backend Mutations
 
-- [ ] Create `convex/eventTypes/mutations.ts`
+- [x] Create `convex/eventTypes/mutations.ts`
   - `create` mutation: Insert new event type with name, description, color, isActive=true, createdAt
   - `update` mutation: Update existing event type fields
   - `remove` mutation: Delete event type (with association check)

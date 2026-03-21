@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 4: Event Types Backend (Tasks 4.1-4.4)**
+  - Task 4.1: Installed `react-colorful` v5.6.1 for color picker functionality
+  - Task 4.2: Created validators (`convex/eventTypes/validators.ts`)
+    - Defined validators for name, description, color, and event type ID
+  - Task 4.3: Created queries (`convex/eventTypes/queries.ts`)
+    - `list`: Returns all event types ordered by name, filters by isActive status
+    - `getById`: Returns single event type by ID or null if not found
+    - `checkAssociations`: Checks if event type has associated events (for deletion safety)
+  - Task 4.4: Created mutations (`convex/eventTypes/mutations.ts`)
+    - `create`: Creates new event type with trimmed name, auto-sets isActive=true and createdAt
+    - `update`: Updates existing event type fields with validation
+    - `remove`: Deletes event type only if no associated events exist
+  - Added `by_name` index to eventTypes schema for efficient name-based queries
+  - **TDD Implementation**: All 15 tests passing (6 query tests + 9 mutation tests)
+    - Tests cover: empty results, ordering by name, status filtering, CRUD operations
+    - Tests cover: error handling for non-existent records, deletion with associations
+    - Tests verify name trimming, partial updates, and association checking
+
 - **TDD Workflow Enforcement System**
   - Created `.agents/skills/cjcrsg-hub/tdd-workflow.md` with comprehensive TDD guidelines
   - Implemented git pre-commit hook (`.githooks/pre-commit`) to enforce TDD workflow

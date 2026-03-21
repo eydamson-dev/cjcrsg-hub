@@ -18,7 +18,11 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Summary:**
 
 - ✅ Phase 1: Infrastructure (6/6 tasks complete)
-- ✅ Phase 2: Critical Convex Unit Tests (2/2 tasks complete, 22 tests passing)
+- ✅ Phase 2: Critical Convex Unit Tests (3/3 tasks complete, 37 tests passing)
+  - ✅ Task 2.1: Test Attendee Mutations (7/7 tests passing)
+  - ✅ Task 2.2: Test Attendee Queries (15/15 tests passing)
+  - ✅ Task 2.3: Test Event Types Queries (6/6 tests passing)
+  - ✅ Task 2.4: Test Event Types Mutations (9/9 tests passing)
 - ✅ Phase 3: Shared Component Tests (3/3 tasks complete, 44 tests passing)
   - ✅ Task 3.1: Test Form Component (15/15 tests passing)
   - ✅ Task 3.2: Test ErrorState Component (21/21 tests passing)
@@ -28,7 +32,7 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
   - ✅ Task 4.2: Create Attendee CRUD Tests (4 tests - navigation, form submission, validation, list view)
   - ✅ Setup tests (2 tests - homepage loads, login page accessible)
 
-**Total Tests:** 75 tests passing (22 Convex + 44 Component + 9 E2E)
+**Total Tests:** 90 tests passing (37 Convex + 44 Component + 9 E2E)
 
 ---
 
