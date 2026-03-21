@@ -9,8 +9,38 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** Phase 4 - Event Types (Admin) - Task 4.5  
-**Status:** 🚧 In Progress | Generate Convex Types
+**Current Task:** Phase 4 - Event Types (Admin) - Task 4.10  
+**Status:** 🚧 In Progress | Create Event Types Route Page
+
+---
+
+## 🔄 Development Workflow (Updated 2026-03-21)
+
+### Implementation-First Workflow
+
+For **ALL tasks** (backend AND frontend):
+
+1. **IMPLEMENT** - Build the feature first
+   - Write the code
+   - Make it functional
+   - Don't write tests yet
+
+2. **MANUAL TEST** - You verify it works
+   - Run the app (`pnpm dev`)
+   - Test the feature manually
+   - Confirm requirements are met
+
+3. **ADD TESTS** - After your confirmation ("works", "LGTM", etc.)
+   - Backend: Add convex-test unit tests
+   - Frontend: Add component tests OR rely on E2E tests
+   - Update test counts in documentation
+
+**Why this change?**
+
+- UI requirements often evolve during implementation
+- Heavy mocking makes tests brittle for React components
+- Manual testing catches UX issues unit tests miss
+- Backend can still be unit tested effectively after implementation
 
 **TDD Implementation (Task 2.2):**
 
@@ -659,32 +689,34 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.5: Generate Convex Types
 
-- [ ] Run `pnpm dlx convex dev --once` to generate types for new modules
-- [ ] Verify types are created in `_generated/api.ts`
+- [x] Run `pnpm dlx convex dev --once` to generate types for new modules
+- [x] Verify types are created in `_generated/api.ts`
 
 ### Task 4.6: Create Frontend Hooks - Queries
 
-- [ ] Create `src/features/events/hooks/useEventTypes.ts`
+- [x] Create `src/features/events/hooks/useEventTypes.ts` (implemented ✓, tests pending)
   - `useEventTypesList()` - Hook for listing event types
   - `useEventType(id)` - Hook for getting single event type
   - `useCheckEventTypeAssociations(id)` - Hook for checking if deletable
 
 ### Task 4.7: Create Frontend Hooks - Mutations
 
-- [ ] Create `src/features/events/hooks/useEventTypeMutations.ts`
+- [x] Create `src/features/events/hooks/useEventTypeMutations.ts` (implemented ✓, tests pending)
   - `useCreateEventType()` - Create mutation with toast notifications
   - `useUpdateEventType()` - Update mutation with toast notifications
   - `useDeleteEventType()` - Delete mutation with confirmation dialog
 
 ### Task 4.8: Create EventTypeForm Component
 
-- [ ] Create `src/features/events/components/EventTypeForm.tsx`
+- [x] Create `src/features/events/components/EventTypeForm.tsx` (implemented ✓, tests pending)
   - Form with react-hook-form + zod validation
-  - Name field (required)
+  - Name field (required, min 2 chars)
   - Description field (optional)
   - Color picker section:
-    - Hex input with randomize button (🎲 icon) inside, right-aligned
-    - react-colorful picker below (matching input width)
+    - Hex input with randomize button (🎲 icon)
+    - react-colorful picker below
+  - Right-aligned Save/Cancel buttons
+  - Supports create and edit modes
   - Randomize button generates random hex color
   - Sync between hex input and color picker
   - Support create and edit modes
@@ -692,16 +724,19 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.9: Create EventTypeList Component
 
-- [ ] Create `src/features/events/components/EventTypeList.tsx`
+- [x] Create `src/features/events/components/EventTypeList.tsx` (implemented ✓, tests pending)
   - shadcn Table component
   - Columns: Color (colored circle + hex value), Name, Description, Actions (trash icon)
   - Click row opens edit modal
-  - Delete button per row
+  - Delete button per row with confirmation dialog
   - Empty state component when no event types
-  - "Add Event Type" button at top (opens create modal)
+  - "Add Event Type" button at top
   - Loading skeleton state
+  - Error state with retry button
 
 ### Task 4.10: Create Event Types Route Page
+
+**Note:** Implement first, add tests after manual verification
 
 - [ ] Create `src/routes/event-types.tsx`
   - Route configuration with auth guard
@@ -712,12 +747,16 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.11: Add Navigation Link
 
+**Note:** Implement first, add tests after manual verification
+
 - [ ] Update `src/lib/navigation.ts`
   - Add "Event Types" nav item
   - Route: `/event-types`
   - Icon: Tag or Palette icon
 
 ### Task 4.12: Test Implementation
+
+**Note:** Add tests after manual verification passes
 
 - [ ] Create event type with random color
 - [ ] Edit event type (change name, description, color)
