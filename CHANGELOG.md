@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 3.3: Test Layout Component**
+  - Created comprehensive unit tests for Layout component
+  - 6 tests covering layout rendering and structure
+  - Tests verify navigation elements (Sidebar, Header, MobileNav) are rendered
+  - Tests check children content rendering and main content area
+  - Tests ensure proper CSS classes for responsive layout (flex, h-screen, overflow-hidden)
+  - Used vi.mock() to mock child components for isolated testing
+  - All 6 tests passing (66 total tests across all phases)
+
+- **TDD Task 3.2: Test ErrorState Component**
+  - Created comprehensive unit tests for ErrorState component
+  - 21 tests covering error type rendering, custom content, and button actions
+  - Tests all 4 error types: not-found, error, network, unauthorized
+  - Tests custom title, description, and error message display
+  - Tests retry/back button functionality with custom handlers
+  - Tests button visibility controls (showRetry, showBack)
+  - Tests default behaviors (page reload, navigation to /attendees)
+  - All 21 tests passing (60 total with Task 3.1)
+
 - **TDD Task 3.1: Test Form Component**
   - Created comprehensive unit tests for AttendeeForm component
   - 15 tests covering form rendering, validation, submission, cancellation, and status field
