@@ -106,7 +106,32 @@ I create a feature branch for each task:
 git checkout -b feature/descriptive-name
 ```
 
-### 2. Implementation
+### 2. TDD Workflow
+
+**Before writing implementation, write tests FIRST:**
+
+```bash
+# Step 1: Write failing tests
+# Create test file (e.g., tests/unit/convex/feature/mutations.test.ts)
+pnpm test  # Confirm tests FAIL (RED)
+git add tests/
+git commit -m "test: add tests for [feature]"
+
+# Step 2: Write minimal implementation
+# Create convex/feature/mutations.ts
+pnpm test  # Confirm tests PASS (GREEN)
+git add convex/
+git commit -m "feat: implement [feature]"
+
+# Step 3: Refactor (if needed)
+# Clean up code
+pnpm test  # Still passing
+git commit -m "refactor: improve [feature]"
+```
+
+**See `.agents/skills/cjcrsg-hub/tdd-workflow.md` for detailed guide.**
+
+### 3. Implementation
 
 I make all code changes on the branch.
 
@@ -182,17 +207,38 @@ git pull origin main
 
 Before committing, ensure:
 
-- [ ] Run `pnpm lint` - no errors
+### TDD Requirements (Moderate Enforcement)
+
+- [ ] **New mutations have tests** (convex-test) - See `.agents/skills/cjcrsg-hub/tdd-workflow.md`
+- [ ] **New queries have tests** (convex-test)
+- [ ] **New shared components have tests** (@testing-library/react)
+- [ ] **Bug fixes include regression test**
+- [ ] Run `pnpm test` - **all tests pass** (enforced by git hook)
+
+### Quality Checks
+
+- [ ] Run `pnpm lint` - no errors (enforced by git hook)
 - [ ] Run type check - no TypeScript errors
 - [ ] Test the feature manually (`pnpm dev`)
+
+### Documentation
+
 - [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
 - [ ] **Update Task Documentation** (choose based on work type):
-  - **Feature work** (Phase 4 Event Types, UI components, etc.) → Update `docs/TASKS.md` "Current Session"
-  - **TDD/Testing work** (test infrastructure, unit tests, E2E) → Update `docs/TDD_TASKS.md` "Current Progress"
+  - **Feature work** → Update `docs/TASKS.md` "Current Session"
+  - **TDD/Testing work** → Update `docs/TDD_TASKS.md` "Current Progress"
 - [ ] **Update "Current Session" or "Current Progress" section** - reflect current task status and date
 - [ ] Clear console.log statements
 - [ ] Review your own changes (diff)
 - [ ] Update AGENTS.md if needed
+
+### Exceptions (TDD Skipped)
+
+Mark commit with keyword if skipping tests:
+
+- `prototype` / `spike` - Exploratory code
+- `hotfix` / `emergency` - Production fixes
+- `docs` / `documentation` - Documentation only
 
 ---
 

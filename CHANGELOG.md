@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Workflow Enforcement System**
+  - Created `.agents/skills/cjcrsg-hub/tdd-workflow.md` with comprehensive TDD guidelines
+  - Implemented git pre-commit hook (`.githooks/pre-commit`) to enforce TDD workflow
+  - Hook automatically runs tests and linting before each commit
+  - Hook warns about missing test files for new mutations/queries/components
+  - Supports exception keywords (prototype, hotfix, emergency, docs) to skip checks
+  - Updated `docs/GIT.md` with TDD pre-commit checklist and workflow documentation
+  - Updated `AGENTS.md` with link to TDD workflow documentation
+  - Moderate enforcement: reminders and warnings, but allows exceptions when needed
+
 - **TDD Phase 4: Complete E2E Critical Flows (Tasks 4.1-4.2)**
   - Updated Playwright configuration to test only Chromium (removed Firefox, WebKit, Mobile Safari)
   - Reduced test execution time by ~60% while maintaining mobile coverage via Mobile Chrome

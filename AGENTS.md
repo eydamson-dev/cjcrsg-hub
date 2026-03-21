@@ -33,6 +33,7 @@ pnpm dev
 ### 📋 Documentation
 
 - **[Tasks](docs/TASKS.md)** - Complete implementation checklist
+- **[TDD Workflow](.agents/skills/cjcrsg-hub/tdd-workflow.md)** - Test-Driven Development guide
 - **[Commands](docs/COMMANDS.md)** - All CLI commands
 - **[Conventions](docs/CONVENTIONS.md)** - Code standards & UI guidelines
 - **[Git Workflow](docs/GIT.md)** - Version control guide
