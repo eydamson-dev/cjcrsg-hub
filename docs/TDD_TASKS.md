@@ -11,16 +11,21 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 2 - Critical Convex Unit Tests  
-**Status:** ✅ Completed | 22/22 tests passing  
-**Current Task:** Phase 2 Complete - Ready for Phase 3 or Phase 4
+**Phase:** Phase 3 - Shared Component Tests  
+**Status:** In Progress | Task 3.1 Completed  
+**Current Task:** Task 3.1 - Test Form Component
 
 **Summary:**
 
 - ✅ Phase 1: Infrastructure (6/6 tasks complete)
 - ✅ Phase 2: Critical Convex Unit Tests (2/2 tasks complete, 22 tests passing)
-- ⏳ Phase 3: Shared Component Tests (next)
+- 🚧 Phase 3: Shared Component Tests (Task 3.1 complete, 15 tests passing)
+  - ✅ Task 3.1: Test Form Component (15/15 tests passing)
+  - ⏳ Task 3.2: Test ErrorState Component (next)
+  - ⏳ Task 3.3: Test Layout Component
 - ⏳ Phase 4: E2E Critical Flows (pending)
+
+**Total Tests:** 40 tests passing (22 Convex + 15 Component + 3 Setup)
 
 ---
 
@@ -485,11 +490,47 @@ Created `tests/unit/convex/attendees/queries.test.ts` with comprehensive tests:
 **Estimated Time:** 2 hours
 **Goal:** Test components used by many features
 
-### Task 3.1: Test Form Component
+### ✅ Task 3.1: Test Form Component
 
 **Time:** 1 hour
+**Status:** Completed ✓
 
-Create `tests/unit/components/ui/form.test.tsx`:
+Created `tests/unit/components/attendee-form.test.tsx` with comprehensive tests for the AttendeeForm component:
+
+**Test Coverage:**
+
+**Form Rendering (3 tests):**
+- ✅ Renders all required form fields (firstName, lastName, address, status)
+- ✅ Renders optional form fields (email, phone, notes, dates)
+- ✅ Renders with initial data when provided
+
+**Form Validation (4 tests):**
+- ✅ Validates required fields on submit
+- ✅ Rejects invalid email format
+- ✅ Accepts empty email field (optional)
+- ✅ Accepts valid email format
+
+**Form Submission (3 tests):**
+- ✅ Submits form with valid data
+- ✅ Submits form with all optional fields
+- ✅ Shows loading state while submitting
+
+**Form Cancellation (3 tests):**
+- ✅ Calls onCancel when cancel button clicked
+- ✅ Does not render cancel button when not provided
+- ✅ Disables cancel button while submitting
+
+**Status Field (2 tests):**
+- ✅ Defaults to visitor status
+- ✅ Renders status dropdown
+
+**Total:** 15 tests, all passing ✓
+
+**Implementation Notes:**
+- Tests use AttendeeForm component with react-hook-form + zod validation
+- Covers both form validation and user interactions
+- Tests are isolated with mock submit/cancel handlers
+- Fixed tsconfig.json to include tests directory for path resolution
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest'
