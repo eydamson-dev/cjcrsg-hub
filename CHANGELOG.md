@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Task 3.1: Test Form Component**
+  - Created comprehensive unit tests for AttendeeForm component
+  - 15 tests covering form rendering, validation, submission, cancellation, and status field
+  - Tests validate required fields (firstName, lastName, address), optional fields, and email format
+  - Tests verify form submission with valid data and all optional fields
+  - Tests cover cancel button behavior and loading states
+  - Fixed tsconfig.json to include tests directory for path resolution (~/\* alias)
+  - All 15 tests passing (40 total tests across all phases)
+
 - **TDD Task 2.2: Test Attendee Queries**
   - Created comprehensive unit tests for attendee queries
   - Tests cover list, getById, search, and count operations
