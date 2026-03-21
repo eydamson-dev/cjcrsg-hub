@@ -8,27 +8,36 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 4 - Event Types (Admin) - ✅ COMPLETE  
-**Current Task:** Phase 5 - Event Management  
-**Status:** 🚧 Ready to start
+**Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
+**Current Task:** Task 5.0 - Setup Types and Mock Data  
+**Status:** Ready to start
+
+**Design Decisions (Phase 5):**
+
+- **Route Structure:** Option 2 - Separate routes (`/events`, `/events/archive`, `/events/:id`)
+- **Event Status:** Manual control (user explicitly starts/completes events)
+- **Media:** Banner supports URL + file upload, other media are file uploads
+- **Attendee Search:** Search + dropdown (type to filter)
+- **Priority:** UI with mock data first, then backend integration
 
 **Recently Completed:**
 
-- ✅ Task 4.12: Event Types E2E Tests - Fixed test failures
-  - Resolved test data conflicts using unique names with `Date.now()`
-  - Fixed Playwright strict mode violations with `.first()` selector
-  - All 16 E2E tests passing (Chromium + Mobile Chrome)
+- ✅ Phase 4 - Event Types (Admin) - Complete
+  - Tasks 4.1-4.12: Backend, hooks, components, routes, tests
   - All 164 tests passing
-- ✅ Tasks 4.10-4.11: Event Types route page and navigation
-  - Task 4.10: Created `/event-types` route page with modal-based CRUD interface
-  - Task 4.11: Added "Event Types" nav item with Palette icon
-  - Integrated EventTypeList and EventTypeForm components with Dialog
-- ✅ Tasks 4.6-4.9: Event Types hooks and components **with comprehensive unit tests**
-  - Task 4.6: useEventTypes hooks (9 tests) - `useEventTypesList`, `useEventType`, `useCheckEventTypeAssociations`
-  - Task 4.7: useEventTypeMutations hooks (12 tests) - `useCreateEventType`, `useUpdateEventType`, `useDeleteEventType`
-  - Task 4.8: EventTypeForm component (15 tests) - rendering, validation, color picker
-  - Task 4.9: EventTypeList component (12 tests) - loading, error, empty states, table rendering
-  - **Total: 48 new tests added, 164 tests passing**
+  - Route: `/event-types`
+
+**Upcoming Tasks (Phase 5):**
+
+- Task 5.0: Setup Types and Mock Data
+- Task 5.1: Empty State UI (No Active Event page)
+- Task 5.2: Navigation Components (Breadcrumbs)
+- Task 5.3: Archive Page UI (Table/Card toggle)
+- Task 5.4: Event Detail View UI
+- Task 5.5: Event Form UI
+- Task 5.6: Dashboard UI (Active Event with attendance)
+- Task 5.7: Backend Integration (Schema, queries, mutations)
+- Task 5.8: Testing
 
 ---
 
@@ -816,61 +825,745 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ## Phase 5: Event Management
 
-### 5.1 Create event queries
+### Design Overview
 
-- [ ] Create `convex/events/queries.ts`
-  - Implement `listUpcoming` for future events
-  - Add `listPast` for historical events
-  - Create `getById` for single event details
-  - Add `listByType` filter
-  - Support date range filtering
-  - Order by date (upcoming: asc, past: desc)
+**Architecture:** Event Dashboard + Archive
 
-### 5.2 Create event mutations
+- Main page (`/events`) shows current/active event with attendance management
+- Empty state with "Start New Event" button when no active event
+- Archive page (`/events/archive`) for past events with table/card views
+- Event detail pages for viewing past events
+- Manual status control (user starts/completes events)
 
-- [ ] Create `convex/events/mutations.ts`
-  - Implement `create` mutation
-  - Add `update` mutation
-  - Create `cancel` mutation (set isActive false)
-  - Validate that event type exists
-  - Ensure date is in the future for new events
+**Event Status Lifecycle:**
 
-### 5.3 Build EventList component
+- `upcoming` → User creates event for future date
+- `active` → User clicks "Start Event" or event date arrives
+- `completed` → User clicks "Complete Event"
+- `cancelled` → User cancels event (optional)
 
-- [ ] Create `src/features/events/components/EventList.tsx`
-  - Display events in card or table format
-  - Show: name, date, time, location, type (with color)
-  - Add filter tabs: Upcoming, Past, All
-  - Implement sorting (by date, by name)
-  - Add "New Event" button
-  - Show attendance count per event
+**Route Structure:**
 
-### 5.4 Build EventForm component
+```
+/events                 → Current event dashboard or empty state
+/events/archive         → Past events archive (table/card views)
+/events/new             → Create event form
+/events/:id             → View event details (past events)
+/events/:id/edit         → Edit event form
+```
 
-- [ ] Create `src/features/events/components/EventForm.tsx`
-  - Form fields: name, description, eventType (select), date, startTime, endTime, location
-  - Use shadcn/ui `Select` for event type dropdown
-  - Add DatePicker for date selection
-  - Validate date is not in the past
-  - Ensure end time is after start time
-  - Support create and edit modes
+---
 
-### 5.5 Create routes: /events, /events/new, /events/$id
+### Phase 5A: UI Development (Mock Data First)
 
-- [ ] Create `src/routes/events.index.tsx` - Event list
-- [ ] Create `src/routes/events.new.tsx` - Create event
-- [ ] Create `src/routes/events.$id.tsx` - Event details
-- [ ] Create `src/routes/events.$id.edit.tsx` - Edit event
-  - Set up route tree with proper nesting
-  - Add breadcrumbs
+#### Task 5.0: Setup Types and Mock Data
 
-### 5.6 Add event filtering by type
+**Status:** Pending
 
-- [ ] Add dropdown filter to EventList
-  - Populate filter options from event types
-  - Filter events dynamically on selection
-  - Show "Clear Filter" button when active
-  - Update URL params with filter state
+**Description:** Create TypeScript types and comprehensive mock data for UI development.
+
+**Files to Create:**
+
+- `src/features/events/types.ts` - Event types, status enums, interfaces
+- `src/features/events/mocks/mockEvents.ts` - Mock event data (15 events)
+- `src/features/events/mocks/mockAttendees.ts` - Mock attendance records
+
+**Types to Define:**
+
+```typescript
+type EventStatus = 'upcoming' | 'active' | 'completed' | 'cancelled'
+
+interface Event {
+  _id: string
+  name: string
+  eventTypeId: string
+  eventType?: { name: string; color: string } // Joined from eventTypes
+  description?: string
+  date: number // Timestamp
+  startTime?: string // "HH:mm"
+  endTime?: string // "HH:mm"
+  location?: string
+  status: EventStatus
+  bannerImage?: string
+  media?: Array<{ url: string; type: 'image' | 'video'; caption?: string }>
+  isActive: boolean
+  createdAt: number
+  updatedAt: number
+  completedAt?: number
+  attendanceCount?: number // Computed
+}
+
+interface AttendanceRecord {
+  _id: string
+  eventId: string
+  attendeeId: string
+  attendee?: {
+    _id: string
+    firstName: string
+    lastName: string
+    status: 'member' | 'visitor' | 'inactive'
+  }
+  checkedInAt: number
+  checkedInBy: string
+  notes?: string
+}
+```
+
+**Mock Data Requirements:**
+
+- 15 mock events (mix: 2 active, 5 upcoming, 8 completed)
+- 25 mock attendance records for active event
+- Event types: Sunday Service, Youth Night, Prayer Meeting, Retreat
+
+**Success Criteria:**
+
+- [ ] All TypeScript types defined and exported
+- [ ] Mock events cover all status types
+- [ ] Mock attendance includes various check-in times
+- [ ] Types match schema structure
+
+---
+
+#### Task 5.1: Empty State UI
+
+**Status:** Pending
+
+**Description:** Create the "No Active Event" page with Start button and quick stats.
+
+**Files to Create:**
+
+- `src/features/events/components/EmptyEventState.tsx`
+- `src/features/events/components/StartEventButton.tsx`
+- `src/features/events/components/QuickStats.tsx`
+
+**UI Specification:**
+
+```
+Layout:
+- Centered card with dashed border (empty state style)
+- 80px circular button with Plus icon (primary color)
+- "Start New Event" heading (H2, bold)
+- "Create an event to begin tracking attendance" subtext
+- Quick stats bar at bottom of card
+
+Quick Stats (Mock Data):
+- Events this month: 12
+- Total events: 156
+- Last event: March 15, 2026
+- Next scheduled: March 23, 2026
+
+Interactions:
+- Button hover: scale(1.05), shadow increase, subtle pulse
+- Button click: Navigate to /events/new (mock)
+- Stats are static display (no interaction)
+```
+
+**Mock Data to Display:**
+
+```typescript
+const mockStats = {
+  eventsThisMonth: 12,
+  totalEvents: 156,
+  lastEvent: 'March 15, 2026',
+  nextScheduled: 'March 23, 2026',
+}
+```
+
+**Success Criteria:**
+
+- [ ] Card is centered vertically and horizontally
+- [ ] Button is visually prominent (primary color, large)
+- [ ] Quick stats display 4 metrics
+- [ ] Hover effects work correctly
+- [ ] Responsive on mobile (smaller button, stacked stats)
+- [ ] Matches existing app styling
+
+---
+
+#### Task 5.2: Navigation Components
+
+**Status:** Pending
+
+**Description:** Create breadcrumb and navigation components for event pages.
+
+**Files to Create:**
+
+- `src/components/navigation/Breadcrumb.tsx` (if not exists)
+- `src/features/events/components/EventsBreadcrumb.tsx`
+
+**UI Specification:**
+
+```
+Breadcrumbs:
+- Events index: "Home > Events"
+- Event archive: "Home > Events > Archive"
+- Event detail: "Home > Events > Archive > [Event Name]"
+
+Link Styles:
+- Home: Clickable link
+- Events: Clickable link
+- Archive: Clickable link
+- Event Name: Current page (not clickable, bold)
+
+Separator: ">" or "/"
+
+Page Links (on main pages):
+- Events index: "View Archive →" (top right)
+- Archive page: "← Back to Events"
+- Event detail: "← Back to Archive"
+```
+
+**Success Criteria:**
+
+- [ ] Breadcrumb renders correctly on all event routes
+- [ ] All links are clickable (mock navigation)
+- [ ] Current page is styled differently (bold, not link)
+- [ ] Responsive (may hide on very small screens)
+- [ ] Consistent with app navigation style
+
+---
+
+#### Task 5.3: Archive Page UI
+
+**Status:** Pending
+
+**Description:** Create the archive page with table and card view toggle for past events.
+
+**Files to Create:**
+
+- `src/routes/events.archive.tsx` - Archive route
+- `src/features/events/components/EventArchive.tsx` - Main component
+- `src/features/events/components/EventArchiveTable.tsx` - Table view
+- `src/features/events/components/EventArchiveCards.tsx` - Card view
+- `src/features/events/components/EventFilters.tsx` - Filter bar
+
+**Mock Data:** Use 8 completed mock events
+
+**UI Specification:**
+
+```
+Header Section:
+- Title: "Event Archive"
+- View toggle: [Table] [Cards] (pill buttons, one active)
+- Filters bar below title
+
+Filter Bar:
+- Event Type: Dropdown [All Types ▼]
+- Date Range: Dropdown [All Dates ▼] or date picker
+- Search: Input with search icon, placeholder "Search events..."
+- Clear Filters: Text button (visible when filters active)
+
+Table View:
+Columns:
+| Banner | Event Name | Date | Type | Attendance | Actions |
+- Banner: 60px thumbnail
+- Event Name: Bold text
+- Date: Formatted date (e.g., "Mar 15, 2026")
+- Type: Badge with color dot
+- Attendance: Number with icon
+- Actions: "View" button
+
+Card View:
+- 3 columns on desktop, 2 tablet, 1 mobile
+- Card content:
+  - Banner image (top, 16:9 aspect)
+  - Event name (bold, H3)
+  - Date (muted, small)
+  - Type badge (colored)
+  - Attendance: "👤 48" bottom right
+- Entire card is clickable
+
+Pagination:
+- "Showing 1-10 of 156 events"
+- Previous / Next buttons
+- Page numbers: [1] [2] [3] ... [16]
+
+Empty State (no results):
+- "No events found" icon (Calendar with X)
+- "Try adjusting your filters"
+- "Clear Filters" button
+```
+
+**Interactions:**
+
+- Toggle view: Instantly switch table ↔ cards
+- Filter change: Filter mock data locally
+- Search: Filter by event name
+- Pagination: Switch pages
+- Click row/card: Navigate to /events/:id
+
+**Success Criteria:**
+
+- [ ] Both table and card views render correctly
+- [ ] View toggle works and persists state
+- [ ] All filters work with mock data
+- [ ] Pagination displays correct range
+- [ ] Clicking event navigates to detail view
+- [ ] Empty state shows when no results
+- [ ] Route: `/events/archive` accessible
+
+---
+
+#### Task 5.4: Event Detail View UI
+
+**Status:** Pending
+
+**Description:** Create read-only event detail page for viewing past/completed events.
+
+**Files to Create:**
+
+- `src/routes/events.$id.tsx` - Detail route
+- `src/features/events/components/EventDetail.tsx` - Main component
+- `src/features/events/components/EventDetailHeader.tsx` - Banner + info
+- `src/features/events/components/EventMediaGallery.tsx` - Media display
+- `src/features/events/components/EventAttendanceSummary.tsx` - Stats + list
+
+**Mock Data:** One complete mock event with 25 attendance records, 6 media items
+
+**UI Specification:**
+
+```
+Header Section:
+┌──────────────────────────────────────────────────────────────┐
+│  [BANNER IMAGE - Full Width, 21:9 aspect]                  │
+│                                                              │
+│  Sunday Service                                   [Completed]│
+│  March 16, 2026 • 9:00 AM - 11:00 AM • Main Sanctuary      │
+│  [Sunday Service Badge - Blue]                               │
+└──────────────────────────────────────────────────────────────┘
+
+Description Section:
+┌──────────────────────────────────────────────────────────────┐
+│  Description                                                 │
+│  ───────────────────────────────────────────────────────    │
+│  Weekly Sunday service with worship, teaching, and          │
+│  communion. Join us for fellowship after the service.      │
+└──────────────────────────────────────────────────────────────┘
+
+Media Gallery Section:
+┌──────────────────────────────────────────────────────────────┐
+│  Media Gallery (6)                              [Expand]    │
+│  ───────────────────────────────────────────────────────    │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐            │
+│  │ [IMG 1] │ │ [IMG 2] │ │ [IMG 3] │ │ [Video]│            │
+│  │         │ │         │ │         │ │   ▶    │            │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘            │
+│  ┌─────────┐ ┌─────────┐                                    │
+│  │ [IMG 4] │ │ [IMG 5] │                                    │
+│  └─────────┘ └─────────┘                                    │
+└──────────────────────────────────────────────────────────────┘
+
+Attendance Summary Section:
+┌──────────────────────────────────────────────────────────────┐
+│  Attendance Summary                                          │
+│  ───────────────────────────────────────────────────────    │
+│                                                              │
+│  Total: 48 attendees                                        │
+│  Members: 35  •  Visitors: 13                              │
+│                                                              │
+│  [View Full List] (expandable)                              │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ Name              │ Status  │ Check-in    │ Time    │   │
+│  ├──────────────────────────────────────────────────────┤   │
+│  │ John Doe           │ Member  │ 9:05 AM    │ 2m      │   │
+│  │ Jane Smith         │ Visitor │ 9:12 AM    │ 9m      │   │
+│  │ ...                                                   │   │
+│  └──────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────┘
+
+Action Buttons:
+┌──────────────────────────────────────────────────────────────┐
+│  [Edit Event]  [Restore Event]  [Delete Event]              │
+└──────────────────────────────────────────────────────────────┘
+Note: "Restore Event" only visible for completed events
+Note: "Delete Event" requires confirmation dialog
+```
+
+**Media Item Types:**
+
+- Images: Displayed in grid, clickable for lightbox
+- Videos: Thumbnail with play icon, clickable for modal player
+
+**Success Criteria:**
+
+- [ ] Banner image displays properly (placeholder if none)
+- [ ] All event details visible
+- [ ] Status badge shows correct color
+- [ ] Media gallery displays images/videos in grid
+- [ ] Attendance summary shows correct counts
+- [ ] Expandable attendee list works
+- [ ] Action buttons visible (non-functional in mock)
+- [ ] Back navigation works
+- [ ] Route: `/events/:id` with mock data
+
+---
+
+#### Task 5.5: Event Form UI
+
+**Status:** Pending
+
+**Description:** Create event creation and edit form with all fields.
+
+**Files to Create:**
+
+- `src/routes/events.new.tsx` - Create route
+- `src/routes/events.$id.edit.tsx` - Edit route
+- `src/features/events/components/EventForm.tsx` - Main form component
+- `src/features/events/components/BannerUploader.tsx` - Banner upload/input
+- `src/features/events/components/MediaUploader.tsx` - Media gallery upload
+
+**Form Fields:**
+
+```typescript
+interface EventFormData {
+  name: string // Required
+  eventTypeId: string // Required (select from eventTypes)
+  date: string // Required (date picker, default: today)
+  startTime: string // Optional (time picker)
+  endTime: string // Optional (time picker)
+  location: string // Optional
+  description: string // Optional (textarea)
+  bannerImage: string // Optional (URL or file upload)
+  media: Array<{
+    // Optional (file uploads only)
+    url: string
+    type: 'image' | 'video'
+    caption: string
+  }>
+}
+```
+
+**UI Specification:**
+
+```
+Form Layout (two-column on desktop, single on mobile):
+
+┌──────────────────────────────────────────────────────────────┐
+│  Create New Event / Edit Event                               │
+│  ═══════════════════════════════════════════════════════════│
+│                                                              │
+│  Event Name *                                                │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Sunday Service                                          │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Event Type *              Date *                            │
+│  ┌─────────────────────┐    ┌─────────────────────┐         │
+│  │ Sunday Service     ▼ │    │ March 23, 2026     📅│         │
+│  └─────────────────────┘    └─────────────────────┘         │
+│                                                              │
+│  Start Time           End Time           Location             │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │
+│  │ 9:00 AM       ▼ │ │ 11:00 AM      ▼ │ │ Main Sanctuary │ │
+│  └─────────────────┘ └─────────────────┘ └─────────────────┘ │
+│                                                              │
+│  Description                                                 │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Weekly Sunday service with worship, teaching, and       │  │
+│  │ communion...                                           │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Banner Image                                                │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Current: [Banner Preview]                              │  │
+│  │                                                        │  │
+│  │ [Enter URL]  or  [Upload Image]                       │  │
+│  │ ┌────────────────────────────────────────────────────┐ │  │
+│  │ │ https://images.unsplash.com/...                   │ │  │
+│  │ └────────────────────────────────────────────────────┘ │  │
+│  │                                                        │  │
+│  │ Preview: [████████████████████████████]               │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Media Gallery                                               │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ + Add Image  + Add Video                              │  │
+│  │ ┌────────┐ ┌────────┐ ┌────────┐                       │  │
+│  │ │ [img1] │ │ [img2] │ │ [vid] ▶│                       │  │
+│  │ │   ✕   │ │   ✕   │ │   ✕   │                       │  │
+│  │ └────────┘ └────────┘ └────────┘                       │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ ⚠️ Creating event in the past                         │  │
+│  │    This event date has already passed.                  │  │
+│  └────────────────────────────────────────────────────────┘  │
+│  (Shown only if date < today)                               │
+│                                                              │
+│              [Cancel]  [Create Event / Save Changes]          │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Field Validations:**
+
+- Name: Required, min 2 characters
+- Event Type: Required (dropdown)
+- Date: Required (date picker)
+- End Time: Must be after Start Time (if both provided)
+- Banner URL: Valid URL format or empty
+- Past Date Warning: Show alert if date < today
+
+**Success Criteria:**
+
+- [ ] All form fields render correctly
+- [ ] Date picker works and defaults to today
+- [ ] Time pickers work
+- [ ] Event type dropdown populated (mock data)
+- [ ] Banner URL input with preview
+- [ ] Banner file upload button (mock - shows placeholder)
+- [ ] Media gallery with add/remove (mock uploads)
+- [ ] Validation messages display correctly
+- [ ] Past date warning shows when appropriate
+- [ ] Form submission shows loading state (mock)
+- [ ] Cancel button navigates back
+- [ ] Routes: `/events/new` and `/events/:id/edit` work
+
+---
+
+#### Task 5.6: Dashboard UI - Active Event
+
+**Status:** Pending
+
+**Description:** Create the main events dashboard showing active event with attendance management.
+
+**Files to Create:**
+
+- `src/routes/events.index.tsx` - Main dashboard route
+- `src/features/events/components/CurrentEventDashboard.tsx` - Main component
+- `src/features/events/components/EventBanner.tsx` - Banner display
+- `src/features/events/components/EventInfo.tsx` - Event details
+- `src/features/events/components/AttendanceManager.tsx` - Live attendance
+
+**Mock Data:** One active event with 42 attendance records
+
+**UI Specification:**
+
+```
+Header with Status:
+┌──────────────────────────────────────────────────────────────┐
+│  Events                                               [LIVE] │
+│  (LIVE badge: pulsing green dot + "LIVE" text)              │
+└──────────────────────────────────────────────────────────────┘
+
+Event Banner Section:
+┌──────────────────────────────────────────────────────────────┐
+│  [BANNER IMAGE - 21:9 aspect]                              │
+│                                                              │
+│  Sunday Service                            [Upcoming ▼]       │
+│  March 23, 2026 • 9:00 AM - 11:00 AM                       │
+│  Main Sanctuary                                             │
+│  [Sunday Service Badge - Blue]                              │
+└──────────────────────────────────────────────────────────────┘
+
+Event Details (collapsible):
+┌──────────────────────────────────────────────────────────────┐
+│  ▼ Description                                              │
+│  Weekly Sunday service with worship, teaching, and          │
+│  communion. Join us for fellowship after the service.      │
+│                                                              │
+│  📍 Main Sanctuary                                          │
+│  👥 42 attendees checked in                                 │
+└──────────────────────────────────────────────────────────────┘
+
+Attendance Manager Section:
+┌──────────────────────────────────────────────────────────────┐
+│  Attendance                                    Count: 42 👤 │
+│  ─────────────────────────────────────────────────────────   │
+│                                                              │
+│  [Search attendee to add...                    ] [+ Add]    │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ Name              │ Status  │ Check-in    │ Action  │   │
+│  ├──────────────────────────────────────────────────────┤   │
+│  │ John Doe           │ Member  │ 9:05 AM    │   ✕     │   │
+│  │ Jane Smith         │ Visitor │ 9:12 AM    │   ✕     │   │
+│  │ Bob Johnson        │ Member  │ 9:08 AM    │   ✕     │   │
+│  │ Mary Williams      │ Member  │ 9:15 AM    │   ✕     │   │
+│  │ ...                                                 [Load More]│   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  Showing 1-10 of 42                              [Load More]│
+└──────────────────────────────────────────────────────────────┘
+
+Action Buttons:
+┌──────────────────────────────────────────────────────────────┐
+│  [Edit Event]  [Complete Event ✓]  [Cancel Event]              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Attendance Search/Add:**
+
+```
+When clicking [+ Add]:
+- Opens dropdown/modal with search input
+- Search results show attendees not yet checked in
+- Shows: Name, Status badge, Quick Add button
+- Clicking attendee adds them immediately (optimistic)
+
+When clicking ✕ (remove):
+- Confirmation: "Remove [Name] from attendance?"
+- Removes immediately (optimistic)
+```
+
+**Success Criteria:**
+
+- [ ] LIVE badge displays with animation
+- [ ] Event banner displays correctly
+- [ ] Event info shows all details
+- [ ] Attendance count updates
+- [ ] Search input works (filters mock attendees)
+- [ ] Add attendee shows in list immediately
+- [ ] Remove attendee shows confirmation
+- [ ] Load more pagination works
+- [ ] Action buttons visible and styled
+- [ ] Responsive on mobile (stacked layout)
+- [ ] Route: `/events` with mock active event
+
+---
+
+#### Task 5.7: Integration - Connect UI to Backend
+
+**Status:** Pending
+
+**Description:** Replace mock data with real Convex queries and mutations.
+
+**Changes Required:**
+
+**Backend Files to Create:**
+
+- `convex/events/validators.ts` - Validation rules
+- `convex/events/queries.ts` - Query functions
+- `convex/events/mutations.ts` - Mutation functions
+- Update `convex/schema.ts` - Add event fields
+
+**Frontend Hooks to Create:**
+
+- `src/features/events/hooks/useEvents.ts`
+- `src/features/events/hooks/useEventMutations.ts`
+- `src/features/events/hooks/useAttendance.ts`
+
+**Integration Steps:**
+
+1. Update schema with new fields (status, bannerImage, media, etc.)
+2. Create validators for event data
+3. Implement queries: getCurrentEvent, getById, listArchive
+4. Implement mutations: create, update, complete, checkIn, remove
+5. Create React hooks wrapping Convex queries/mutations
+6. Replace mock data usage with hooks in all components
+7. Add optimistic updates for attendance operations
+8. Add toast notifications for all operations
+
+**Schema Updates:**
+
+```typescript
+// New fields in events table
+.status: v.union(
+  v.literal('upcoming'),
+  v.literal('active'),
+  v.literal('completed'),
+  v.literal('cancelled')
+)
+.bannerImage: v.optional(v.string())
+.media: v.optional(v.array(v.object({
+  url: v.string(),
+  type: v.union(v.literal('image'), v.literal('video')),
+  caption: v.optional(v.string())
+})))
+.updatedAt: v.number()
+.completedAt: v.optional(v.number())
+```
+
+**Success Criteria:**
+
+- [ ] Schema migration runs without errors
+- [ ] All queries return real data
+- [ ] Create event works and redirects to dashboard
+- [ ] Edit event updates and shows changes
+- [ ] Complete event moves to archive
+- [ ] Add attendee creates attendance record immediately
+- [ ] Remove attendee deletes record immediately
+- [ ] Archive page shows real past events
+- [ ] Real-time updates work (attendance count)
+- [ ] Toast notifications appear for all operations
+
+---
+
+#### Task 5.8: Testing
+
+**Status:** Pending
+
+**Description:** Write comprehensive tests for event management.
+
+**Test Files to Create:**
+
+```
+tests/unit/
+├── convex/events/
+│   ├── queries.test.ts
+│   └── mutations.test.ts
+├── components/events/
+│   ├── EventForm.test.tsx
+│   ├── EventArchive.test.tsx
+│   ├── CurrentEventDashboard.test.tsx
+│   └── AttendanceManager.test.tsx
+
+tests/e2e/specs/
+└── events.spec.ts
+```
+
+**Unit Tests to Write:**
+
+- Event queries: list, filter, pagination
+- Event mutations: create, update, complete, delete
+- Attendance: check-in, remove (prevent duplicates)
+- Validation: required fields, date logic
+
+**Component Tests:**
+
+- EventForm: validation, field updates, submit
+- EventArchive: filters, view toggle, pagination
+- AttendanceManager: add, remove, search
+- EmptyState: rendering, button click
+
+**E2E Tests:**
+
+- Create event flow
+- Add/remove attendance
+- Complete event
+- View archive
+- Edit event
+- Filter archive
+
+**Success Criteria:**
+
+- [ ] All unit tests pass
+- [ ] All component tests pass
+- [ ] All E2E tests pass
+- [ ] Coverage > 80% for events feature
+
+---
+
+### Phase 5 Summary
+
+| Task | Description         | Mock | Backend | Tests |
+| ---- | ------------------- | ---- | ------- | ----- |
+| 5.0  | Types & Mock Data   | ✓    | -       | -     |
+| 5.1  | Empty State UI      | ✓    | -       | -     |
+| 5.2  | Navigation          | ✓    | -       | -     |
+| 5.3  | Archive Page        | ✓    | -       | -     |
+| 5.4  | Event Detail        | ✓    | -       | -     |
+| 5.5  | Event Form          | ✓    | -       | -     |
+| 5.6  | Dashboard UI        | ✓    | -       | -     |
+| 5.7  | Backend Integration | -    | ✓       | -     |
+| 5.8  | Testing             | -    | -       | ✓     |
+
+**Estimated Total Time:**
+
+- UI Development (Mock): 6-8 hours
+- Backend Integration: 4-6 hours
+- Testing: 3-4 hours
+- **Total: 13-18 hours**
 
 ---
 

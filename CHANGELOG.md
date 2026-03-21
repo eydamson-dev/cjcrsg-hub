@@ -28,6 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 5 Planning: Event Management** - Detailed implementation plan for event management feature:
+  - Route structure: Dashboard + Archive (Option 2)
+  - Design: Current event dashboard with attendance management
+  - Event statuses: draft, upcoming, active, completed, cancelled
+  - Media support: Banner (URL + upload), Media gallery (uploads)
+  - Attendance: Search + dropdown, immediate check-in
+  - UI-first approach: Mock data before backend integration
+  - 9 detailed tasks with comprehensive specifications
+  - Estimated: 13-18 hours total (UI: 6-8h, Backend: 4-6h, Tests: 3-4h)
+  - Route: `/events` (main), `/events/archive`, `/events/:id`, `/events/new`
+
 - **Phase 4: Event Types Tests (Tasks 4.10, 4.12)**
   - Task 4.10: Created Event Types route page tests (`tests/unit/events/routes/event-types.test.tsx`)
     - 8 tests covering: initial render, dialog state management, form submission, loading states
