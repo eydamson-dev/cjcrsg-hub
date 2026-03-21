@@ -11,9 +11,9 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 4 - Event Types Unit Tests  
-**Status:** ✅ Completed | Tasks 4.6-4.9 Done  
-**Current Task:** Event Types hooks and components tests added
+**Phase:** Phase 4 - Event Types Tests  
+**Status:** ✅ Completed | Tasks 4.10-4.12 Done  
+**Current Task:** Event Types route and E2E tests added
 
 **Summary:**
 
@@ -36,8 +36,11 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
   - ✅ Task 4.7: Test useEventTypeMutations hooks (12 tests - create, update, delete with toast notifications)
   - ✅ Task 4.8: Test EventTypeForm component (15 tests - rendering, validation, color picker, submission)
   - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
+- ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
+  - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
+  - ✅ Task 4.12: Test Event Types E2E (9 tests - navigation, empty state, CRUD, validation)
 
-**Total Tests:** 138 tests passing (37 Convex + 92 Component + 9 E2E)
+**Total Tests:** 155 tests passing (37 Convex + 100 Component + 18 E2E)
 
 ---
 

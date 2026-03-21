@@ -20,6 +20,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 4: Event Types Tests (Tasks 4.10, 4.12)**
+  - Task 4.10: Created Event Types route page tests (`tests/unit/events/routes/event-types.test.tsx`)
+    - 8 tests covering: initial render, dialog state management, form submission, loading states
+    - Tests verify dialog open/close, create mode vs edit mode, and mutation calls
+  - Task 4.12: Created Event Types E2E tests (`tests/e2e/specs/event-types.spec.ts`)
+    - 9 tests covering: navigation, empty state, CRUD operations, form validation
+    - Tests include: create event types, randomize color, close dialog, validation errors
+  - Total: 17 new tests added (155 total tests passing)
+
+- **Phase 4: Event Types Route & Navigation (Tasks 4.10-4.11)**
+  - Task 4.10: Created Event Types route page (`src/routes/event-types.tsx`)
+    - Route configuration with auth guard and ProtectedRoute
+    - Page layout with header and description
+    - Integrated EventTypeList and EventTypeForm components
+    - Modal state management with Dialog component
+    - Handles create and edit modes
+  - Task 4.11: Added "Event Types" navigation link
+    - Updated navigation.ts with Palette icon
+    - Route: `/event-types`
+    - Description: "Manage event types and categories"
+
 - **Phase 4: Event Types Tests (Tasks 4.6-4.9)**
   - Task 4.6: Created hooks query tests (`tests/unit/events/hooks/useEventTypes.test.ts`)
     - 9 tests covering: list filtering, loading states, getById, checkAssociations

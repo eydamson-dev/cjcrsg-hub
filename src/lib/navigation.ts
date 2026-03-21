@@ -4,6 +4,7 @@ import {
   CalendarDays,
   CheckSquare,
   Settings,
+  Palette,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -40,10 +41,16 @@ export const navItems: NavItem[] = [
     description: 'Track attendance for events',
   },
   {
+    title: 'Event Types',
+    href: '/event-types',
+    icon: Palette,
+    description: 'Manage event types and categories',
+  },
+  {
     title: 'Settings',
     href: '/settings',
     icon: Settings,
-    description: 'Configure event types and app settings',
+    description: 'Configure app settings',
   },
 ]
 

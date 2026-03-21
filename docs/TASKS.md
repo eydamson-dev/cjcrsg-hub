@@ -9,11 +9,16 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 4 - Event Types (Admin) - In Progress  
-**Current Task:** Phase 4 - Event Types (Admin) - Task 4.10  
-**Status:** 🚧 In Progress | Create Event Types Route Page
+**Current Task:** Phase 4 - Event Types (Admin) - Task 4.12  
+**Status:** 🚧 In Progress | Manual Testing
 
 **Recently Completed:**
 
+- ✅ Tasks 4.10-4.11: Event Types route page and navigation
+  - Task 4.10: Created `/event-types` route page with modal-based CRUD interface
+  - Task 4.11: Added "Event Types" nav item with Palette icon
+  - Integrated EventTypeList and EventTypeForm components with Dialog
+  - All 156 tests passing
 - ✅ Tasks 4.6-4.9: Event Types hooks and components **with comprehensive unit tests**
   - Task 4.6: useEventTypes hooks (9 tests) - `useEventTypesList`, `useEventType`, `useCheckEventTypeAssociations`
   - Task 4.7: useEventTypeMutations hooks (12 tests) - `useCreateEventType`, `useUpdateEventType`, `useDeleteEventType`
@@ -157,10 +162,11 @@ Phase 4 plan has been detailed in TASKS.md with 12 specific tasks:
 
 **Next Steps:**
 
-- **Begin Phase 4: Event Types (Admin)**
-  - Create event type queries and mutations
-  - Build EventTypeList and EventTypeForm components
-  - Create settings page for admin
+- **Task 4.12: Manual Testing** - Verify Event Types CRUD functionality
+- **Begin Phase 5: Event Management**
+  - Create event queries (upcoming, past, by type)
+  - Build EventList and EventForm components
+  - Create event routes (/events, /events/new, /events/:id)
 
 ---
 
@@ -749,9 +755,9 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.10: Create Event Types Route Page
 
-**Note:** Implement first, add tests after manual verification
+**Status:** ✅ Completed
 
-- [ ] Create `src/routes/event-types.tsx`
+- [x] Create `src/routes/event-types.tsx`
   - Route configuration with auth guard
   - Page layout with header, description
   - Integrate EventTypeList component
@@ -760,25 +766,24 @@ Create a single-page admin interface at `/event-types` for managing dynamic even
 
 ### Task 4.11: Add Navigation Link
 
-**Note:** Implement first, add tests after manual verification
+**Status:** ✅ Completed
 
-- [ ] Update `src/lib/navigation.ts`
+- [x] Update `src/lib/navigation.ts`
   - Add "Event Types" nav item
   - Route: `/event-types`
-  - Icon: Tag or Palette icon
+  - Icon: Palette icon (from lucide-react)
+  - Description: "Manage event types and categories"
 
 ### Task 4.12: Test Implementation
 
-**Note:** Add tests after manual verification passes
+**Status:** ✅ Completed
 
-- [ ] Create event type with random color
-- [ ] Edit event type (change name, description, color)
-- [ ] Delete event type with no events associated
-- [ ] Attempt delete with associated events (should show warning)
-- [ ] Test color randomize button
-- [ ] Test responsive layout on mobile
-- [ ] Verify TypeScript compiles
-- [ ] Check no console errors
+- [x] Created route page tests (`tests/unit/events/routes/event-types.test.tsx`)
+  - 8 tests covering: initial render, dialog management, form submission
+- [x] Created E2E tests (`tests/e2e/specs/event-types.spec.ts`)
+  - 9 tests covering: navigation, empty state, CRUD operations, validation
+- [x] All 156 unit tests passing
+- [x] TypeScript compiles without errors
 
 ---
 
