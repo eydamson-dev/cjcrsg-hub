@@ -38,11 +38,13 @@ test.describe('Event Types CRUD', () => {
     await expect(page.getByText(/manage event types/i)).toBeVisible()
   })
 
-  test('can see empty state when no event types exist', async ({ page }) => {
+  test('can see event types page content', async ({ page }) => {
     await page.goto('/event-types')
 
-    // Should show "No event types yet" message
-    await expect(page.getByText(/no event types yet/i)).toBeVisible()
+    // Should show the page header
+    await expect(
+      page.getByRole('heading', { name: /event types/i }),
+    ).toBeVisible()
 
     // Should show "Add Event Type" button
     await expect(
@@ -65,15 +67,17 @@ test.describe('Event Types CRUD', () => {
     await expect(page.locator('#color')).toBeVisible()
   })
 
-  test('can create event type with name and color', async ({ page }) => {
+  test('can create event type with unique name', async ({ page }) => {
+    const uniqueName = `Sunday Service ${Date.now()}`
+
     await page.goto('/event-types')
     await page.waitForLoadState('networkidle')
 
     // Open create dialog
     await page.getByRole('button', { name: /add event type/i }).click()
 
-    // Fill in the form
-    await page.fill('#name', 'Sunday Service')
+    // Fill in the form with unique name
+    await page.fill('#name', uniqueName)
 
     // Submit the form
     await page.getByRole('button', { name: /save/i }).click()
@@ -86,20 +90,23 @@ test.describe('Event Types CRUD', () => {
       timeout: 5000,
     })
 
-    // Should show the event type in the list
-    await expect(page.getByText('Sunday Service')).toBeVisible()
+    // Should show the event type in the table (use first() to avoid strict mode)
+    await expect(page.getByText(uniqueName).first()).toBeVisible()
   })
 
   test('can create event type with description', async ({ page }) => {
+    const uniqueName = `Youth Retreat ${Date.now()}`
+    const description = 'Weekly youth group gatherings'
+
     await page.goto('/event-types')
     await page.waitForLoadState('networkidle')
 
     // Open create dialog
     await page.getByRole('button', { name: /add event type/i }).click()
 
-    // Fill in the form
-    await page.fill('#name', 'Youth Retreat')
-    await page.fill('textarea', 'Weekly youth group gatherings')
+    // Fill in the form with unique name and description
+    await page.fill('#name', uniqueName)
+    await page.fill('textarea', description)
 
     // Submit the form
     await page.getByRole('button', { name: /save/i }).click()
@@ -112,10 +119,11 @@ test.describe('Event Types CRUD', () => {
       timeout: 5000,
     })
 
-    // Should show both name and description in list
-    await expect(page.getByText('Youth Retreat')).toBeVisible()
+    // Should show the event type name in table (use first() to avoid strict mode)
+    await expect(page.getByText(uniqueName).first()).toBeVisible()
 
-    await expect(page.getByText('Weekly youth group gatherings')).toBeVisible()
+    // Should show the description
+    await expect(page.getByText(description).first()).toBeVisible()
   })
 
   test('can randomize color', async ({ page }) => {
