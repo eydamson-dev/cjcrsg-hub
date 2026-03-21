@@ -8,11 +8,32 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Updated:** 2026-03-21
 
-**Phase:** Phase 3 - ✅ COMPLETE (All Tasks 3.1-3.17 Done)
-**Current Task:** Task 3.17 - Make attendee table rows clickable to navigate to view page
-**Status:** ✅ Task 3.17 Complete | ✅ Phase 3 Complete
+**Phase:** Phase 4 - Event Types (Admin) - In Progress
+**Current Task:** Task 4.1 - Install Dependencies
+**Status:** 🚧 Phase 4 Started | Ready to begin implementation
 
-**Completed This Session (Task 3.17 - Clickable Table Rows):**
+**Starting Phase 4 (Event Types):**
+
+Phase 4 plan has been detailed in TASKS.md with 12 specific tasks:
+
+- Task 4.1: Install react-colorful dependency
+- Task 4.2-4.4: Backend (validators, queries, mutations)
+- Task 4.5: Generate Convex types
+- Task 4.6-4.7: Frontend hooks
+- Task 4.8-4.9: UI components (EventTypeForm, EventTypeList)
+- Task 4.10: Route page
+- Task 4.11: Navigation
+- Task 4.12: Testing
+
+**Key Design Decisions:**
+
+- Single page at `/event-types` (not under settings)
+- Table layout with click-to-edit modal
+- Color picker (react-colorful) with inline randomize button
+- Delete button in modal header + per row
+- Right-aligned Save/Cancel buttons (Save first)
+
+**Previously Completed (Task 3.17 - Clickable Table Rows):**
 
 - ✅ **AttendeeList.tsx** - Made table rows clickable:
   - Added `onClick` handler to `TableRow` that navigates to attendee detail view
@@ -546,48 +567,149 @@ pnpm dlx shadcn@canary add select date-picker tabs toast command tabs
 
 ## Phase 4: Event Types (Admin)
 
-### 4.1 Create event type queries
+### Overview
+
+Create a single-page admin interface at `/event-types` for managing dynamic event types (e.g., "Sunday Service", "Retreat", "Youth Event") with custom colors. Features inline row editing via modal and a color picker with randomize functionality.
+
+### Design Specifications
+
+**Modal Layout:**
+
+- Title: "Edit Event Type" or "Create Event Type"
+- Header includes: Trash icon (delete) + Close (X) button
+- Form fields:
+  - Name (required)
+  - Description (optional)
+  - Color: Hex input with inline randomize button (🎲), color picker below (same width as input)
+- Footer: [Save] [Cancel] buttons (right-aligned, Save first)
+
+**Table Layout:**
+
+- Columns: Color (circle + hex), Name, Description, Actions (trash icon)
+- Click row to open edit modal
+- Delete button per row
+- Empty state when no types exist
+
+---
+
+### Task 4.1: Install Dependencies
+
+- [ ] Install `react-colorful` color picker library
+- [ ] Verify installation and TypeScript types
+
+### Task 4.2: Create Backend Validators
+
+- [ ] Create `convex/eventTypes/validators.ts`
+  - Define eventTypeName validator (string, min 1 char)
+  - Define eventTypeDescription validator (optional string)
+  - Define eventTypeColor validator (optional hex color string)
+
+### Task 4.3: Create Backend Queries
 
 - [ ] Create `convex/eventTypes/queries.ts`
-  - Implement `list` query to get all active event types
-  - Add `getById` query for single event type
-  - Support filtering by isActive status
-  - Order by name alphabetically
-  - Create validators in `convex/eventTypes/validators.ts`
+  - `list` query: Get all event types, order by name, filter by isActive
+  - `getById` query: Get single event type by ID
+  - `checkAssociations` query: Check if event type is used by any events
 
-### 4.2 Create event type mutations
+### Task 4.4: Create Backend Mutations
 
 - [ ] Create `convex/eventTypes/mutations.ts`
-  - Implement `create` mutation with name, description, color
-  - Add `update` mutation for modifying existing types
-  - Create `toggleActive` mutation to soft-delete
-  - Ensure only admins can modify event types
+  - `create` mutation: Insert new event type with name, description, color, isActive=true, createdAt
+  - `update` mutation: Update existing event type fields
+  - `remove` mutation: Delete event type (with association check)
 
-### 4.3 Build EventTypeList component
+### Task 4.5: Generate Convex Types
 
-- [ ] Create `src/features/events/components/EventTypeList.tsx`
-  - Display event types as cards or table rows
-  - Show color indicator for each type
-  - Add "Edit" and "Delete" action buttons
-  - Implement confirmation dialog for delete
-  - Add "New Event Type" button
-  - Handle empty state
+- [ ] Run `pnpm dlx convex dev --once` to generate types for new modules
+- [ ] Verify types are created in `_generated/api.ts`
 
-### 4.4 Build EventTypeForm component
+### Task 4.6: Create Frontend Hooks - Queries
+
+- [ ] Create `src/features/events/hooks/useEventTypes.ts`
+  - `useEventTypesList()` - Hook for listing event types
+  - `useEventType(id)` - Hook for getting single event type
+  - `useCheckEventTypeAssociations(id)` - Hook for checking if deletable
+
+### Task 4.7: Create Frontend Hooks - Mutations
+
+- [ ] Create `src/features/events/hooks/useEventTypeMutations.ts`
+  - `useCreateEventType()` - Create mutation with toast notifications
+  - `useUpdateEventType()` - Update mutation with toast notifications
+  - `useDeleteEventType()` - Delete mutation with confirmation dialog
+
+### Task 4.8: Create EventTypeForm Component
 
 - [ ] Create `src/features/events/components/EventTypeForm.tsx`
-  - Form fields: name, description, color picker
-  - Use shadcn/ui `Form`, `Input`, `ColorPicker` (or custom)
-  - Validate that name is unique
+  - Form with react-hook-form + zod validation
+  - Name field (required)
+  - Description field (optional)
+  - Color picker section:
+    - Hex input with randomize button (🎲 icon) inside, right-aligned
+    - react-colorful picker below (matching input width)
+  - Randomize button generates random hex color
+  - Sync between hex input and color picker
   - Support create and edit modes
+  - Submit handler with loading states
 
-### 4.5 Create settings page for admin
+### Task 4.9: Create EventTypeList Component
 
-- [ ] Create `src/routes/settings.tsx` route
-  - Add tabs: Event Types, General Settings, Admin Users
-  - Implement Event Types tab with list and form
-  - Add access control (admin only)
-  - Style with shadcn/ui `Tabs` component
+- [ ] Create `src/features/events/components/EventTypeList.tsx`
+  - shadcn Table component
+  - Columns: Color (colored circle + hex value), Name, Description, Actions (trash icon)
+  - Click row opens edit modal
+  - Delete button per row
+  - Empty state component when no event types
+  - "Add Event Type" button at top (opens create modal)
+  - Loading skeleton state
+
+### Task 4.10: Create Event Types Route Page
+
+- [ ] Create `src/routes/event-types.tsx`
+  - Route configuration with auth guard
+  - Page layout with header, description
+  - Integrate EventTypeList component
+  - Modal state management (open/close, create vs edit mode)
+  - Toast notifications for CRUD operations
+
+### Task 4.11: Add Navigation Link
+
+- [ ] Update `src/lib/navigation.ts`
+  - Add "Event Types" nav item
+  - Route: `/event-types`
+  - Icon: Tag or Palette icon
+
+### Task 4.12: Test Implementation
+
+- [ ] Create event type with random color
+- [ ] Edit event type (change name, description, color)
+- [ ] Delete event type with no events associated
+- [ ] Attempt delete with associated events (should show warning)
+- [ ] Test color randomize button
+- [ ] Test responsive layout on mobile
+- [ ] Verify TypeScript compiles
+- [ ] Check no console errors
+
+---
+
+### Technical Notes
+
+**Color Management:**
+
+- Store as hex string (e.g., "#3b82f6")
+- react-colorful outputs hex values
+- Randomize: Generate hex from Math.random()
+
+**Delete Behavior:**
+
+- Check if event type has associated events via query
+- If yes: Show alert "Cannot delete - used by X events"
+- If no: Show confirmation dialog then delete
+
+**State Management:**
+
+- Modal open/close with local state
+- Form state with react-hook-form
+- Server state with TanStack Query + Convex
 
 ---
 
