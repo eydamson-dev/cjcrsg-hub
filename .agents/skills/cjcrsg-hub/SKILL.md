@@ -1,3 +1,8 @@
+---
+name: cjcrsg-hub
+description: Comprehensive guidance for CJCRSG-Hub church management system built with TanStack Start, Convex, and shadcn/ui. Covers project architecture and feature-based folder structure, database schema with indexes and validators, Convex query/mutation patterns with real-time subscriptions, authentication flows with Convex Auth (Password + Google + Facebook OAuth), shadcn/ui component patterns and form handling with react-hook-form + zod, code conventions and TypeScript standards, common development tasks and implementation workflows, TDD testing strategy with convex-test and Playwright, troubleshooting guides, and quick reference for commands and file locations. Use when implementing features, creating database operations, building UI components, setting up auth, or working with TanStack Router.
+---
+
 # CJCRSG-Hub Skill
 
 This skill provides comprehensive guidance for working on the CJCRSG-Hub church management system.
