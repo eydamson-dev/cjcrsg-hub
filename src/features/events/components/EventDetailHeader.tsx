@@ -1,13 +1,20 @@
-import { MapPin, Clock } from 'lucide-react'
+import { MapPin, Clock, Pencil, ImagePlus } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Card } from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
 import type { Event } from '../types'
 
 interface EventDetailHeaderProps {
   event: Event
+  onEdit?: () => void
+  onBannerClick?: () => void
 }
 
-export function EventDetailHeader({ event }: EventDetailHeaderProps) {
+export function EventDetailHeader({
+  event,
+  onEdit,
+  onBannerClick,
+}: EventDetailHeaderProps) {
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -46,23 +53,60 @@ export function EventDetailHeader({ event }: EventDetailHeaderProps) {
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="aspect-[5/1] w-full overflow-hidden">
+      {/* Banner - Clickable for upload */}
+      <div
+        className="group relative aspect-[5/1] w-full cursor-pointer overflow-hidden"
+        onClick={onBannerClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            onBannerClick?.()
+          }
+        }}
+      >
         {event.bannerImage ? (
-          <img
-            src={event.bannerImage}
-            alt={event.name}
-            className="h-full w-full object-cover"
-          />
+          <>
+            <img
+              src={event.bannerImage}
+              alt={event.name}
+              className="h-full w-full object-cover transition-opacity group-hover:opacity-75"
+            />
+            {/* Upload overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+              <ImagePlus className="size-8 text-white drop-shadow-lg" />
+              <span className="mt-2 text-sm font-medium text-white drop-shadow-lg">
+                Click to {event.bannerImage ? 'change' : 'upload'} banner
+              </span>
+            </div>
+          </>
         ) : (
-          <div className="flex h-full items-center justify-center bg-muted">
-            <span className="text-muted-foreground">No banner image</span>
+          <div className="flex h-full flex-col items-center justify-center bg-muted transition-colors hover:bg-muted/80">
+            <ImagePlus className="size-8 text-muted-foreground" />
+            <span className="mt-2 text-sm text-muted-foreground">
+              Click to upload banner
+            </span>
           </div>
         )}
       </div>
 
       <div className="p-6">
+        {/* Title row with edit button */}
         <div className="mb-4 flex items-start justify-between">
-          <h1 className="text-2xl font-semibold">{event.name}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-semibold">{event.name}</h1>
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="size-8 rounded-full bg-muted/50 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:opacity-100"
+                aria-label="Edit event"
+              >
+                <Pencil className="size-4" />
+              </Button>
+            )}
+          </div>
           {getStatusBadge()}
         </div>
 
