@@ -9,8 +9,8 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-21
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
-**Current Task:** Task 5.0 - Setup Types and Mock Data  
-**Status:** Ready to start
+**Current Task:** Task 5.4 - Event Detail View UI (UI completed, mock data integrated)  
+**Status:** Ready for PR
 
 **Design Decisions (Phase 5):**
 
@@ -22,6 +22,15 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Recently Completed:**
 
+- ✅ Phase 5 - Tasks 5.0-5.4 Complete (UI with mock data)
+  - Task 5.0: Types and Mock Data - Event types, 15 mock events, 25 attendance records
+  - Task 5.1: Empty State UI - "Start New Event" page with stats
+  - Task 5.2: Navigation Components - Breadcrumbs and back links
+  - Task 5.3: Archive Page UI - Table/Card view toggle with filters and pagination
+  - Task 5.4: Event Detail View UI - Banner, description, media gallery, attendance table with search/pagination
+  - New routes: `/events/archive`, `/events/$id`
+  - All navigation working, responsive design implemented
+
 - ✅ Phase 4 - Event Types (Admin) - Complete
   - Tasks 4.1-4.12: Backend, hooks, components, routes, tests
   - All 164 tests passing
@@ -29,12 +38,7 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Upcoming Tasks (Phase 5):**
 
-- Task 5.0: Setup Types and Mock Data
-- Task 5.1: Empty State UI (No Active Event page)
-- Task 5.2: Navigation Components (Breadcrumbs)
-- Task 5.3: Archive Page UI (Table/Card toggle)
-- Task 5.4: Event Detail View UI
-- Task 5.5: Event Form UI
+- Task 5.5: Event Form UI (Create/Edit)
 - Task 5.6: Dashboard UI (Active Event with attendance)
 - Task 5.7: Backend Integration (Schema, queries, mutations)
 - Task 5.8: Testing
