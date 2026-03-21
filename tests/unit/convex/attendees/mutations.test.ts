@@ -11,6 +11,21 @@ import { getById } from '../../../../convex/attendees/queries.js'
 // Create a mock modules object that convex-test expects
 const modules = import.meta.glob('../../../../convex/**/*.ts', { eager: true })
 
+// Suppress Convex warning about calling functions from tests
+// This is expected behavior when using convex-test
+const originalWarn = console.warn
+console.warn = (...args: any[]) => {
+  const message = args[0]?.toString() || ''
+  if (
+    message.includes(
+      'Convex functions should not directly call other Convex functions',
+    )
+  ) {
+    return
+  }
+  originalWarn.apply(console, args)
+}
+
 describe('attendees mutations', () => {
   describe('create', () => {
     it('creates attendee with valid data', async () => {

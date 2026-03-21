@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **TDD Phase 4: Complete E2E Critical Flows (Tasks 4.1-4.2)**
+  - Updated Playwright configuration to test only Chromium (removed Firefox, WebKit, Mobile Safari)
+  - Reduced test execution time by ~60% while maintaining mobile coverage via Mobile Chrome
+  - **Task 4.1: Create Auth Tests**
+    - Created `tests/e2e/specs/auth.spec.ts` with 3 comprehensive authentication tests
+    - Tests cover: signup/login flow, invalid credentials error handling, session persistence after refresh
+    - Uses unique email generation with timestamps to avoid test conflicts
+    - Includes TODO section for future OAuth tests (Google, Facebook)
+  - **Task 4.2: Create Attendee CRUD Tests**
+    - Created `tests/e2e/specs/attendees-crud.spec.ts` with 7 comprehensive workflow tests
+    - Tests cover: create attendee, validation errors, invalid email handling, edit workflow, archive workflow
+    - Tests cover: search by name, filter by status, view attendee details
+    - Each test creates unique user credentials for isolation
+    - Tests verify success messages, URL redirects, and data persistence
+  - **Total: 10 new E2E tests** (76 total tests across all TDD phases)
+  - Tests run on Chromium desktop and Mobile Chrome (Pixel 5)
+
 - **TDD Task 3.3: Test Layout Component**
   - Created comprehensive unit tests for Layout component
   - 6 tests covering layout rendering and structure
