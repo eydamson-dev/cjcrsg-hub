@@ -6,11 +6,11 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 ## 🎯 Current Session
 
-**Updated:** 2026-03-22
+**Updated:** 2026-03-23
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
 **Current Task:** Task 5.7 - Backend Integration (Connecting UI to Convex)  
-**Status:** 🚧 IN PROGRESS - Creating backend infrastructure
+**Status:** 🚧 IN PROGRESS - Phase 1 (Schema Updates) complete, Phase 2 (Backend Events) next
 
 **Recently Completed:**
 
@@ -36,215 +36,463 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Current Work (Task 5.7):**
 
-Backend Integration - Replacing mock data with real Convex backend:
+Backend Integration - Replacing mock data with real Convex backend.
 
-**Configuration Decisions:**
+---
 
-- ✅ **Image URL Validation:** Validate URLs start with http/https and have valid image extensions (.jpg, .jpeg, .png, .gif, .webp, .svg) OR are data URLs (data:image/)
-- ✅ **Active Event Constraint:** Only one event can be active at a time. `getCurrentEvent` returns the single active event or `null` if none exists
-- ✅ **Past Date Handling:** Backend allows creating events in the past. UI will show warning but won't block creation
-- ✅ **Pagination:** Use standard Convex `paginationOptsValidator` (frontend controls page size, default 10)
+### ✅ Finalized Configuration Decisions
 
-**Schema Updates (`convex/schema.ts`):**
+| Decision                     | Choice                                                                                                        | Reasoning                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Image URL Validation**     | Format only — check file extension (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`) or `data:image/` prefix | No HEAD requests; simpler and faster                                                                                                            |
+| **New Event Default Status** | Always `'upcoming'` regardless of date                                                                        | UI shows warning for past dates but backend always defaults to upcoming                                                                         |
+| **Attendance Deletion**      | Hard delete — permanently removes the record                                                                  | Simpler; no soft delete or undo needed                                                                                                          |
+| **Attendance Model**         | Separate `attendanceRecords` table                                                                            | Allows tracking `checkedInAt`, `checkedInBy`, `invitedBy`, `notes` per record; no document size limits                                          |
+| **Invite Tracking**          | Both `attendees.invitedBy` AND `attendanceRecords.invitedBy` (Option C)                                       | `attendees.invitedBy` = who originally brought them to church (permanent); `attendanceRecords.invitedBy` = who brought them to a specific event |
+| **Duplicate Check-in**       | Backend enforces — mutation throws if already checked in                                                      | Prevents race conditions; `by_event_attendee` index used for fast lookup                                                                        |
+| **Attendance List Order**    | By `checkedInAt` descending (newest first)                                                                    | Shows who just arrived; real-time feel                                                                                                          |
+| **Bulk Check-in Result**     | Single final toast — "X attendees checked in (Y skipped)"                                                     | Simpler UX; no per-item progress toasts                                                                                                         |
+| **Active Event Constraint**  | Only one event can be `active` at a time                                                                      | `startEvent` throws "Another event is currently active" if constraint violated                                                                  |
+| **Pagination**               | Standard Convex `paginationOptsValidator`                                                                     | Default page size 10; frontend controls page size                                                                                               |
 
-Add to `events` table:
+---
+
+### 📋 Task 5.7 Sub-phases
+
+- [x] **Phase 1:** Schema Updates — `convex/schema.ts`
+- [ ] **Phase 2:** Backend Events — `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
+- [ ] **Phase 3:** Backend Attendance — `convex/attendance/queries.ts`, `mutations.ts`
+- [ ] **Phase 4:** Frontend Hooks — `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
+- [ ] **Phase 5:** Route Integration — wire up all 4 routes with real data
+- [ ] **Phase 6:** Type Generation + Verification — `pnpm dlx convex dev --once`
+
+---
+
+### Phase 1: Schema Updates — `convex/schema.ts`
+
+No data migration needed — no existing data in any of these tables.
+
+#### `attendees` table — add `invitedBy` field
 
 ```typescript
-.status: v.union(
-  v.literal('upcoming'),
-  v.literal('active'),
-  v.literal('completed'),
-  v.literal('cancelled')
-)
-.bannerImage: v.optional(v.string())  // Validated URL
-.media: v.optional(v.array(v.object({
-  url: v.string(),
-  type: v.union(v.literal('image'), v.literal('video')),
-  caption: v.optional(v.string()),
-})))
-.updatedAt: v.number()
-.completedAt: v.optional(v.number())
+invitedBy: v.optional(v.id('attendees')),
+// Who originally invited this person to church (permanent record on the attendee)
+// Only relevant for visitors; null/undefined for founding members
+// Example: "John Smith invited Mary Jones to church" → Mary's invitedBy = John's ID
+// This stays on their profile even after they become a member
 ```
 
-Add indexes:
+New index:
 
-- `.index('by_status', ['status'])` - For filtering by status
-- `.index('by_date_status', ['date', 'status'])` - For upcoming/active queries
+```typescript
+.index('by_invited_by', ['invitedBy'])
+// Use case: "Show me all people originally invited by John"
+// Use case: "How many people has Peter brought to church in total?"
+```
 
-**Backend Files to Create:**
+#### `events` table — add new fields
 
-**`convex/events/validators.ts`:**
+```typescript
+status: v.union(
+  v.literal('upcoming'),   // Default for ALL new events (even if date is in the past)
+  v.literal('active'),     // Currently happening — only ONE event can be active at a time
+  v.literal('completed'),  // Event ended — completedAt timestamp is set
+  v.literal('cancelled'),  // Event was cancelled before or during
+),
 
-- Individual field validators (eventName, eventDescription, eventDate, etc.)
-- `eventStatus` union validator
-- `eventFields` object for create operations
-- `updateEventFields` object for updates (all optional)
-- `mediaItemValidator` for media array items
-- `isValidImageUrl()` helper function
+bannerImage: v.optional(v.string()),
+// URL validation (format only, no HEAD request):
+// Valid: ends in .jpg, .jpeg, .png, .gif, .webp, .svg (case-insensitive)
+// Valid: starts with data:image/ (base64 data URI)
+// Invalid: any other format
 
-**`convex/events/queries.ts`:**
+media: v.optional(v.array(v.object({
+  url: v.string(),         // Same URL validation rules as bannerImage
+  type: v.union(v.literal('image'), v.literal('video')),
+  caption: v.optional(v.string()),
+}))),
+// Array of photos/videos from the event
+// Each item validated individually in mutation
 
-- `list` - List events with optional filters (status, date range, eventTypeId)
-  - Use paginationOptsValidator for pagination
-  - Support filtering by status
-  - Order by date descending
-- `getById` - Get single event by ID with joined eventType data
-- `getCurrentEvent` - Get the single active event (status='active')
-  - Returns first active event or null
-- `listArchive` - Get completed events for archive page
-  - Filter by status='completed'
-  - Support pagination
-  - Optional date range filter
-- `getStats` - Get event statistics
-  - Total events count
-  - Events by status counts
-  - Events this month
-  - Next upcoming event
+updatedAt: v.number(),
+// Set to Date.now() on every create and update mutation
 
-**`convex/events/mutations.ts`:**
+completedAt: v.optional(v.number()),
+// Set to Date.now() only when completeEvent mutation is called
+// Null/undefined for all other statuses
+```
 
-- `create` - Create new event
-  - Validate required fields (name, eventTypeId, date)
-  - Validate bannerImage URL if provided
-  - If status='active', validate no other active event exists
-  - Set createdAt and updatedAt timestamps
-  - Default status to 'upcoming' if not specified
-- `update` - Update event fields
-  - Validate event exists
-  - Partial updates allowed
-  - Update updatedAt timestamp
-  - If updating to status='active', check no other active event
-- `startEvent` - Set status to 'active'
-  - Validate event exists
-  - Check no other event is currently active
-  - Update status and updatedAt
-- `completeEvent` - Set status to 'completed'
-  - Validate event exists and is active
-  - Set status='completed', completedAt=Date.now(), updatedAt
-- `cancelEvent` - Set status to 'cancelled'
-  - Validate event exists
-  - Set status='cancelled', updatedAt
-- `archive` - Soft delete (set isActive=false)
-  - Set isActive=false, updatedAt
+New indexes:
 
-**`convex/attendance/queries.ts`:**
+```typescript
+.index('by_status', ['status'])
+// Use case: "Get all upcoming events"
+// Use case: "Get all cancelled events for admin review"
 
-- `getByEvent` - Get all attendance records for an event
-  - Join with attendee data
-  - Order by checkedInAt descending
-  - Support pagination
-- `getStats` - Get attendance statistics for an event
-  - Total attendance count
-  - Count by attendee status (member/visitor)
-- `getByAttendee` - Get attendance history for an attendee
-  - Join with event data
-  - Order by checkedInAt descending
-  - Support pagination
+.index('by_date_status', ['date', 'status'])
+// Use case: "Get upcoming events after today ordered by date"
+// Use case: "Get completed events in a date range for archive"
 
-**`convex/attendance/mutations.ts`:**
+.index('by_active', ['isActive', 'status'])
+// Use case: "Get the single currently active event quickly"
+// Used by getCurrentEvent query for fast lookup
+```
 
-- `checkIn` - Create attendance record
-  - Validate event exists and is active
-  - Validate attendee exists
-  - Check for duplicate (prevent double check-in)
-  - Set checkedInAt=Date.now(), checkedInBy=current user
-  - Return attendance record ID
-- `unCheckIn` - Remove attendance record
-  - Validate record exists
-  - Delete from database
-- `bulkCheckIn` - Check in multiple attendees at once
-  - Accept array of attendeeIds
-  - Filter out already checked-in attendees
-  - Create records for remaining
-  - Return results (success count, skipped count)
+#### `attendanceRecords` table — add `invitedBy` field
 
-**Frontend Hooks to Create:**
+```typescript
+invitedBy: v.optional(v.id('attendees')),
+// Who invited this attendee to THIS specific event
+// Different from attendees.invitedBy (which is permanent/church-level)
+// Example: John brought Mary to church originally (attendees.invitedBy = John)
+//          but Peter invited Mary to this specific retreat (attendanceRecords.invitedBy = Peter)
+// Optional — not all attendees are personally invited to every event
+```
 
-**`src/features/events/hooks/useEvents.ts`:**
+New index:
 
-- `useEventsList(options)` - Query hook for listing events
-  - Options: status, eventTypeId, dateRange, paginationOpts
-  - Uses TanStack Query + convexQuery
-- `useEvent(id)` - Get single event by ID
-  - Use 'skip' pattern for conditional queries
-- `useCurrentEvent()` - Get active event
-  - Returns null if no active event
-- `useEventStats()` - Get event statistics
-- `useArchiveEvents(options)` - Get completed events for archive
-  - Options: dateRange, paginationOpts
+```typescript
+.index('by_invited_by', ['invitedBy', 'checkedInAt'])
+// Use case: "How many people did Peter invite to events this month?"
+// Use case: "Show all people Peter invited to today's service"
+// Use case: "Top inviters leaderboard for this event"
+```
 
-**`src/features/events/hooks/useEventMutations.ts`:**
+---
 
-- `useCreateEvent()` - Create event mutation
-  - Toast notifications on success/error
-  - Invalidate events list query on success
-  - Return mutation result with ID
-- `useUpdateEvent()` - Update event mutation
-  - Toast notifications
-  - Invalidate event and list queries
-- `useStartEvent()` - Start event mutation
-  - Toast notifications
-  - Error handling for "another event active"
-- `useCompleteEvent()` - Complete event mutation
-  - Toast notifications
-  - Invalidate current event query
-- `useCancelEvent()` - Cancel event mutation
-  - Toast notifications
-- `useArchiveEvent()` - Archive event mutation
-  - Toast notifications
-  - Invalidate list queries
+### Phase 2: Backend Events
 
-**`src/features/events/hooks/useAttendance.ts`:**
+#### `convex/events/validators.ts`
 
-- `useAttendanceByEvent(eventId)` - Get attendance for event
-  - Join with attendee data
+Individual field validators:
+
+- `eventName` — `v.string()` (min 2 chars enforced in mutation)
+- `eventDescription` — `v.optional(v.string())`
+- `eventDate` — `v.number()` (Unix timestamp in milliseconds)
+- `eventStartTime` — `v.optional(v.string())` — "HH:mm" 24-hour format e.g. "09:00"
+- `eventEndTime` — `v.optional(v.string())` — "HH:mm" 24-hour format; must be after startTime (validated in mutation logic, not schema)
+- `eventLocation` — `v.optional(v.string())`
+- `eventStatus` — `v.union(v.literal('upcoming'), v.literal('active'), v.literal('completed'), v.literal('cancelled'))`
+- `mediaItemValidator` — `v.object({ url: v.string(), type: v.union(v.literal('image'), v.literal('video')), caption: v.optional(v.string()) })`
+- `eventFields` — combined object validator for create (all required + optional fields)
+- `updateEventFields` — all fields optional for partial updates
+
+Helper function:
+
+```typescript
+export function isValidImageUrl(url: string): boolean {
+  // Accepts data URIs
+  if (url.startsWith('data:image/')) return true
+  // Accepts URLs ending in image extensions (case-insensitive)
+  return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)
+}
+```
+
+#### `convex/events/queries.ts`
+
+- **`list(paginationOpts, filters?)`** — Paginated list with optional filters
+  - Filters: `status?`, `eventTypeId?`, `dateFrom?`, `dateTo?`
+  - Uses `by_date_status` index when status filter is provided
+  - Uses `by_date` index for date-range-only queries
+  - Order: date descending (newest first)
+  - Each result includes joined `eventType` data: `{ name, color }`
+  - Returns Convex paginated result
+
+- **`getById(id)`** — Single event lookup
+  - Returns event with joined `eventType: { name, color }`
+  - Returns `null` if not found (caller handles not-found case)
+
+- **`getCurrentEvent()`** — The single active event
+  - Uses `by_status` index with `status='active'`
+  - Returns event with joined `eventType` and current `attendanceCount`
+  - Returns `null` if no event is currently active
+  - UI uses this to decide: show dashboard or show EmptyEventState
+
+- **`listArchive(paginationOpts, filters?)`** — Completed events for archive page
+  - Always filters `status='completed'`
+  - Optional additional filters: `eventTypeId?`, `dateFrom?`, `dateTo?`
+  - Order: date descending (most recent past events first)
+  - Includes joined `eventType: { name, color }` and `attendanceCount`
+
+- **`getStats()`** — Dashboard statistics widget
+  - `totalEvents` — count of all events (any status)
+  - `byStatus` — `{ upcoming, active, completed, cancelled }` counts
+  - `thisMonth` — count of events in current calendar month
+  - `nextUpcoming` — the nearest upcoming event after today (name + date)
+
+#### `convex/events/mutations.ts`
+
+- **`create(fields)`** — Create new event
+  - Required fields: `name` (min 2 chars), `eventTypeId`, `date`
+  - Optional fields: `description`, `startTime`, `endTime`, `location`, `bannerImage`, `media`
+  - `status` is always set to `'upcoming'` — not accepted from input
+  - Validates `eventTypeId` exists and `isActive: true` in `eventTypes` table
+  - Validates `bannerImage` format if provided using `isValidImageUrl()`
+  - Validates each `media[].url` format if media array is provided
+  - Validates `endTime > startTime` if both provided (string comparison of "HH:mm")
+  - Sets `createdAt: Date.now()`, `updatedAt: Date.now()`, `isActive: true`
+  - Returns created event `_id`
+
+- **`update(id, fields)`** — Partial update any event fields
+  - All fields optional
+  - Validates event exists — throws "Event not found" if not
+  - Validates `bannerImage` format if provided
+  - Validates `eventTypeId` exists and is active if provided
+  - Validates `endTime > startTime` if both provided
+  - If `status` is being changed to `'active'`, checks no other event is active first
+  - Always updates `updatedAt: Date.now()`
+
+- **`startEvent(id)`** — Transition event to active (start it)
+  - Validates event exists
+  - Validates event is currently `'upcoming'` or `'cancelled'` (not already active/completed)
+  - Checks no other event currently has `status='active'` — throws "Another event is currently active. Complete or cancel it first."
+  - Sets `status='active'`, `updatedAt: Date.now()`
+
+- **`completeEvent(id)`** — Mark event as completed
+  - Validates event exists
+  - Validates event is currently `'active'` — throws "Only active events can be completed"
+  - Sets `status='completed'`, `completedAt: Date.now()`, `updatedAt: Date.now()`
+
+- **`cancelEvent(id)`** — Cancel an event
+  - Validates event exists
+  - Validates event is `'upcoming'` or `'active'` (can't cancel already completed/cancelled)
+  - Sets `status='cancelled'`, `updatedAt: Date.now()`
+
+- **`archive(id)`** — Soft delete (hide from all lists)
+  - Validates event exists
+  - Sets `isActive: false`, `updatedAt: Date.now()`
+  - Event remains in database but filtered out of all queries
+
+---
+
+### Phase 3: Backend Attendance
+
+#### `convex/attendance/queries.ts`
+
+- **`getByEvent(eventId, paginationOpts)`** — All attendees for a specific event
+  - Uses `by_event` index (`eventId` + `checkedInAt`)
+  - For each record, joins:
+    - Attendee: `firstName`, `lastName`, `status` (member/visitor/inactive), `email`, `phone`
+    - `invitedBy` attendee (if set): `firstName`, `lastName`
+  - Order: `checkedInAt` descending (most recent check-ins first)
+  - Returns paginated results with full attendee details
+
+- **`getStats(eventId)`** — Attendance summary counts for an event
+  - `total` — total attendance records for this event
+  - `members` — count where `attendee.status = 'member'`
+  - `visitors` — count where `attendee.status = 'visitor'`
+  - `withInvite` — count where `invitedBy` is set (visitors who were personally invited)
+  - Uses `by_event` index for all counts
+
+- **`getByAttendee(attendeeId, paginationOpts)`** — Attendance history for a person
+  - Uses `by_attendee` index (`attendeeId` + `checkedInAt`)
+  - For each record, joins event data: `name`, `date`, `startTime`, `location`, `status`
+  - Also joins event's `eventType`: `name`, `color`
+  - Order: `checkedInAt` descending (most recent events first)
+  - Returns paginated results
+
+- **`getInviters(eventId)`** — Top inviters for a specific event
+  - Queries all attendance records for the event where `invitedBy` is set
+  - Groups by `invitedBy` attendee ID
+  - Joins each inviter's attendee data: `firstName`, `lastName`
+  - Returns `{ inviter: { _id, firstName, lastName }, count: number }[]`
+  - Order: count descending (top inviters first)
+  - Use case: recognition widget "Top Inviters This Event"
+
+#### `convex/attendance/mutations.ts`
+
+- **`checkIn(eventId, attendeeId, invitedBy?)`** — Add attendee to event
+  - Requires authentication — `checkedInBy` set to `ctx.auth.getUserId()`
+  - Validates event exists — throws "Event not found"
+  - Validates attendee exists — throws "Attendee not found"
+  - Validates `invitedBy` attendee exists if provided — throws "Inviter not found"
+  - Checks duplicate using `by_event_attendee` index — throws "Attendee is already checked in to this event"
+  - Sets `checkedInAt: Date.now()`, `checkedInBy: userId`
+  - Sets `invitedBy` if provided
+  - Returns created attendance record `_id`
+
+- **`unCheckIn(attendanceRecordId)`** — Remove attendee from event
+  - Requires authentication
+  - Validates record exists — throws "Attendance record not found"
+  - **Hard deletes** the record using `ctx.db.delete(attendanceRecordId)`
+  - No soft delete, no undo — record is permanently removed
+  - UI must show confirmation dialog before calling this mutation
+
+- **`bulkCheckIn(eventId, attendees[])`** — Check in multiple attendees at once
+  - `attendees`: array of `{ attendeeId: Id<'attendees'>, invitedBy?: Id<'attendees'> }`
+  - For each attendee:
+    - Checks for duplicate using `by_event_attendee` index
+    - If already checked in: skip (no error thrown, increment `skippedCount`)
+    - If not checked in: create record, increment `successCount`
+  - Sets `checkedInAt: Date.now()` and `checkedInBy: userId` for all new records
+  - Returns `{ successCount: number, skippedCount: number }`
+  - Frontend shows single toast: "X attendees checked in (Y already checked in)"
+
+---
+
+### Phase 4: Frontend Hooks
+
+#### `src/features/events/hooks/useEvents.ts`
+
+- **`useEventsList(options?)`** — Paginated list with filters
+  - Options: `{ status?, eventTypeId?, dateFrom?, dateTo?, paginationOpts? }`
+  - Uses `convexQuery(api.events.list, args)` with TanStack Query
+  - Passes `'skip'` when no valid options provided
+  - Returns `{ data, isLoading, error, fetchNextPage, hasNextPage }`
+
+- **`useEvent(id?)`** — Single event with joined eventType
+  - Passes `'skip'` when `id` is `undefined`
+  - Returns event data including `eventType: { name, color }`
+  - Returns `null` if event not found
+
+- **`useCurrentEvent()`** — The single active event
+  - No args — always queries for `status='active'`
+  - Returns `null` when no event is active (UI renders `EmptyEventState`)
+  - Includes `attendanceCount` for display on dashboard
+
+- **`useEventStats()`** — Dashboard statistics
+  - Returns `{ totalEvents, byStatus, thisMonth, nextUpcoming }`
+  - Used in `EmptyEventState` quick stats section
+
+- **`useArchiveEvents(options?)`** — Completed events for archive page
+  - Options: `{ eventTypeId?, dateFrom?, dateTo?, paginationOpts? }`
+  - Always queries `status='completed'`
+
+#### `src/features/events/hooks/useEventMutations.ts`
+
+- **`useCreateEvent()`** — Create event
+  - On success: toast "Event created successfully", navigate to `/events/${newId}`
+  - On error: toast error message from Convex
+
+- **`useUpdateEvent()`** — Update event
+  - On success: toast "Event updated", invalidate `useEvent(id)` and `useEventsList`
+  - On error: toast error message
+
+- **`useStartEvent()`** — Start event (set active)
+  - On success: toast "Event started — now live!"
+  - On error: if message contains "Another event is currently active" → toast specific helpful message
+  - Invalidates `useCurrentEvent` and `useEventsList`
+
+- **`useCompleteEvent()`** — Complete event
+  - On success: toast "Event completed successfully"
+  - Invalidates `useCurrentEvent` and `useArchiveEvents`
+  - On error: toast error message
+
+- **`useCancelEvent()`** — Cancel event
+  - On success: toast "Event cancelled"
+  - Invalidates `useEventsList` and `useCurrentEvent`
+  - On error: toast error message
+
+- **`useArchiveEvent()`** — Soft delete event
+  - On success: toast "Event archived"
+  - Invalidates `useEventsList` and `useArchiveEvents`
+  - On error: toast error message
+
+#### `src/features/events/hooks/useAttendance.ts`
+
+- **`useAttendanceByEvent(eventId?)`** — Live attendance list for an event
+  - Passes `'skip'` when `eventId` is `undefined`
+  - Real-time updates via Convex subscription (auto-updates when someone checks in/out)
+  - Returns each record with full attendee details + `invitedBy` name
+  - Supports pagination via `paginationOpts`
+
+- **`useAttendanceStats(eventId?)`** — Attendance counts for an event
+  - Returns `{ total, members, visitors, withInvite }`
+  - Passes `'skip'` when `eventId` is `undefined`
   - Real-time updates via Convex subscription
-- `useAttendanceStats(eventId)` - Get attendance counts
-- `useCheckIn()` - Check in mutation
-  - Optimistic updates (show attendee in list immediately)
-  - Toast notifications
-  - Error handling for duplicates
-- `useUnCheckIn()` - Remove attendance mutation
-  - Confirmation dialog
-  - Optimistic updates
-  - Toast notifications
-- `useBulkCheckIn()` - Bulk check in mutation
-  - Accept array of attendee IDs
-  - Toast with success count
 
-**UI Integration:**
+- **`useCheckIn()`** — Add attendee to event
+  - Args: `{ eventId, attendeeId, invitedBy? }`
+  - Optimistic update: attendee appears in list immediately before server confirms
+  - On error: rollback optimistic update + toast specific message:
+    - "Already checked in" if duplicate
+    - Generic error otherwise
+  - On success: silent (list already updated optimistically)
 
-**Replace mock data in:**
+- **`useUnCheckIn()`** — Remove attendee from event
+  - Args: `{ attendanceRecordId }`
+  - Hard delete — no undo
+  - UI **must** show confirmation dialog before calling (hook does not confirm)
+  - On success: toast "Attendee removed from event"
+  - On error: toast error message
+  - Invalidates attendance list and stats
 
-- `src/routes/events.archive.tsx` - Wire up EventArchive with real data
-  - Use useArchiveEvents for completed events
-  - Connect filters to query params
-  - Implement real pagination
-- `src/routes/events.$id.tsx` - Wire up EventDetail with real data
-  - Use useEvent for event data
-  - Use useAttendanceByEvent for attendance list
-  - Connect edit modals to mutations
-- `src/routes/events.new.tsx` - Wire up EventForm with mutations
-  - Use useCreateEvent on submit
-  - Navigate to event detail on success
-  - Show validation errors
-- `src/routes/events.index.tsx` (Task 5.6 prep)
-  - Use useCurrentEvent for dashboard
-  - Handle null case (no active event)
+- **`useBulkCheckIn()`** — Check in multiple attendees at once
+  - Args: `{ eventId, attendees: { attendeeId, invitedBy? }[] }`
+  - On success: single toast "X attendees checked in (Y already checked in)"
+  - On error: toast error message
+  - Invalidates attendance list and stats
 
-**Success Criteria:**
+---
 
-- [ ] Schema migration runs without errors
-- [ ] All queries return real data from Convex
-- [ ] Create event validates image URLs
-- [ ] Only one event can be active at a time (enforced in mutations)
-- [ ] Complete event updates status and sets completedAt timestamp
-- [ ] Add attendance prevents duplicates
-- [ ] Remove attendance deletes record immediately
-- [ ] Archive page shows real past events with working pagination
-- [ ] Real-time updates work (Convex subscriptions update UI automatically)
-- [ ] Toast notifications appear for all CRUD operations
-- [ ] All existing UI components work with real data (no mock imports remaining)
+### Phase 5: Route Integration
+
+Replace all mock data imports with real hooks:
+
+- **`src/routes/events.index.tsx`**
+  - Use `useCurrentEvent()` — returns null or active event
+  - If null: render `EmptyEventState` with `useEventStats()` for quick stats
+  - If active: render `CurrentEventDashboard` (Task 5.6)
+
+- **`src/routes/events.archive.tsx`**
+  - Use `useArchiveEvents(options)` for real paginated data
+  - Connect filter dropdowns to query options (eventTypeId, dateFrom, dateTo)
+  - Connect search input to filter (search by event name on frontend)
+  - Implement real pagination controls
+
+- **`src/routes/events.$id.tsx`**
+  - Use `useEvent(id)` for event data — show skeleton while loading
+  - Use `useAttendanceByEvent(id)` for live attendance list
+  - Use `useAttendanceStats(id)` for counts
+  - Wire `BasicInfoEditModal` → `useUpdateEvent()`
+  - Wire `DescriptionEditModal` → `useUpdateEvent()`
+  - Wire `BannerUploader` → `useUpdateEvent()` with bannerImage URL
+  - Wire media gallery upload → `useUpdateEvent()` with updated media array
+  - Wire trash icons on media items → `useUpdateEvent()` with item removed
+  - Wire "Start Event" button → `useStartEvent()`
+  - Wire "Complete Event" button → `useCompleteEvent()`
+  - Wire "Cancel Event" button → `useCancelEvent()`
+
+- **`src/routes/events.new.tsx`**
+  - Use `useCreateEvent()` on form submit
+  - On success: navigate to `/events/${newId}`
+  - Show field-level validation errors from Convex
+
+---
+
+### Phase 6: Type Generation + Verification
+
+```bash
+pnpm dlx convex dev --once
+```
+
+- Regenerates `convex/_generated/api.ts` with new functions
+- Regenerates `convex/_generated/dataModel.d.ts` with updated table types
+- Verify no TypeScript errors: `pnpm dev:ts`
+- Verify app loads without errors: `pnpm dev`
+
+---
+
+### ✅ Success Criteria
+
+- [ ] Schema updates apply without errors (no data migration needed — no existing data)
+- [ ] `attendees.invitedBy` saves the original church inviter (permanent on attendee profile)
+- [ ] `attendanceRecords.invitedBy` saves the per-event inviter (can differ from attendees.invitedBy)
+- [ ] New events always default to `status='upcoming'` regardless of date
+- [ ] Image URL validation: format only — extension check or `data:image/` prefix (no HEAD request)
+- [ ] Only one event can be active at a time — `startEvent` throws if another is active
+- [ ] `completeEvent` sets `completedAt` timestamp
+- [ ] `checkIn` prevents duplicates — backend throws "Attendee is already checked in"
+- [ ] `unCheckIn` hard deletes the record permanently (no soft delete, no undo)
+- [ ] `bulkCheckIn` returns `{ successCount, skippedCount }` — single toast on frontend
+- [ ] `getInviters` query returns top inviters sorted by invite count descending
+- [ ] All queries return real data (no mock data imports remaining in routes)
+- [ ] Archive page shows real completed events with working pagination and filters
+- [ ] Real-time updates work — attendance list updates without page refresh (Convex subscription)
+- [ ] Toast notifications for all CRUD operations
+- [ ] Events index shows `EmptyEventState` when no active event
+- [ ] Events index shows active event dashboard when event is active
+- [ ] `getStats()` returns correct counts for dashboard quick stats
 
 **Upcoming Tasks (Phase 5):**
 
