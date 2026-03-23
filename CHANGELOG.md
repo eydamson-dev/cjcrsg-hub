@@ -39,6 +39,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `cancelEvent`: Cancel upcoming or active events
     - `archive`: Soft delete (set isActive=false)
 
+- **Task 5.7 Phase 3: Backend Attendance** - Complete Convex backend for attendance tracking
+  - `convex/attendance/validators.ts`: Field validators for attendance operations (eventId, attendeeId, inviterId, bulkAttendees)
+  - `convex/attendance/queries.ts`: Four queries with joined data and pagination
+    - `getByEvent`: Paginated attendance records for an event with attendee and inviter details
+    - `getStats`: Attendance statistics (total, members, visitors, withInvite counts)
+    - `getByAttendee`: Paginated attendance history for a person with event and eventType data
+    - `getInviters`: Top inviters for an event grouped by count, sorted descending
+  - `convex/attendance/mutations.ts`: Three mutations for check-in operations
+    - `checkIn`: Single attendee check-in with duplicate prevention, auth requirement, inviter validation
+    - `unCheckIn`: Hard delete attendance record (no soft delete)
+    - `bulkCheckIn`: Multiple attendees check-in with duplicate skipping, returns success/skipped counts
+  - Schema update: Changed `checkedInBy` to `v.string()` to store auth identity subject string
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)

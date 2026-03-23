@@ -10,11 +10,17 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
 **Current Task:** Task 5.7 - Backend Integration (Connecting UI to Convex)  
-**Status:** 🚧 IN PROGRESS - Phase 2 (Backend Events) complete, Phase 3 (Backend Attendance) next
+**Status:** 🚧 IN PROGRESS - Phase 3 (Backend Attendance) complete, Phase 4 (Frontend Hooks) next
 
 **Recently Completed:**
 
-- ✅ Phase 2 (Task 5.7): Backend Events - `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
+- ✅ Phase 3 (Task 5.7): Backend Attendance - `convex/attendance/validators.ts`, `queries.ts`, `mutations.ts`
+  - Validators: Field validators for attendance operations
+  - Queries: `getByEvent`, `getStats`, `getByAttendee`, `getInviters`
+  - Mutations: `checkIn`, `unCheckIn`, `bulkCheckIn`
+  - Features: Duplicate check-in prevention, auth checks, pagination support
+
+- ✅ Phase 2 (Task 5.7): Backend Events
   - Validators: `isValidImageUrl()`, field validators, `eventFields`, `updateEventFields`
   - Queries: `list`, `getById`, `getCurrentEvent`, `listArchive`, `getStats`
   - Mutations: `create`, `update`, `startEvent`, `completeEvent`, `cancelEvent`, `archive`
@@ -67,7 +73,7 @@ Backend Integration - Replacing mock data with real Convex backend.
 
 - [x] **Phase 1:** Schema Updates — `convex/schema.ts`
 - [x] **Phase 2:** Backend Events — `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
-- [ ] **Phase 3:** Backend Attendance — `convex/attendance/queries.ts`, `mutations.ts`
+- [x] **Phase 3:** Backend Attendance — `convex/attendance/queries.ts`, `mutations.ts`
 - [ ] **Phase 4:** Frontend Hooks — `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
 - [ ] **Phase 5:** Route Integration — wire up all 4 routes with real data
 - [ ] **Phase 6:** Type Generation + Verification — `pnpm dlx convex dev --once`

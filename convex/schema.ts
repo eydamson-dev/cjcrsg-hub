@@ -89,7 +89,7 @@ export default defineSchema({
     eventId: v.id('events'),
     attendeeId: v.id('attendees'),
     checkedInAt: v.number(),
-    checkedInBy: v.id('users'), // Admin user who recorded this check-in
+    checkedInBy: v.string(), // Auth identity subject string (not a DB ID reference)
     // Who invited this attendee to THIS specific event (per-event, not permanent)
     // Different from attendees.invitedBy (which is who brought them to church overall)
     // Example: John brought Mary to church (attendees.invitedBy = John)
