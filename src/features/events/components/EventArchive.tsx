@@ -16,8 +16,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '~/components/ui/pagination'
-import { mockCompletedEvents, mockEventTypes } from '../mocks'
-import type { Event } from '../types'
+import { Skeleton } from '~/components/ui/skeleton'
+import type { Event, EventType } from '../types'
 
 type ViewMode = 'table' | 'cards'
 
@@ -25,14 +25,18 @@ const ITEMS_PER_PAGE = 10
 
 interface EventArchiveProps {
   events?: Event[]
+  eventTypes?: EventType[]
   onEventClick?: (eventId: string) => void
   showBackLink?: boolean
+  isLoading?: boolean
 }
 
 export function EventArchive({
-  events = mockCompletedEvents,
+  events = [],
+  eventTypes,
   onEventClick,
   showBackLink = false,
+  isLoading = false,
 }: EventArchiveProps) {
   const navigate = useNavigate()
   const [viewMode, setViewMode] = useState<ViewMode>('table')
@@ -122,7 +126,7 @@ export function EventArchive({
       </div>
 
       <EventFilters
-        eventTypes={mockEventTypes}
+        eventTypes={eventTypes || []}
         selectedEventType={selectedEventType}
         onEventTypeChange={(type) => {
           setSelectedEventType(type)
@@ -136,7 +140,23 @@ export function EventArchive({
         onClearFilters={handleClearFilters}
       />
 
-      {filteredEvents.length === 0 ? (
+      {isLoading ? (
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-4 p-4 border rounded-lg"
+            >
+              <Skeleton className="h-16 w-24 rounded" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+              <Skeleton className="h-8 w-20" />
+            </div>
+          ))}
+        </div>
+      ) : filteredEvents.length === 0 ? (
         <Empty className="mt-8">
           <EmptyTitle>No events found</EmptyTitle>
           <EmptyDescription>
