@@ -153,7 +153,9 @@ export function BasicInfoEditModal({
                 onValueChange={(value) => setEventTypeId(value || '')}
               >
                 <SelectTrigger id="eventType">
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder="Select type">
+                    {eventTypes.find((t) => t._id === eventTypeId)?.name}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {eventTypes.map((type) => (
