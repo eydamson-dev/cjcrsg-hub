@@ -25,9 +25,14 @@ export function useEventTypesList(options?: { isActive?: boolean }) {
  */
 export function useEventType(id?: string) {
   return useQuery({
-    ...convexQuery(api.eventTypes.queries.getById, {
-      id: id as Id<'eventTypes'>,
-    }),
+    ...convexQuery(
+      api.eventTypes.queries.getById,
+      id
+        ? {
+            id: id as Id<'eventTypes'>,
+          }
+        : ('skip' as any),
+    ),
     enabled: !!id,
   })
 }
