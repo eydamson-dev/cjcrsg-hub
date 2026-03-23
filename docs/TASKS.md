@@ -9,8 +9,8 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 **Updated:** 2026-03-22
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
-**Current Task:** Task 5.5 - Event Form UI (Section-based editing)  
-**Status:** ✅ COMPLETE - Branch created, ready for review
+**Current Task:** Task 5.7 - Backend Integration (Connecting UI to Convex)  
+**Status:** 🚧 IN PROGRESS - Creating backend infrastructure
 
 **Recently Completed:**
 
@@ -34,10 +34,221 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
   - All 164 tests passing
   - Route: `/event-types`
 
+**Current Work (Task 5.7):**
+
+Backend Integration - Replacing mock data with real Convex backend:
+
+**Configuration Decisions:**
+
+- ✅ **Image URL Validation:** Validate URLs start with http/https and have valid image extensions (.jpg, .jpeg, .png, .gif, .webp, .svg) OR are data URLs (data:image/)
+- ✅ **Active Event Constraint:** Only one event can be active at a time. `getCurrentEvent` returns the single active event or `null` if none exists
+- ✅ **Past Date Handling:** Backend allows creating events in the past. UI will show warning but won't block creation
+- ✅ **Pagination:** Use standard Convex `paginationOptsValidator` (frontend controls page size, default 10)
+
+**Schema Updates (`convex/schema.ts`):**
+
+Add to `events` table:
+
+```typescript
+.status: v.union(
+  v.literal('upcoming'),
+  v.literal('active'),
+  v.literal('completed'),
+  v.literal('cancelled')
+)
+.bannerImage: v.optional(v.string())  // Validated URL
+.media: v.optional(v.array(v.object({
+  url: v.string(),
+  type: v.union(v.literal('image'), v.literal('video')),
+  caption: v.optional(v.string()),
+})))
+.updatedAt: v.number()
+.completedAt: v.optional(v.number())
+```
+
+Add indexes:
+
+- `.index('by_status', ['status'])` - For filtering by status
+- `.index('by_date_status', ['date', 'status'])` - For upcoming/active queries
+
+**Backend Files to Create:**
+
+**`convex/events/validators.ts`:**
+
+- Individual field validators (eventName, eventDescription, eventDate, etc.)
+- `eventStatus` union validator
+- `eventFields` object for create operations
+- `updateEventFields` object for updates (all optional)
+- `mediaItemValidator` for media array items
+- `isValidImageUrl()` helper function
+
+**`convex/events/queries.ts`:**
+
+- `list` - List events with optional filters (status, date range, eventTypeId)
+  - Use paginationOptsValidator for pagination
+  - Support filtering by status
+  - Order by date descending
+- `getById` - Get single event by ID with joined eventType data
+- `getCurrentEvent` - Get the single active event (status='active')
+  - Returns first active event or null
+- `listArchive` - Get completed events for archive page
+  - Filter by status='completed'
+  - Support pagination
+  - Optional date range filter
+- `getStats` - Get event statistics
+  - Total events count
+  - Events by status counts
+  - Events this month
+  - Next upcoming event
+
+**`convex/events/mutations.ts`:**
+
+- `create` - Create new event
+  - Validate required fields (name, eventTypeId, date)
+  - Validate bannerImage URL if provided
+  - If status='active', validate no other active event exists
+  - Set createdAt and updatedAt timestamps
+  - Default status to 'upcoming' if not specified
+- `update` - Update event fields
+  - Validate event exists
+  - Partial updates allowed
+  - Update updatedAt timestamp
+  - If updating to status='active', check no other active event
+- `startEvent` - Set status to 'active'
+  - Validate event exists
+  - Check no other event is currently active
+  - Update status and updatedAt
+- `completeEvent` - Set status to 'completed'
+  - Validate event exists and is active
+  - Set status='completed', completedAt=Date.now(), updatedAt
+- `cancelEvent` - Set status to 'cancelled'
+  - Validate event exists
+  - Set status='cancelled', updatedAt
+- `archive` - Soft delete (set isActive=false)
+  - Set isActive=false, updatedAt
+
+**`convex/attendance/queries.ts`:**
+
+- `getByEvent` - Get all attendance records for an event
+  - Join with attendee data
+  - Order by checkedInAt descending
+  - Support pagination
+- `getStats` - Get attendance statistics for an event
+  - Total attendance count
+  - Count by attendee status (member/visitor)
+- `getByAttendee` - Get attendance history for an attendee
+  - Join with event data
+  - Order by checkedInAt descending
+  - Support pagination
+
+**`convex/attendance/mutations.ts`:**
+
+- `checkIn` - Create attendance record
+  - Validate event exists and is active
+  - Validate attendee exists
+  - Check for duplicate (prevent double check-in)
+  - Set checkedInAt=Date.now(), checkedInBy=current user
+  - Return attendance record ID
+- `unCheckIn` - Remove attendance record
+  - Validate record exists
+  - Delete from database
+- `bulkCheckIn` - Check in multiple attendees at once
+  - Accept array of attendeeIds
+  - Filter out already checked-in attendees
+  - Create records for remaining
+  - Return results (success count, skipped count)
+
+**Frontend Hooks to Create:**
+
+**`src/features/events/hooks/useEvents.ts`:**
+
+- `useEventsList(options)` - Query hook for listing events
+  - Options: status, eventTypeId, dateRange, paginationOpts
+  - Uses TanStack Query + convexQuery
+- `useEvent(id)` - Get single event by ID
+  - Use 'skip' pattern for conditional queries
+- `useCurrentEvent()` - Get active event
+  - Returns null if no active event
+- `useEventStats()` - Get event statistics
+- `useArchiveEvents(options)` - Get completed events for archive
+  - Options: dateRange, paginationOpts
+
+**`src/features/events/hooks/useEventMutations.ts`:**
+
+- `useCreateEvent()` - Create event mutation
+  - Toast notifications on success/error
+  - Invalidate events list query on success
+  - Return mutation result with ID
+- `useUpdateEvent()` - Update event mutation
+  - Toast notifications
+  - Invalidate event and list queries
+- `useStartEvent()` - Start event mutation
+  - Toast notifications
+  - Error handling for "another event active"
+- `useCompleteEvent()` - Complete event mutation
+  - Toast notifications
+  - Invalidate current event query
+- `useCancelEvent()` - Cancel event mutation
+  - Toast notifications
+- `useArchiveEvent()` - Archive event mutation
+  - Toast notifications
+  - Invalidate list queries
+
+**`src/features/events/hooks/useAttendance.ts`:**
+
+- `useAttendanceByEvent(eventId)` - Get attendance for event
+  - Join with attendee data
+  - Real-time updates via Convex subscription
+- `useAttendanceStats(eventId)` - Get attendance counts
+- `useCheckIn()` - Check in mutation
+  - Optimistic updates (show attendee in list immediately)
+  - Toast notifications
+  - Error handling for duplicates
+- `useUnCheckIn()` - Remove attendance mutation
+  - Confirmation dialog
+  - Optimistic updates
+  - Toast notifications
+- `useBulkCheckIn()` - Bulk check in mutation
+  - Accept array of attendee IDs
+  - Toast with success count
+
+**UI Integration:**
+
+**Replace mock data in:**
+
+- `src/routes/events.archive.tsx` - Wire up EventArchive with real data
+  - Use useArchiveEvents for completed events
+  - Connect filters to query params
+  - Implement real pagination
+- `src/routes/events.$id.tsx` - Wire up EventDetail with real data
+  - Use useEvent for event data
+  - Use useAttendanceByEvent for attendance list
+  - Connect edit modals to mutations
+- `src/routes/events.new.tsx` - Wire up EventForm with mutations
+  - Use useCreateEvent on submit
+  - Navigate to event detail on success
+  - Show validation errors
+- `src/routes/events.index.tsx` (Task 5.6 prep)
+  - Use useCurrentEvent for dashboard
+  - Handle null case (no active event)
+
+**Success Criteria:**
+
+- [ ] Schema migration runs without errors
+- [ ] All queries return real data from Convex
+- [ ] Create event validates image URLs
+- [ ] Only one event can be active at a time (enforced in mutations)
+- [ ] Complete event updates status and sets completedAt timestamp
+- [ ] Add attendance prevents duplicates
+- [ ] Remove attendance deletes record immediately
+- [ ] Archive page shows real past events with working pagination
+- [ ] Real-time updates work (Convex subscriptions update UI automatically)
+- [ ] Toast notifications appear for all CRUD operations
+- [ ] All existing UI components work with real data (no mock imports remaining)
+
 **Upcoming Tasks (Phase 5):**
 
 - ⏳ Task 5.6: Dashboard UI (Active Event with attendance)
-- ⏳ Task 5.7: Backend Integration (Schema, queries, mutations)
 - ⏳ Task 5.8: Testing
 
 ---
