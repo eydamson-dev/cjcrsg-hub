@@ -16,6 +16,9 @@ import type * as auth from "../auth.js";
 import type * as eventTypes_mutations from "../eventTypes/mutations.js";
 import type * as eventTypes_queries from "../eventTypes/queries.js";
 import type * as eventTypes_validators from "../eventTypes/validators.js";
+import type * as events_mutations from "../events/mutations.js";
+import type * as events_queries from "../events/queries.js";
+import type * as events_validators from "../events/validators.js";
 import type * as http from "../http.js";
 import type * as myFunctions from "../myFunctions.js";
 
@@ -34,6 +37,9 @@ declare const fullApi: ApiFromModules<{
   "eventTypes/mutations": typeof eventTypes_mutations;
   "eventTypes/queries": typeof eventTypes_queries;
   "eventTypes/validators": typeof eventTypes_validators;
+  "events/mutations": typeof events_mutations;
+  "events/queries": typeof events_queries;
+  "events/validators": typeof events_validators;
   http: typeof http;
   myFunctions: typeof myFunctions;
 }>;

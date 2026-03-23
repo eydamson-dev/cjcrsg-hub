@@ -23,6 +23,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `attendanceRecords` table: Add `invitedBy` field — per-event inviter tracking (who brought this person to this specific event; can differ from `attendees.invitedBy`)
   - `attendanceRecords` table: Add `by_invited_by` index — top inviters leaderboard and monthly invite count queries
 
+- **Task 5.7 Phase 2: Backend Events** - Complete Convex backend implementation for event management
+  - `convex/events/validators.ts`: Image URL validation (`isValidImageUrl`), field validators, `eventFields` and `updateEventFields` validators
+  - `convex/events/queries.ts`: Five queries with joined data and pagination
+    - `list`: Paginated events with filters (status, eventTypeId, dateFrom, dateTo), returns events with joined eventType data
+    - `getById`: Single event lookup with eventType join
+    - `getCurrentEvent`: Get active event with attendance count for dashboard
+    - `listArchive`: Completed events for archive page with attendance counts
+    - `getStats`: Dashboard statistics (totalEvents, byStatus, thisMonth, nextUpcoming)
+  - `convex/events/mutations.ts`: Six mutations with full validation
+    - `create`: Create event with validation (eventType exists, image URLs, time ordering), always defaults status to 'upcoming'
+    - `update`: Partial update with validation, enforces single active event constraint when changing status
+    - `startEvent`: Transition to 'active' with constraint check (only one active event at a time)
+    - `completeEvent`: Mark as completed, sets completedAt timestamp
+    - `cancelEvent`: Cancel upcoming or active events
+    - `archive`: Soft delete (set isActive=false)
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)

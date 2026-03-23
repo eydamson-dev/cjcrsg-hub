@@ -10,9 +10,15 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
 **Current Task:** Task 5.7 - Backend Integration (Connecting UI to Convex)  
-**Status:** 🚧 IN PROGRESS - Phase 1 (Schema Updates) complete, Phase 2 (Backend Events) next
+**Status:** 🚧 IN PROGRESS - Phase 2 (Backend Events) complete, Phase 3 (Backend Attendance) next
 
 **Recently Completed:**
+
+- ✅ Phase 2 (Task 5.7): Backend Events - `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
+  - Validators: `isValidImageUrl()`, field validators, `eventFields`, `updateEventFields`
+  - Queries: `list`, `getById`, `getCurrentEvent`, `listArchive`, `getStats`
+  - Mutations: `create`, `update`, `startEvent`, `completeEvent`, `cancelEvent`, `archive`
+  - Features: Image URL validation, status transitions, active event constraint, pagination
 
 - ✅ Bug Fix: useEventType hook - Properly handle undefined id (pass 'skip' to query)
 
@@ -60,7 +66,7 @@ Backend Integration - Replacing mock data with real Convex backend.
 ### 📋 Task 5.7 Sub-phases
 
 - [x] **Phase 1:** Schema Updates — `convex/schema.ts`
-- [ ] **Phase 2:** Backend Events — `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
+- [x] **Phase 2:** Backend Events — `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
 - [ ] **Phase 3:** Backend Attendance — `convex/attendance/queries.ts`, `mutations.ts`
 - [ ] **Phase 4:** Frontend Hooks — `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
 - [ ] **Phase 5:** Route Integration — wire up all 4 routes with real data
