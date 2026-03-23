@@ -14,6 +14,8 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Recently Completed:**
 
+- ✅ Bug Fix: useEventType hook - Properly handle undefined id (pass 'skip' to query)
+
 - ✅ Phase 5 - Tasks 5.0-5.5 Complete (UI with mock data)
   - Task 5.0: Types and Mock Data - Event types, 15 mock events, 25 attendance records
   - Task 5.1: Empty State UI - "Start New Event" page with stats

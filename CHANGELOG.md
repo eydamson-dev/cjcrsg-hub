@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)
+
 ### Added
 
 - **Phase 5: Event Management UI (Tasks 5.0-5.5)** - Complete UI implementation with mock data
