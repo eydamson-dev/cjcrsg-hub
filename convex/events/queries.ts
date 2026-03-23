@@ -130,6 +130,8 @@ export const getCurrentEvent = query({
       .filter((q) => q.eq(q.field('isActive'), true))
       .first()
 
+      console.log({event})
+
     if (!event) return null
 
     const eventType = await ctx.db.get(event.eventTypeId)

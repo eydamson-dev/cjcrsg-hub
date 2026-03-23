@@ -86,6 +86,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Shows event details, description, banner image
     - Displays attendance list with useAttendanceByEvent
     - Shows attendance stats with useAttendanceStats
+  - `src/routes/events.archive.tsx`: Archive page wired to useArchiveEvents and useEventTypesList
+    - Displays real completed events with pagination
+    - Event type filter and search functionality
+    - Loading skeleton during data fetch
 
 ### Fixed
 
