@@ -23,10 +23,10 @@ import {
   MediaGallery,
   type MediaItem,
 } from '~/features/events/components/MediaGallery'
-import { mockEventTypes } from '~/features/events/mocks'
 import { EventsBreadcrumb } from '~/features/events/components/EventsBreadcrumb'
-import { toast } from 'sonner'
 import type { CreateEventInput } from '~/features/events/types'
+import { useCreateEvent } from '~/features/events/hooks/useEventMutations'
+import { useEventTypesList } from '~/features/events/hooks/useEventTypes'
 
 export const Route = createFileRoute('/events/new')({
   component: CreateEventPage,
@@ -37,6 +37,8 @@ export const Route = createFileRoute('/events/new')({
 
 function CreateEventPage() {
   const navigate = useNavigate()
+  const createEvent = useCreateEvent()
+  const { data: eventTypes } = useEventTypesList()
 
   // Form state
   const [name, setName] = useState('')
@@ -51,7 +53,6 @@ function CreateEventPage() {
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
@@ -83,10 +84,7 @@ function CreateEventPage() {
 
     if (!validate()) return
 
-    setIsSubmitting(true)
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
       const eventData: CreateEventInput = {
         name,
         eventTypeId,
@@ -99,14 +97,11 @@ function CreateEventPage() {
         media: media.length > 0 ? media : undefined,
       }
 
-      console.log('Creating event:', eventData)
-      toast.success('Event created successfully!')
-
-      // Navigate to events page
+      await createEvent.mutateAsync(eventData)
       navigate({ to: '/events' })
-
-      setIsSubmitting(false)
-    }, 1000)
+    } catch (error) {
+      // Error is handled by the mutation hook with toast
+    }
   }
 
   const handleCancel = () => {
@@ -175,7 +170,7 @@ function CreateEventPage() {
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {mockEventTypes.map((type) => (
+                        {eventTypes?.map((type) => (
                           <SelectItem key={type._id} value={type._id}>
                             {type.name}
                           </SelectItem>
@@ -325,12 +320,12 @@ function CreateEventPage() {
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={isSubmitting}
+                disabled={createEvent.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Event'}
+              <Button type="submit" disabled={createEvent.isPending}>
+                {createEvent.isPending ? 'Creating...' : 'Create Event'}
               </Button>
             </div>
           </form>

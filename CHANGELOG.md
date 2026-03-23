@@ -75,6 +75,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `useUnCheckIn`: Remove attendance record (hard delete)
     - `useBulkCheckIn`: Multiple attendees check-in, returns counts
 
+- **Task 5.7 Phase 5: Route Integration** - Wire up event routes with real Convex backend
+  - `src/routes/events.index.tsx`: Main dashboard with useCurrentEvent and useEventStats hooks
+    - Shows active event with LIVE badge and attendance count if event is active
+    - Shows EmptyEventState with real stats if no active event
+  - `src/routes/events.new.tsx`: Create event form wired to useCreateEvent mutation
+    - Uses useEventTypesList for event type dropdown
+    - Uses mutation for form submission with loading state
+  - `src/routes/events.$id.tsx`: Event detail page wired to useEvent hook
+    - Shows event details, description, banner image
+    - Displays attendance list with useAttendanceByEvent
+    - Shows attendance stats with useAttendanceStats
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)

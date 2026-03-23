@@ -10,11 +10,17 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 **Phase:** Phase 5 - Event Management - 🚧 IN PROGRESS  
 **Current Task:** Task 5.7 - Backend Integration (Connecting UI to Convex)  
-**Status:** 🚧 IN PROGRESS - Phase 4 (Frontend Hooks) complete, Phase 5 (Route Integration) next
+**Status:** 🚧 IN PROGRESS - Phase 5 (Route Integration) complete, Phase 6 (Type Generation) next
 
 **Recently Completed:**
 
-- ✅ Phase 4 (Task 5.7): Frontend Hooks - `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
+- ✅ Phase 5 (Task 5.7): Route Integration - Wire up all 4 routes with real data
+  - `/events`: Dashboard showing active event or EmptyEventState with real stats
+  - `/events/new`: Create form using useCreateEvent mutation, loads event types from API
+  - `/events/$id`: Event detail page with useEvent hook, attendance data, stats
+  - `/events/archive`: Archive page (placeholder for now, component exists)
+
+- ✅ Phase 4 (Task 5.7): Frontend Hooks
   - useEvents: `useEventsList`, `useEvent`, `useCurrentEvent`, `useArchiveEvents`, `useEventStats`
   - useEventMutations: `useCreateEvent`, `useUpdateEvent`, `useStartEvent`, `useCompleteEvent`, `useCancelEvent`, `useArchiveEvent`
   - useAttendance: `useAttendanceByEvent`, `useAttendanceStats`, `useAttendanceByAttendee`, `useEventInviters`, `useCheckIn`, `useUnCheckIn`, `useBulkCheckIn`
@@ -81,6 +87,7 @@ Backend Integration - Replacing mock data with real Convex backend.
 - [x] **Phase 2:** Backend Events — `convex/events/validators.ts`, `queries.ts`, `mutations.ts`
 - [x] **Phase 3:** Backend Attendance — `convex/attendance/queries.ts`, `mutations.ts`
 - [x] **Phase 4:** Frontend Hooks — `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
+- [x] **Phase 5:** Route Integration — wire up all 4 routes with real data
 - [ ] **Phase 4:** Frontend Hooks — `useEvents.ts`, `useEventMutations.ts`, `useAttendance.ts`
 - [ ] **Phase 5:** Route Integration — wire up all 4 routes with real data
 - [ ] **Phase 6:** Type Generation + Verification — `pnpm dlx convex dev --once`
