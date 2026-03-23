@@ -52,6 +52,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `bulkCheckIn`: Multiple attendees check-in with duplicate skipping, returns success/skipped counts
   - Schema update: Changed `checkedInBy` to `v.string()` to store auth identity subject string
 
+- **Task 5.7 Phase 4: Frontend Hooks** - React hooks wrapping Convex backend
+  - `src/features/events/hooks/useEvents.ts`: Five TanStack Query hooks for events
+    - `useEventsList`: Paginated event list with filters (status, eventTypeId, date range)
+    - `useEvent`: Single event by ID with eventType data
+    - `useCurrentEvent`: Active event for dashboard with attendance count
+    - `useArchiveEvents`: Completed events for archive page
+    - `useEventStats`: Dashboard statistics (totalEvents, byStatus, thisMonth, nextUpcoming)
+  - `src/features/events/hooks/useEventMutations.ts`: Six mutation hooks with toast notifications
+    - `useCreateEvent`: Create event, invalidates list on success
+    - `useUpdateEvent`: Update event, invalidates queries on success
+    - `useStartEvent`: Start event (set active), handles active event constraint error
+    - `useCompleteEvent`: Complete event, invalidates current/archive queries
+    - `useCancelEvent`: Cancel event, invalidates queries
+    - `useArchiveEvent`: Soft delete event, invalidates queries
+  - `src/features/events/hooks/useAttendance.ts`: Seven hooks for attendance management
+    - `useAttendanceByEvent`: Paginated attendance records for an event
+    - `useAttendanceStats`: Attendance statistics (total, members, visitors, withInvite)
+    - `useAttendanceByAttendee`: Person's attendance history
+    - `useEventInviters`: Top inviters for an event
+    - `useCheckIn`: Single attendee check-in with duplicate prevention
+    - `useUnCheckIn`: Remove attendance record (hard delete)
+    - `useBulkCheckIn`: Multiple attendees check-in, returns counts
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)
