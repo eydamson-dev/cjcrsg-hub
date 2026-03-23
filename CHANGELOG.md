@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
+  - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
+  - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member
+  - `events` table: Add `status` union (`upcoming | active | completed | cancelled`) — only one event can be `active` at a time
+  - `events` table: Add `bannerImage` field — event banner URL with format-only validation (extension check, no HEAD requests)
+  - `events` table: Add `media` array — photos and videos with url, type, and optional caption
+  - `events` table: Add `updatedAt` field — tracked on every mutation
+  - `events` table: Add `completedAt` field — timestamp set only when event is completed
+  - `events` table: Add `by_status` index — filter events by lifecycle status
+  - `events` table: Add `by_date_status` index — date + status queries (e.g. upcoming events after today ordered by date)
+  - `events` table: Add `by_active` index — fast lookup of the single currently active event
+  - `attendanceRecords` table: Add `invitedBy` field — per-event inviter tracking (who brought this person to this specific event; can differ from `attendees.invitedBy`)
+  - `attendanceRecords` table: Add `by_invited_by` index — top inviters leaderboard and monthly invite count queries
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)
