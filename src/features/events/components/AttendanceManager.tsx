@@ -1,5 +1,19 @@
+'use client'
+
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Search, Plus, Trash2, X, Users, Check } from 'lucide-react'
+import { cn } from '~/lib/utils'
+import {
+  Search,
+  Plus,
+  Trash2,
+  X,
+  Users,
+  Check,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
@@ -13,6 +27,19 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +66,7 @@ import {
   useUnCheckIn,
   useBulkCheckIn,
 } from '../hooks/useAttendance'
+import { useNavigate } from '@tanstack/react-router'
 
 interface AttendanceManagerProps {
   eventId: string
@@ -70,19 +98,23 @@ interface AttendanceRecordItem {
 }
 
 export function AttendanceManager({ eventId }: AttendanceManagerProps) {
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [selectedAttendees, setSelectedAttendees] = useState<Set<string>>(
     new Set(),
   )
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null)
+  const [cursor, setCursor] = useState<string | null>(null)
+  const [pageSize, setPageSize] = useState(10)
   const searchRef = useRef<HTMLDivElement>(null)
 
+  const pageSizeOptions = [10, 25, 50]
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   // Queries
   const { data: attendanceData, isLoading: isLoadingAttendance } =
-    useAttendanceByEvent(eventId)
+    useAttendanceByEvent(eventId, { numItems: pageSize, cursor })
   const { data: stats } = useAttendanceStats(eventId)
   const { data: searchResults, isLoading: isSearching } =
     useSearchAttendees(debouncedSearchQuery)
@@ -129,6 +161,21 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
       minute: '2-digit',
       hour12: true,
     })
+  }
+
+  // Calculate pagination info
+  const paginationInfo = {
+    currentPage: cursor ? 2 : 1, // Simplified - assumes max 2 pages for cursor-based
+    totalCount: stats?.total || 0,
+    pageSize,
+    totalPages: Math.ceil((stats?.total || 0) / pageSize),
+    startItem: (cursor ? pageSize : 0) + 1,
+    endItem: Math.min(
+      (cursor ? pageSize : 0) + (attendanceData?.page?.length || 0),
+      stats?.total || 0,
+    ),
+    hasNext: !!attendanceData?.continueCursor,
+    hasPrevious: !!cursor,
   }
 
   // Handle single check-in
@@ -195,240 +242,369 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   const attendance = attendanceData?.page || []
   const totalCount = stats?.total || attendance.length
 
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'member':
+        return 'default' as const
+      case 'visitor':
+        return 'secondary' as const
+      case 'inactive':
+        return 'outline' as const
+      default:
+        return 'outline' as const
+    }
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Attendance</CardTitle>
-          <div className="flex items-center gap-2">
-            <Users className="size-4 text-muted-foreground" />
-            <span className="text-2xl font-bold">{totalCount}</span>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Search Section */}
-        <div ref={searchRef} className="relative">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search attendee to add..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value)
-                  setShowSearchResults(true)
+    <div className="space-y-6">
+      {/* Search Bar with Add Button */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex-1 w-full sm:min-w-[200px] sm:max-w-md">
+          <div ref={searchRef} className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search attendee to add..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setShowSearchResults(true)
+                if (e.target.value === '') {
                   setSelectedAttendees(new Set())
-                }}
-                onFocus={() => setShowSearchResults(true)}
-                className="pl-9"
-              />
-              {searchQuery && (
+                }
+              }}
+              onFocus={() => setShowSearchResults(true)}
+              className="pl-9"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              {isSearching && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+              {searchQuery && !isSearching && (
                 <button
                   onClick={() => {
                     setSearchQuery('')
                     setShowSearchResults(false)
                     setSelectedAttendees(new Set())
                   }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground"
                 >
-                  <X className="size-4" />
+                  <X className="h-4 w-4" />
                 </button>
               )}
             </div>
 
-            {/* Bulk Check-in Button */}
-            {selectedAttendees.size > 0 && (
-              <Button
-                onClick={handleBulkCheckIn}
-                disabled={bulkCheckIn.isPending}
-                className="whitespace-nowrap"
-              >
-                <Plus className="mr-2 size-4" />
-                Add {selectedAttendees.size}
-              </Button>
+            {/* Search Results Dropdown */}
+            {showSearchResults && (
+              <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+                <Command>
+                  <CommandList>
+                    {debouncedSearchQuery.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Start typing to search for attendees
+                      </div>
+                    ) : isSearching ? (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Searching...
+                      </div>
+                    ) : availableAttendees.length === 0 ? (
+                      <CommandEmpty>
+                        {searchResults?.length === 0
+                          ? 'No attendees found'
+                          : 'All matching attendees are already checked in'}
+                      </CommandEmpty>
+                    ) : (
+                      <CommandGroup
+                        heading={`${availableAttendees.length} available`}
+                      >
+                        {availableAttendees.map((attendee) => (
+                          <CommandItem
+                            key={attendee._id}
+                            className="flex items-center justify-between py-2 cursor-pointer"
+                            onSelect={() => {
+                              if (selectedAttendees.size > 0) {
+                                toggleAttendeeSelection(attendee._id)
+                              } else {
+                                handleCheckIn({
+                                  attendeeId: attendee._id,
+                                  firstName: attendee.firstName,
+                                  lastName: attendee.lastName,
+                                  status: attendee.status,
+                                })
+                              }
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Checkbox
+                                checked={selectedAttendees.has(attendee._id)}
+                                onCheckedChange={() =>
+                                  toggleAttendeeSelection(attendee._id)
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <span className="font-medium">
+                                {attendee.firstName} {attendee.lastName}
+                              </span>
+                              <Badge
+                                variant={
+                                  attendee.status === 'member'
+                                    ? 'default'
+                                    : 'secondary'
+                                }
+                                className="text-xs"
+                              >
+                                {attendee.status === 'member'
+                                  ? 'Member'
+                                  : 'Visitor'}
+                              </Badge>
+                            </div>
+                            {selectedAttendees.has(attendee._id) && (
+                              <Check className="size-4 text-primary" />
+                            )}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
+                  </CommandList>
+                </Command>
+              </div>
             )}
           </div>
-
-          {/* Search Results Dropdown */}
-          {showSearchResults && debouncedSearchQuery.length > 0 && (
-            <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
-              <Command>
-                <CommandList>
-                  {isSearching ? (
-                    <div className="p-4 text-center text-sm text-muted-foreground">
-                      Searching...
-                    </div>
-                  ) : availableAttendees.length === 0 ? (
-                    <CommandEmpty>
-                      {searchResults?.length === 0
-                        ? 'No attendees found'
-                        : 'All matching attendees are already checked in'}
-                    </CommandEmpty>
-                  ) : (
-                    <CommandGroup
-                      heading={`${availableAttendees.length} available`}
-                    >
-                      {availableAttendees.map((attendee) => (
-                        <CommandItem
-                          key={attendee._id}
-                          className="flex items-center justify-between py-2 cursor-pointer"
-                          onSelect={() => {
-                            if (selectedAttendees.size > 0) {
-                              toggleAttendeeSelection(attendee._id)
-                            } else {
-                              handleCheckIn({
-                                attendeeId: attendee._id,
-                                firstName: attendee.firstName,
-                                lastName: attendee.lastName,
-                                status: attendee.status,
-                              })
-                            }
-                          }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Checkbox
-                              checked={selectedAttendees.has(attendee._id)}
-                              onCheckedChange={() =>
-                                toggleAttendeeSelection(attendee._id)
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <span className="font-medium">
-                              {attendee.firstName} {attendee.lastName}
-                            </span>
-                            <Badge
-                              variant={
-                                attendee.status === 'member'
-                                  ? 'default'
-                                  : 'secondary'
-                              }
-                              className="text-xs"
-                            >
-                              {attendee.status === 'member'
-                                ? 'Member'
-                                : 'Visitor'}
-                            </Badge>
-                          </div>
-                          {selectedAttendees.has(attendee._id) && (
-                            <Check className="size-4 text-primary" />
-                          )}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                </CommandList>
-              </Command>
+          <p
+            className={cn(
+              'text-xs text-muted-foreground mt-1 h-4 transition-opacity duration-200',
+              searchQuery.length > 0 && searchQuery.length < 3
+                ? 'opacity-100'
+                : 'opacity-0',
+            )}
+          >
+            Type at least 3 characters to search
+          </p>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {/* Selection count display */}
+          {selectedAttendees.size > 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mr-2">
+              <span>{selectedAttendees.size} selected</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedAttendees(new Set())}
+              >
+                Clear
+              </Button>
             </div>
           )}
-        </div>
-
-        {/* Selection hint */}
-        {selectedAttendees.size > 0 && (
-          <div className="flex items-center justify-between rounded-md bg-muted p-2 text-sm">
-            <span>{selectedAttendees.size} selected</span>
+          {/* Add Button */}
+          {selectedAttendees.size === 0 ? (
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedAttendees(new Set())}
-            >
-              Clear
-            </Button>
-          </div>
-        )}
-
-        {/* Attendance Table */}
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Check-in</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoadingAttendance ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
-                    <div className="flex items-center justify-center">
-                      <div className="size-6 animate-spin rounded-full border-b-2 border-primary" />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : attendance.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No attendees yet. Search above to check someone in.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                attendance.map((record: AttendanceRecordItem) => (
-                  <TableRow key={record._id}>
-                    <TableCell className="font-medium">
-                      {record.attendee ? (
-                        <>
-                          {record.attendee.firstName} {record.attendee.lastName}
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">
-                          Unknown Attendee
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {record.attendee ? (
-                        <Badge
-                          variant={
-                            record.attendee.status === 'member'
-                              ? 'default'
-                              : 'secondary'
-                          }
-                        >
-                          {record.attendee.status === 'member'
-                            ? 'Member'
-                            : 'Visitor'}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">Unknown</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{formatTime(record.checkedInAt)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 text-destructive hover:text-destructive"
-                        onClick={() => setDeleteRecordId(record._id)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Load More */}
-        {attendanceData?.continueCursor && (
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
               onClick={() => {
-                // Implement load more logic
+                setShowSearchResults(true)
+                const searchInput = document.querySelector(
+                  'input[placeholder="Search attendee to add..."]',
+                ) as HTMLInputElement
+                searchInput?.focus()
+              }}
+              disabled={checkIn.isPending}
+              className="flex-1 sm:flex-none"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Attendee
+            </Button>
+          ) : (
+            <Button
+              onClick={handleBulkCheckIn}
+              disabled={bulkCheckIn.isPending}
+              className="flex-1 sm:flex-none"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add {selectedAttendees.size}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Results Info */}
+      {attendance.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <span className="text-sm text-muted-foreground">
+            {paginationInfo.totalCount > 0
+              ? `Showing ${paginationInfo.startItem} to ${paginationInfo.endItem} of ${paginationInfo.totalCount} attendees`
+              : `${attendance.length} attendees`}
+          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Items per page:
+            </span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => {
+                setPageSize(Number(value))
+                setCursor(null)
               }}
             >
-              Load More
+              <SelectTrigger className="w-[80px] h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="w-[80px] min-w-0">
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance Table Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Checked-in Attendees</CardTitle>
+            <div className="flex items-center gap-2">
+              <Users className="size-4 text-muted-foreground" />
+              <span className="text-2xl font-bold">{totalCount}</span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingAttendance ? (
+            <div className="flex h-24 items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : attendance.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <Users className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold">No attendees yet</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Search above to check someone in
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto -mx-6 px-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Check-in Time</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {attendance.map((record: AttendanceRecordItem) => (
+                    <TableRow
+                      key={record._id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() =>
+                        record.attendee?._id &&
+                        navigate({
+                          to: '/attendees/$id',
+                          params: { id: record.attendee._id },
+                        })
+                      }
+                    >
+                      <TableCell className="font-medium">
+                        {record.attendee ? (
+                          <>
+                            {record.attendee.firstName}{' '}
+                            {record.attendee.lastName}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Unknown Attendee
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {record.attendee ? (
+                          <Badge
+                            variant={getStatusBadgeVariant(
+                              record.attendee.status,
+                            )}
+                          >
+                            {record.attendee.status === 'member'
+                              ? 'Member'
+                              : 'Visitor'}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">Unknown</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{formatTime(record.checkedInAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {record.attendee?._id && (
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  navigate({
+                                    to: '/attendees/$id',
+                                    params: { id: record.attendee._id },
+                                  })
+                                }}
+                              >
+                                View Profile
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeleteRecordId(record._id)
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Remove
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Pagination Controls */}
+      {attendance.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t">
+          <span className="text-sm text-muted-foreground">
+            Page {paginationInfo.currentPage} of {paginationInfo.totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCursor(null)}
+              disabled={!paginationInfo.hasPrevious || isLoadingAttendance}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCursor(attendanceData?.continueCursor || null)}
+              disabled={!paginationInfo.hasNext || isLoadingAttendance}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
-        )}
-      </CardContent>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog
@@ -456,6 +632,6 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>
+    </div>
   )
 }

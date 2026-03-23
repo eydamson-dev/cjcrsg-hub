@@ -79,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/routes/events.index.tsx`: Main dashboard with useCurrentEvent and useEventStats hooks
     - Shows active event with LIVE badge and attendance count if event is active
     - Shows EmptyEventState with real stats if no active event
+    - Now uses unified EventDetails component for consistent UI
   - `src/routes/events.new.tsx`: Create event form wired to useCreateEvent mutation
     - Uses useEventTypesList for event type dropdown
     - Uses mutation for form submission with loading state
@@ -86,10 +87,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Shows event details, description, banner image
     - Displays attendance list with useAttendanceByEvent
     - Shows attendance stats with useAttendanceStats
+    - Now uses unified EventDetails component for full editing capabilities
   - `src/routes/events.archive.tsx`: Archive page wired to useArchiveEvents and useEventTypesList
     - Displays real completed events with pagination
     - Event type filter and search functionality
     - Loading skeleton during data fetch
+
+- **Unified EventDetails Component** - Single reusable component for both dashboard and detail views
+  - `src/features/events/components/EventDetails.tsx`: Main unified component
+    - Supports both dashboard mode (at `/events`) and detail mode (at `/events/$id`)
+    - Inline editing for all event fields regardless of status
+    - **EventBanner**: 4:1 aspect ratio with gradient overlay, event type badge, status badge
+    - **EventInfo**: Collapsible description section with inline edit capability
+    - **BasicInfoEditModal**: Edit event name, type, date, time, location
+    - **DescriptionEditModal**: Edit event description in textarea
+    - **BannerUploader**: Click-to-upload with hover effect, supports file upload
+    - **MediaGallery**: Grid layout with preview modal, manage (add/remove) media items
+    - **AttendanceManager**: Full attendance management with search, bulk operations, pagination
+      - Real-time search across all attendees with status badges
+      - Bulk check-in with checkbox selection
+      - Remove attendees with confirmation dialog
+      - Paginated list (Previous/Next) with items per page selector (10, 25, 50)
+      - "Add Attendee" button always visible below search
+    - **Status-based action buttons**: Start Event, Complete Event, Cancel Event (context-aware)
+    - Dashboard mode shows "View All Events →" link
+    - Detail mode shows "← Back to Events" button
+    - Toast notifications for all CRUD operations
+    - Fully responsive design with mobile optimization
 
 ### Fixed
 

@@ -6,28 +6,40 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
 
 ## 🎯 Current Session
 
-**Updated:** 2026-03-23
+**Updated:** 2026-03-24
 
 **Phase:** Phase 5 - Event Management - ✅ COMPLETE  
-**Current Task:** Task 5.6 - Active Event Dashboard (Completed)  
-**Status:** ✅ All Task 5.6 components implemented and integrated
+**Current Task:** Task 5.7 - Route Integration with Unified EventDetails Component (Completed)  
+**Status:** ✅ Unified EventDetails component with full editing and attendance management
 
 **Recently Completed:**
 
-- ✅ Phase 5 (Task 5.6): Active Event Dashboard - Full dashboard with live attendance management
-  - `EventBanner`: 21:9 aspect ratio with event info overlay and LIVE badge
-  - `EventInfo`: Collapsible description, location, and attendance count
-  - `AttendanceManager`: Real-time search (all attendees), bulk check-in, status badges, remove confirmations
-  - `CurrentEventDashboard`: Main container with pulsing LIVE animation and action buttons
-  - Search finds all attendees (not just active) with status badges
-  - Bulk check-in with checkbox selection support
-  - Toast notifications for all CRUD operations
+- ✅ Phase 5 (Task 5.6-5.7): Unified EventDetails Component - Full event management on both dashboard and detail pages
+  - **Unified `EventDetails` Component**: Single component shared between `/events` (dashboard) and `/events/$id` (detail)
+  - **EventBanner**: 4:1 aspect ratio banner with inline editing (click to upload/change), hover effect
+  - **EventInfo**: Collapsible description, location, attendance count, and action buttons
+  - **Inline Editing**: Edit events regardless of status (upcoming, active, completed, cancelled)
+  - **BasicInfoEditModal**: Edit name, type, date, time, location
+  - **DescriptionEditModal**: Edit description in textarea
+  - **BannerUploader**: Click banner to upload new image
+  - **MediaGallery**: View and manage event media with preview modal
+  - **AttendanceManager**: Full attendance management with pagination
+    - Real-time search for all attendees (not just active) with status badges
+    - Bulk check-in with checkbox selection support
+    - Remove attendees with confirmation dialog
+    - Paginated attendance list (Previous/Next buttons)
+    - Items per page selector (10, 25, 50)
+    - "Add Attendee" button always visible
+  - **Status-Based Actions**: Start/Complete/Cancel buttons based on event status
+  - **Toast notifications** for all CRUD operations
+  - **Dashboard Mode**: Shows "View All Events" link
+  - **Detail Mode**: Shows "Back to Events" button
   - Fully responsive design
 
 - ✅ Phase 5 (Task 5.7): Route Integration - Wire up all 4 routes with real data
-  - `/events`: Dashboard showing active event or EmptyEventState with real stats
+  - `/events`: Dashboard using EventDetails in dashboard mode with useCurrentEvent
   - `/events/new`: Create form using useCreateEvent mutation, loads event types from API
-  - `/events/$id`: Event detail page with useEvent hook, attendance data, stats
+  - `/events/$id`: Event detail page using EventDetails in detail mode with useEvent
   - `/events/archive`: Archive page with useArchiveEvents and useEventTypesList hooks
 
 - ✅ Phase 4 (Task 5.7): Frontend Hooks
@@ -68,9 +80,10 @@ Complete checklist of all implementation tasks for CJCRSG-Hub.
   - All 164 tests passing
   - Route: `/event-types`
 
-**Current Work (Task 5.7):**
+**Next Up:**
 
-Backend Integration - Replacing mock data with real Convex backend.
+- ⏳ Task 5.8: Testing
+- ⏳ Phase 6: Type Generation (`pnpm dlx convex dev --once`)
 
 ---
 
