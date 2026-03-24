@@ -34,7 +34,7 @@ export function EmptyEventState({
 
   return (
     <div className="flex h-full items-center justify-center p-4">
-      <Card className="w-full max-w-lg border-dashed">
+      <Card className="w-full max-w-lg border-0 shadow-none ring-0 bg-transparent">
         <div className="flex flex-col items-center gap-6 p-8 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
@@ -72,10 +72,6 @@ export function EmptyEventState({
           </div>
 
           <div className="w-full border-t pt-6">
-            <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
-              <CalendarDays className="size-4" />
-              <span>Quick Stats</span>
-            </div>
             <QuickStats
               eventsThisMonth={stats.eventsThisMonth}
               totalEvents={stats.totalEvents}
@@ -83,15 +79,16 @@ export function EmptyEventState({
               nextScheduled={stats.nextScheduled}
             />
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate({ to: '/events/archive' })}
-            className="mt-2"
-          >
-            View Event Archive
-          </Button>
+          <div className="w-full mt-14">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate({ to: '/events/archive' })}
+              className="mt-2"
+            >
+              View Event Archive
+            </Button>
+          </div>
         </div>
       </Card>
     </div>

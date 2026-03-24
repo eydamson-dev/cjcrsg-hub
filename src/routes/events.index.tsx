@@ -101,10 +101,10 @@ function EventsContent() {
         totalEvents: stats.totalEvents,
         lastEvent: stats.nextUpcoming
           ? new Date(stats.nextUpcoming.date).toLocaleDateString()
-          : 'None yet',
+          : 'None',
         nextScheduled: stats.nextUpcoming
           ? new Date(stats.nextUpcoming.date).toLocaleDateString()
-          : 'None scheduled',
+          : 'None',
       }
     : undefined
 

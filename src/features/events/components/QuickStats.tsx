@@ -18,11 +18,14 @@ export function QuickStats({
 }: QuickStatsProps) {
   return (
     <div
-      className={cn('grid grid-cols-2 gap-4 @[600px]:grid-cols-4', className)}
+      className={cn(
+        'grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4',
+        className,
+      )}
     >
       <StatItem
         icon={Calendar}
-        label="This Month"
+        label="Events This Month"
         value={eventsThisMonth.toString()}
       />
       <StatItem
@@ -48,10 +51,14 @@ interface StatItemProps {
 
 function StatItem({ icon: Icon, label, value }: StatItemProps) {
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
-      <Icon className="size-5 text-muted-foreground" />
-      <span className="text-2xl font-semibold tabular-nums">{value}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
+    <div className="flex flex-col items-center gap-2 text-center">
+      <Icon className="size-4 sm:size-5 text-muted-foreground" />
+      <span className="text-lg sm:text-2xl font-semibold tabular-nums">
+        {value}
+      </span>
+      <span className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
+        {label}
+      </span>
     </div>
   )
 }
