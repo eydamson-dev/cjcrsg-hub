@@ -11,9 +11,9 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-26
 
-**Phase:** Phase 6 - Events Backend Tests  
-**Status:** ⏳ Planned | Ready to start  
-**Current Task:** Planning complete - ready to implement Phase 6-10
+**Phase:** Phase 7 - Attendance Backend Tests  
+**Status:** 🚧 In Progress | Task 7.1-7.2  
+**Current Task:** Implementing attendance mutations and queries tests
 
 **Summary:**
 
@@ -39,8 +39,11 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 - ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
   - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
   - ✅ Task 4.12: Test Event Types E2E (16 tests - navigation, CRUD, validation, color picker, 2 browsers)
+- ✅ Phase 6: Events Backend Tests (2/2 tasks complete, 57 tests added) [COMMITTED]
+  - ✅ Task 6.1: Test Event Mutations (31 tests - create, update, start, complete, cancel, archive)
+  - ✅ Task 6.2: Test Event Queries (26 tests - list, getById, getCurrentEvent, listArchive, getStats)
 
-**Total Tests:** 164 tests passing (37 Convex + 100 Component + 27 E2E)
+**Total Tests:** 221 tests passing (94 Convex + 108 Component + 56 E2E)
 
 ---
 
@@ -1131,8 +1134,8 @@ Tests to add after core features are stable:
 | **Phase 3** | Component Tests | 2 hours | 44 | ✅ Complete |
 | **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
 | **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
-| **Phase 6** | Events Backend | 3-4 hours | 27 | ⏳ Planned |
-| **Phase 7** | Attendance Backend | 2-3 hours | 16 | ⏳ Planned |
+| **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
+| **Phase 7** | Attendance Backend | 2-3 hours | 16 | 🚧 In Progress |
 | **Phase 8** | Events Hooks | 2-3 hours | 26 | ⏳ Planned |
 | **Phase 9** | Events Components | 4-5 hours | 18 | ⏳ Planned |
 | **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
