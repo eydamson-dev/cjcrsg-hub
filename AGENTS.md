@@ -2,8 +2,9 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 1 - Foundation Setup  
-**Last Updated:** 2026-03-20
+**Status:** Phase 5 - Event Management (Complete)  
+**Last Updated:** 2026-03-25  
+**Tests:** 164 passing (37 Convex + 100 Component + 27 E2E)
 
 ---
 
@@ -32,8 +33,8 @@ pnpm dev
 
 ### 📋 Documentation
 
-- **[Tasks](docs/TASKS.md)** - Complete implementation checklist
-- **[TDD Workflow](.agents/skills/cjcrsg-hub/tdd-workflow.md)** - Test-Driven Development guide
+- **[Tasks](docs/TASKS.md)** - Feature catalog and implementation status
+- **[TDD Tasks](docs/TDD_TASKS.md)** - Testing workflow and test coverage
 - **[Commands](docs/COMMANDS.md)** - All CLI commands
 - **[Conventions](docs/CONVENTIONS.md)** - Code standards & UI guidelines
 - **[Git Workflow](docs/GIT.md)** - Version control guide
@@ -85,73 +86,7 @@ convex/
 └── eventTypes/        # Event type queries/mutations
 ```
 
----
-
-## Database Schema
-
-### Core Tables
-
-#### attendees
-
-```typescript
-{
-  _id: string
-  firstName: string
-  lastName: string
-  email?: string
-  phone?: string
-  dateOfBirth?: number
-  address?: string
-  status: 'member' | 'visitor' | 'inactive'
-  joinDate?: number
-  notes?: string
-  createdAt: number
-  updatedAt: number
-}
-```
-
-#### event_types
-
-```typescript
-{
-  _id: string
-  name: string
-  description?: string
-  color?: string
-  isActive: boolean
-  createdAt: number
-}
-```
-
-#### events
-
-```typescript
-{
-  _id: string
-  name: string
-  eventTypeId: string
-  description?: string
-  date: number
-  startTime?: string
-  endTime?: string
-  location?: string
-  isActive: boolean
-  createdAt: number
-}
-```
-
-#### attendance_records
-
-```typescript
-{
-  _id: string
-  eventId: string
-  attendeeId: string
-  checkedInAt: number
-  checkedInBy: string
-  notes?: string
-}
-```
+**See [docs/DATABASE.md](docs/DATABASE.md) for complete schema reference.**
 
 ---
 
@@ -167,6 +102,10 @@ pnpm build            # Production build
 pnpm lint             # Run ESLint
 pnpm format           # Format with Prettier
 
+# Testing
+pnpm test             # Run unit tests
+pnpm test:e2e         # Run E2E tests
+
 # Convex
 pnpm dlx convex dev           # Start Convex local dev
 pnpm dlx convex dashboard   # Open dashboard
@@ -177,17 +116,61 @@ pnpm dlx convex deploy      # Deploy to production
 
 ---
 
+## Implementation Status
+
+### ✅ Completed Features
+
+**Core Infrastructure**
+
+- Authentication (Email + Google + Facebook OAuth)
+- Protected routes with route guards
+- Responsive layout with sidebar and mobile navigation
+
+**Attendee Management**
+
+- Full CRUD operations (Create, Read, Update, Archive)
+- Real-time search with filters and pagination
+- Detailed attendee profiles
+- Form validation with react-hook-form + Zod
+
+**Event Types (Admin)**
+
+- Dynamic event categories with custom colors
+- Color picker with react-colorful
+- Inline editing via modal
+- 48 unit tests passing
+
+**Event Management**
+
+- Event lifecycle (upcoming → active → completed/cancelled)
+- Event dashboard with real-time attendance
+- Bulk check-in functionality
+- Archive page with filters
+- Inline editing and media gallery
+- Image upload and management
+
+### 📅 Upcoming Features
+
+- Attendance reporting & analytics
+- Dashboard with statistics widgets
+- Data export to CSV
+- Toast notifications
+
+**See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
+
+---
+
 ## Development Workflow
 
-**Note:** All git operations use native `git` CLI commands (not `gh` CLI). See [docs/GIT.md](docs/GIT.md) for complete workflow.
+**Note:** All git operations use native `git` CLI commands. See [docs/GIT.md](docs/GIT.md) for complete workflow.
 
-### 1. Before You Start
+### Before You Start
 
-- Read [docs/TASKS.md](docs/TASKS.md) for current phase tasks
+- Read [docs/TASKS.md](docs/TASKS.md) for current status
 - Check [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for code standards
 - Review [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) if issues arise
 
-### 2. Making Changes
+### Making Changes
 
 ```bash
 # Create feature branch
@@ -200,7 +183,7 @@ git checkout -b feature/descriptive-name
 pnpm dev
 ```
 
-### 3. Commit & Push (After Your Approval)
+### Commit & Push (After Your Approval)
 
 ```bash
 # Stage and commit
@@ -213,33 +196,18 @@ git push -u origin feature-name
 # Create PR on GitHub (you manually approve)
 ```
 
-**See [docs/GIT.md](docs/GIT.md) for detailed workflow.**
-
 ---
 
-## Development Tools & AI Assistants
+## Development Tools
 
-### OpenCode Configuration
+### AI Assistants
 
-This project uses **OpenCode** for AI-assisted development with the following configuration:
-
-**MCP (Model Context Protocol) Tools:**
-
-- **shadcn MCP** - AI assistant for shadcn/ui component management
-  - Automatically adds, updates, and manages shadcn components
-  - Provides component recommendations based on context
-  - Configuration: `opencode.json`
-
-**Skills:**
-
-- **shadcn/ui Skill** - Comprehensive knowledge base for shadcn/ui
-  - Located in: `.agents/skills/shadcn/`
-  - Includes: CLI commands, customization guides, component rules
-  - Helps with: Component selection, styling, forms, icons
+- **shadcn/ui MCP** - Component management and recommendations
+- **Skills** - Located in `.agents/skills/` for detailed guidance
+  - `cjcrsg-hub/` - Project-specific patterns and workflows
+  - `shadcn/` - shadcn/ui component usage
 
 ### VS Code Extensions
-
-Recommended extensions for development:
 
 - **Convex** - Official Convex extension
 - **Tailwind CSS IntelliSense** - Autocomplete for Tailwind
@@ -249,34 +217,16 @@ Recommended extensions for development:
 
 ---
 
-## Implementation Status
+## Testing Summary
 
-### ✅ Completed
+| Category    | Count   | Status             |
+| ----------- | ------- | ------------------ |
+| Convex Unit | 37      | ✅ Passing         |
+| Component   | 100     | ✅ Passing         |
+| E2E         | 27      | ✅ Passing         |
+| **Total**   | **164** | **✅ All Passing** |
 
-- [x] Git repository setup
-- [x] GitHub remote configuration
-- [x] .gitignore configuration
-- [x] AGENTS.md documentation
-- [x] README.md creation
-
-### 🚧 In Progress (Phase 1)
-
-- [ ] Initialize shadcn/ui with canary version
-- [ ] Setup Convex Auth (Password + Google + Facebook OAuth)
-- [ ] Configure environment variables
-- [ ] Create base layout with navigation
-- [ ] Setup protected routes
-
-### 📅 Upcoming
-
-- Phase 2: Database Schema & Auth
-- Phase 3: Attendee Management
-- Phase 4: Event Types (Admin)
-- Phase 5: Event Management
-- Phase 6: Attendance Tracking
-- Phase 7: Dashboard & Polish
-
-**See [docs/TASKS.md](docs/TASKS.md) for full task list with details.**
+**See [docs/TDD_TASKS.md](docs/TDD_TASKS.md) for detailed testing workflow.**
 
 ---
 
