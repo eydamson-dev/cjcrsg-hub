@@ -21,7 +21,6 @@ import { BasicInfoEditModal } from './BasicInfoEditModal'
 import { DescriptionEditModal } from './DescriptionEditModal'
 import { BannerUploader } from './BannerUploader'
 import { MediaGallery, type MediaItem } from './MediaGallery'
-import { mockEventTypes } from '../mocks'
 import type { Event, AttendanceRecord, UpdateEventInput } from '../types'
 
 interface EventDetailProps {
@@ -53,7 +52,6 @@ export function EventDetail({
 
   const handleUpdateBasicInfo = (updates: {
     name: string
-    eventTypeId: string
     date: number
     startTime?: string
     endTime?: string
@@ -62,9 +60,6 @@ export function EventDetail({
     const updatedEvent: Event = {
       ...currentEvent,
       ...updates,
-      eventType:
-        mockEventTypes.find((t) => t._id === updates.eventTypeId) ||
-        currentEvent.eventType,
     }
     setCurrentEvent(updatedEvent)
 
@@ -295,7 +290,6 @@ export function EventDetail({
       <BasicInfoEditModal
         open={showBasicInfoModal}
         event={currentEvent}
-        eventTypes={mockEventTypes}
         onSave={handleUpdateBasicInfo}
         onClose={() => setShowBasicInfoModal(false)}
       />

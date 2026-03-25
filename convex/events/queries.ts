@@ -130,8 +130,6 @@ export const getCurrentEvent = query({
       .filter((q) => q.eq(q.field('isActive'), true))
       .first()
 
-      console.log({event})
-
     if (!event) return null
 
     const eventType = await ctx.db.get(event.eventTypeId)
@@ -153,10 +151,11 @@ export const getCurrentEvent = query({
 })
 
 /**
- * Get completed events for the archive page.
- * - Always filters status='completed'
+ * Get all events except active for the archive page.
+ * - Excludes status='active' (shown on dashboard)
+ * - Includes: upcoming, completed, cancelled
  * - Optional additional filters: eventTypeId, dateFrom, dateTo
- * - Order: date descending (most recent past events first)
+ * - Order: date descending (most recent events first)
  * - Includes joined eventType: { name, color } and attendanceCount
  */
 export const listArchive = query({
@@ -179,7 +178,7 @@ export const listArchive = query({
       })
       .filter((q) =>
         q.and(
-          q.eq(q.field('status'), 'completed'),
+          q.neq(q.field('status'), 'active'),
           q.eq(q.field('isActive'), true),
         ),
       )

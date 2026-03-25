@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Plus, CalendarDays } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card } from '~/components/ui/card'
 import { QuickStats } from './QuickStats'

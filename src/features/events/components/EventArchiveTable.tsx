@@ -33,9 +33,10 @@ export function EventArchiveTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[80px]">Banner</TableHead>
+            <TableHead className="w-20">Banner</TableHead>
             <TableHead>Event Name</TableHead>
             <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Type</TableHead>
             <TableHead className="text-center">Attendance</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -61,6 +62,22 @@ export function EventArchiveTable({
               </TableCell>
               <TableCell className="font-medium">{event.name}</TableCell>
               <TableCell>{formatDate(event.date)}</TableCell>
+              <TableCell>
+                <Badge
+                  variant={
+                    event.status === 'completed'
+                      ? 'default'
+                      : event.status === 'cancelled'
+                        ? 'destructive'
+                        : event.status === 'active'
+                          ? 'secondary'
+                          : 'outline'
+                  }
+                  className="capitalize"
+                >
+                  {event.status}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <Badge
                   variant="secondary"

@@ -7,15 +7,19 @@ import {
   XCircle,
   List,
   Image as ImageIcon,
+  Save,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Badge } from '~/components/ui/badge'
+import { cn } from '~/lib/utils'
 import { AttendanceManager } from './AttendanceManager'
 import { BasicInfoEditModal } from './BasicInfoEditModal'
 import { DescriptionEditModal } from './DescriptionEditModal'
 import { BannerUploader } from './BannerUploader'
 import { MediaGallery, type MediaItem } from './MediaGallery'
+import { StatusAndTypeEditModal } from './StatusAndTypeEditModal'
 import { useEventTypesList } from '../hooks/useEventTypes'
 import {
   useUpdateEvent,
@@ -28,18 +32,25 @@ import type { Event } from '../types'
 interface EventDetailsProps {
   event: Event
   mode: 'dashboard' | 'detail'
-  onEventUpdated?: () => void
+  isUnsaved?: boolean
+  onSave?: () => void
+  onCancel?: () => void
+  onUpdate?: (updates: Partial<Event>) => void
 }
 
 export function EventDetails({
   event,
   mode,
-  onEventUpdated,
+  isUnsaved = false,
+  onSave,
+  onCancel,
+  onUpdate,
 }: EventDetailsProps) {
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false)
   const [showDescriptionModal, setShowDescriptionModal] = useState(false)
   const [showBannerUploader, setShowBannerUploader] = useState(false)
   const [showMediaGallery, setShowMediaGallery] = useState(false)
+  const [showStatusAndTypeModal, setShowStatusAndTypeModal] = useState(false)
 
   const { data: eventTypes } = useEventTypesList()
   const updateEvent = useUpdateEvent()
@@ -65,68 +76,67 @@ export function EventDetails({
     return `${hour12}:${minutes} ${ampm}`
   }
 
-  const getStatusBadge = () => {
-    switch (event.status) {
-      case 'active':
-        return (
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-            <span className="mr-1.5 relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            LIVE
-          </span>
-        )
-      case 'completed':
-        return <Badge variant="outline">Completed</Badge>
-      case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>
-      default:
-        return <Badge variant="secondary">Upcoming</Badge>
-    }
-  }
-
   const handleUpdateBasicInfo = async (updates: {
     name: string
-    eventTypeId: string
     date: number
     startTime?: string
     endTime?: string
     location?: string
   }) => {
+    if (isUnsaved) {
+      onUpdate?.({
+        name: updates.name,
+        date: updates.date,
+        startTime: updates.startTime,
+        endTime: updates.endTime,
+        location: updates.location,
+      })
+      setShowBasicInfoModal(false)
+      return
+    }
+
     try {
       await updateEvent.mutateAsync({
         id: event._id,
         ...updates,
       })
       setShowBasicInfoModal(false)
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
   }
 
   const handleUpdateDescription = async (description: string) => {
+    if (isUnsaved) {
+      onUpdate?.({ description })
+      setShowDescriptionModal(false)
+      return
+    }
+
     try {
       await updateEvent.mutateAsync({
         id: event._id,
         description,
       })
       setShowDescriptionModal(false)
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
   }
 
   const handleUpdateBanner = async (bannerImage: string) => {
+    if (isUnsaved) {
+      onUpdate?.({ bannerImage })
+      setShowBannerUploader(false)
+      return
+    }
+
     try {
       await updateEvent.mutateAsync({
         id: event._id,
         bannerImage,
       })
       setShowBannerUploader(false)
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
@@ -134,12 +144,16 @@ export function EventDetails({
 
   const handleAddMedia = async (item: MediaItem) => {
     const currentMedia = event.media || []
+    if (isUnsaved) {
+      onUpdate?.({ media: [...currentMedia, item] })
+      return
+    }
+
     try {
       await updateEvent.mutateAsync({
         id: event._id,
         media: [...currentMedia, item],
       })
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
@@ -148,12 +162,16 @@ export function EventDetails({
   const handleDeleteMedia = async (index: number) => {
     const currentMedia = event.media || []
     const newMedia = currentMedia.filter((_, i) => i !== index)
+    if (isUnsaved) {
+      onUpdate?.({ media: newMedia })
+      return
+    }
+
     try {
       await updateEvent.mutateAsync({
         id: event._id,
         media: newMedia,
       })
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
@@ -162,7 +180,6 @@ export function EventDetails({
   const handleStartEvent = async () => {
     try {
       await startEvent.mutateAsync(event._id)
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
@@ -171,7 +188,6 @@ export function EventDetails({
   const handleCompleteEvent = async () => {
     try {
       await completeEvent.mutateAsync(event._id)
-      onEventUpdated?.()
     } catch (error) {
       // Error handled by hook
     }
@@ -180,7 +196,52 @@ export function EventDetails({
   const handleCancelEvent = async () => {
     try {
       await cancelEvent.mutateAsync(event._id)
-      onEventUpdated?.()
+    } catch (error) {
+      // Error handled by hook
+    }
+  }
+
+  const handleSaveUnsaved = () => {
+    onSave?.()
+  }
+
+  const handleCancelUnsaved = () => {
+    onCancel?.()
+  }
+
+  const handleUpdateStatusAndType = async (updates: {
+    status: 'upcoming' | 'active' | 'completed' | 'cancelled'
+    eventTypeId: string
+  }) => {
+    const selectedEventType = eventTypes?.find(
+      (et) => et._id === updates.eventTypeId,
+    )
+
+    if (isUnsaved) {
+      onUpdate?.({
+        status: updates.status,
+        eventTypeId: updates.eventTypeId,
+        eventType: selectedEventType
+          ? {
+              _id: selectedEventType._id,
+              name: selectedEventType.name,
+              color: selectedEventType.color || '#3b82f6',
+              isActive: selectedEventType.isActive,
+              createdAt: selectedEventType.createdAt,
+            }
+          : undefined,
+      })
+      setShowStatusAndTypeModal(false)
+      return
+    }
+
+    try {
+      await updateEvent.mutateAsync({
+        id: event._id,
+        status: updates.status,
+        eventTypeId: updates.eventTypeId,
+      })
+      setShowStatusAndTypeModal(false)
     } catch (error) {
       // Error handled by hook
     }
@@ -213,10 +274,26 @@ export function EventDetails({
 
       {/* Event Header */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          {getStatusBadge()}
+        <div className="flex items-center gap-3">
+          <Badge
+            variant="outline"
+            className={cn(
+              'gap-1.5 border-2 cursor-pointer hover:bg-accent',
+              event.status === 'upcoming' && 'border-gray-300',
+              event.status === 'active' && 'border-green-500',
+              event.status === 'completed' && 'border-blue-500',
+              event.status === 'cancelled' && 'border-red-500',
+            )}
+            onClick={() => setShowStatusAndTypeModal(true)}
+          >
+            {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
+          </Badge>
           {event.eventType && (
-            <Badge variant="outline" className="gap-1.5">
+            <Badge
+              variant="outline"
+              className="gap-1.5 cursor-pointer hover:bg-accent"
+              onClick={() => setShowStatusAndTypeModal(true)}
+            >
               <span
                 className="size-2 rounded-full"
                 style={{ backgroundColor: event.eventType.color }}
@@ -224,6 +301,15 @@ export function EventDetails({
               {event.eventType.name}
             </Badge>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+            onClick={() => setShowStatusAndTypeModal(true)}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
         </div>
         <h1 className="text-3xl font-bold">{event.name}</h1>
       </div>
@@ -292,12 +378,6 @@ export function EventDetails({
                 <p className="font-medium">{event.location}</p>
               </div>
             )}
-            <div>
-              <p className="text-sm text-muted-foreground">Type</p>
-              <p className="font-medium">
-                {event.eventType?.name || 'Unknown'}
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -386,50 +466,97 @@ export function EventDetails({
         </CardContent>
       </Card>
 
-      {/* Attendance Manager */}
-      <AttendanceManager eventId={event._id} />
+      {/* Attendance Manager - Hidden for unsaved events */}
+      {!isUnsaved && <AttendanceManager eventId={event._id} />}
+
+      {/* Unsaved Event Info Card */}
+      {isUnsaved && (
+        <Card className="border-yellow-200 bg-yellow-50/50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-yellow-100 p-2">
+                <Save className="h-4 w-4 text-yellow-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-yellow-900">
+                  Unsaved Event Draft
+                </h3>
+                <p className="text-sm text-yellow-700 mt-1">
+                  This event is not saved yet. Attendance tracking will be
+                  available after you save the event.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-3 pt-4 border-t">
-        {event.status === 'upcoming' && (
-          <Button onClick={handleStartEvent} disabled={startEvent.isPending}>
-            <Play className="mr-2 h-4 w-4" />
-            Start Event
-          </Button>
-        )}
-
-        {event.status === 'active' && (
+        {isUnsaved ? (
           <>
-            <Button
-              onClick={handleCompleteEvent}
-              disabled={completeEvent.isPending}
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Complete Event
+            <Button onClick={handleSaveUnsaved}>
+              <Save className="mr-2 h-4 w-4" />
+              Save Event
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleCancelEvent}
-              disabled={cancelEvent.isPending}
-            >
-              <XCircle className="mr-2 h-4 w-4" />
-              Cancel Event
+            <Button variant="outline" onClick={handleCancelUnsaved}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Cancel
             </Button>
+          </>
+        ) : (
+          <>
+            {event.status === 'upcoming' && (
+              <Button
+                onClick={handleStartEvent}
+                disabled={startEvent.isPending}
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Start Event
+              </Button>
+            )}
+
+            {event.status === 'active' && (
+              <>
+                <Button
+                  onClick={handleCompleteEvent}
+                  disabled={completeEvent.isPending}
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Complete Event
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleCancelEvent}
+                  disabled={cancelEvent.isPending}
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel Event
+                </Button>
+              </>
+            )}
           </>
         )}
       </div>
 
       {/* Modals */}
+      <BasicInfoEditModal
+        open={showBasicInfoModal}
+        event={event}
+        onSave={handleUpdateBasicInfo}
+        onClose={() => setShowBasicInfoModal(false)}
+      />
+
       {eventTypes && (
-        <BasicInfoEditModal
-          open={showBasicInfoModal}
+        <StatusAndTypeEditModal
+          open={showStatusAndTypeModal}
           event={event}
           eventTypes={eventTypes.map((et) => ({
             ...et,
             color: et.color || '#3b82f6',
           }))}
-          onSave={handleUpdateBasicInfo}
-          onClose={() => setShowBasicInfoModal(false)}
+          onSave={handleUpdateStatusAndType}
+          onClose={() => setShowStatusAndTypeModal(false)}
         />
       )}
 
