@@ -157,8 +157,10 @@ describe('eventTypes mutations', () => {
           name: 'Test Event',
           eventTypeId,
           date: Date.now(),
+          status: 'upcoming',
           isActive: true,
           createdAt: Date.now(),
+          updatedAt: Date.now(),
         })
       })
 
