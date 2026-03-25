@@ -16,15 +16,13 @@ import {
   SelectValue,
 } from '~/components/ui/select'
 import { DatePicker } from '~/components/ui/date-picker'
-import type { Event, EventType } from '../types'
+import type { Event } from '../types'
 
 interface BasicInfoEditModalProps {
   open?: boolean
   event: Event
-  eventTypes: EventType[]
   onSave: (updates: {
     name: string
-    eventTypeId: string
     date: number
     startTime?: string
     endTime?: string
@@ -36,13 +34,11 @@ interface BasicInfoEditModalProps {
 export function BasicInfoEditModal({
   open,
   event,
-  eventTypes,
   onSave,
   onClose,
 }: BasicInfoEditModalProps) {
   const [isOpen, setIsOpen] = useState(open ?? false)
   const [name, setName] = useState(event.name)
-  const [eventTypeId, setEventTypeId] = useState(event.eventTypeId)
   const [date, setDate] = useState<number | undefined>(event.date)
   const [startTime, setStartTime] = useState(event.startTime || '')
   const [endTime, setEndTime] = useState(event.endTime || '')
@@ -58,7 +54,6 @@ export function BasicInfoEditModal({
   useEffect(() => {
     if (isOpen) {
       setName(event.name)
-      setEventTypeId(event.eventTypeId)
       setDate(event.date)
       setStartTime(event.startTime || '')
       setEndTime(event.endTime || '')
@@ -83,10 +78,6 @@ export function BasicInfoEditModal({
       newErrors.name = 'Name must be at least 2 characters'
     }
 
-    if (!eventTypeId) {
-      newErrors.eventTypeId = 'Event type is required'
-    }
-
     if (!date) {
       newErrors.date = 'Date is required'
     }
@@ -104,7 +95,6 @@ export function BasicInfoEditModal({
 
     onSave({
       name,
-      eventTypeId,
       date: date!,
       startTime: startTime || undefined,
       endTime: endTime || undefined,
@@ -145,38 +135,12 @@ export function BasicInfoEditModal({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="eventType">Event Type *</Label>
-              <Select
-                value={eventTypeId}
-                onValueChange={(value) => setEventTypeId(value || '')}
-              >
-                <SelectTrigger id="eventType">
-                  <SelectValue placeholder="Select type">
-                    {eventTypes.find((t) => t._id === eventTypeId)?.name}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {eventTypes.map((type) => (
-                    <SelectItem key={type._id} value={type._id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.eventTypeId && (
-                <p className="text-sm text-destructive">{errors.eventTypeId}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Date *</Label>
-              <DatePicker value={date} onChange={setDate} />
-              {errors.date && (
-                <p className="text-sm text-destructive">{errors.date}</p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label>Date *</Label>
+            <DatePicker value={date} onChange={setDate} />
+            {errors.date && (
+              <p className="text-sm text-destructive">{errors.date}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

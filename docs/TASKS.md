@@ -2,9 +2,9 @@
 
 Complete feature catalog for the church management system.
 
-**Last Updated:** 2026-03-25  
+**Last Updated:** 2026-03-26  
 **Current Phase:** Phase 5 - Event Management (Complete)  
-**Status:** 164 tests passing, all core features implemented
+**Status:** 164 tests passing, all core features implemented + UI refinements
 
 ---
 
@@ -148,6 +148,14 @@ Complete feature catalog for the church management system.
 - Click to preview full image in modal
 - Delete individual media items with confirmation
 - Support for image and video types
+
+### Recent UI Improvements (2026-03-26)
+
+- **Refactored EventDetails component** - Unified component for dashboard and detail pages with better code organization
+- **Enhanced BasicInfoEditModal** - Improved form handling and validation
+- **Updated EventArchiveTable** - Better data display and responsive layout
+- **Improved events index page** - Better integration with backend data and filters
+- **Removed redundant EventDetail component** - Consolidated into EventDetails for consistency
 
 ---
 

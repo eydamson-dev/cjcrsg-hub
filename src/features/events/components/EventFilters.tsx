@@ -30,7 +30,7 @@ export function EventFilters({
   const hasFilters = selectedEventType || searchQuery
 
   return (
-    <div className="flex flex-col gap-3 @md:flex-row">
+    <div className="flex flex-col gap-3 @md:flex-row mb-3">
       <div className="flex flex-1 gap-3">
         <Select
           value={selectedEventType || 'all'}
@@ -57,7 +57,7 @@ export function EventFilters({
           </SelectContent>
         </Select>
 
-        <div className="relative flex-1">
+        <div className="relative flex-1 w-full sm:min-w-50 sm:max-w-md">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search events..."
