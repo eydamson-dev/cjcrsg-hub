@@ -7,6 +7,114 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
+  - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
+  - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member
+  - `events` table: Add `status` union (`upcoming | active | completed | cancelled`) — only one event can be `active` at a time
+  - `events` table: Add `bannerImage` field — event banner URL with format-only validation (extension check, no HEAD requests)
+  - `events` table: Add `media` array — photos and videos with url, type, and optional caption
+  - `events` table: Add `updatedAt` field — tracked on every mutation
+  - `events` table: Add `completedAt` field — timestamp set only when event is completed
+  - `events` table: Add `by_status` index — filter events by lifecycle status
+  - `events` table: Add `by_date_status` index — date + status queries (e.g. upcoming events after today ordered by date)
+  - `events` table: Add `by_active` index — fast lookup of the single currently active event
+  - `attendanceRecords` table: Add `invitedBy` field — per-event inviter tracking (who brought this person to this specific event; can differ from `attendees.invitedBy`)
+  - `attendanceRecords` table: Add `by_invited_by` index — top inviters leaderboard and monthly invite count queries
+
+- **Task 5.7 Phase 2: Backend Events** - Complete Convex backend implementation for event management
+  - `convex/events/validators.ts`: Image URL validation (`isValidImageUrl`), field validators, `eventFields` and `updateEventFields` validators
+  - `convex/events/queries.ts`: Five queries with joined data and pagination
+    - `list`: Paginated events with filters (status, eventTypeId, dateFrom, dateTo), returns events with joined eventType data
+    - `getById`: Single event lookup with eventType join
+    - `getCurrentEvent`: Get active event with attendance count for dashboard
+    - `listArchive`: Completed events for archive page with attendance counts
+    - `getStats`: Dashboard statistics (totalEvents, byStatus, thisMonth, nextUpcoming)
+  - `convex/events/mutations.ts`: Six mutations with full validation
+    - `create`: Create event with validation (eventType exists, image URLs, time ordering), always defaults status to 'upcoming'
+    - `update`: Partial update with validation, enforces single active event constraint when changing status
+    - `startEvent`: Transition to 'active' with constraint check (only one active event at a time)
+    - `completeEvent`: Mark as completed, sets completedAt timestamp
+    - `cancelEvent`: Cancel upcoming or active events
+    - `archive`: Soft delete (set isActive=false)
+
+- **Task 5.7 Phase 3: Backend Attendance** - Complete Convex backend for attendance tracking
+  - `convex/attendance/validators.ts`: Field validators for attendance operations (eventId, attendeeId, inviterId, bulkAttendees)
+  - `convex/attendance/queries.ts`: Four queries with joined data and pagination
+    - `getByEvent`: Paginated attendance records for an event with attendee and inviter details
+    - `getStats`: Attendance statistics (total, members, visitors, withInvite counts)
+    - `getByAttendee`: Paginated attendance history for a person with event and eventType data
+    - `getInviters`: Top inviters for an event grouped by count, sorted descending
+  - `convex/attendance/mutations.ts`: Three mutations for check-in operations
+    - `checkIn`: Single attendee check-in with duplicate prevention, auth requirement, inviter validation
+    - `unCheckIn`: Hard delete attendance record (no soft delete)
+    - `bulkCheckIn`: Multiple attendees check-in with duplicate skipping, returns success/skipped counts
+  - Schema update: Changed `checkedInBy` to `v.string()` to store auth identity subject string
+
+- **Task 5.7 Phase 4: Frontend Hooks** - React hooks wrapping Convex backend
+  - `src/features/events/hooks/useEvents.ts`: Five TanStack Query hooks for events
+    - `useEventsList`: Paginated event list with filters (status, eventTypeId, date range)
+    - `useEvent`: Single event by ID with eventType data
+    - `useCurrentEvent`: Active event for dashboard with attendance count
+    - `useArchiveEvents`: Completed events for archive page
+    - `useEventStats`: Dashboard statistics (totalEvents, byStatus, thisMonth, nextUpcoming)
+  - `src/features/events/hooks/useEventMutations.ts`: Six mutation hooks with toast notifications
+    - `useCreateEvent`: Create event, invalidates list on success
+    - `useUpdateEvent`: Update event, invalidates queries on success
+    - `useStartEvent`: Start event (set active), handles active event constraint error
+    - `useCompleteEvent`: Complete event, invalidates current/archive queries
+    - `useCancelEvent`: Cancel event, invalidates queries
+    - `useArchiveEvent`: Soft delete event, invalidates queries
+  - `src/features/events/hooks/useAttendance.ts`: Seven hooks for attendance management
+    - `useAttendanceByEvent`: Paginated attendance records for an event
+    - `useAttendanceStats`: Attendance statistics (total, members, visitors, withInvite)
+    - `useAttendanceByAttendee`: Person's attendance history
+    - `useEventInviters`: Top inviters for an event
+    - `useCheckIn`: Single attendee check-in with duplicate prevention
+    - `useUnCheckIn`: Remove attendance record (hard delete)
+    - `useBulkCheckIn`: Multiple attendees check-in, returns counts
+
+- **Task 5.7 Phase 5: Route Integration** - Wire up event routes with real Convex backend
+  - `src/routes/events.index.tsx`: Main dashboard with useCurrentEvent and useEventStats hooks
+    - Shows active event with LIVE badge and attendance count if event is active
+    - Shows EmptyEventState with real stats if no active event
+    - Now uses unified EventDetails component for consistent UI
+  - `src/routes/events.new.tsx`: Create event form wired to useCreateEvent mutation
+    - Uses useEventTypesList for event type dropdown
+    - Uses mutation for form submission with loading state
+  - `src/routes/events.$id.tsx`: Event detail page wired to useEvent hook
+    - Shows event details, description, banner image
+    - Displays attendance list with useAttendanceByEvent
+    - Shows attendance stats with useAttendanceStats
+    - Now uses unified EventDetails component for full editing capabilities
+  - `src/routes/events.archive.tsx`: Archive page wired to useArchiveEvents and useEventTypesList
+    - Displays real completed events with pagination
+    - Event type filter and search functionality
+    - Loading skeleton during data fetch
+
+- **Unified EventDetails Component** - Single reusable component for both dashboard and detail views
+  - `src/features/events/components/EventDetails.tsx`: Main unified component
+    - Supports both dashboard mode (at `/events`) and detail mode (at `/events/$id`)
+    - Inline editing for all event fields regardless of status
+    - **EventBanner**: 4:1 aspect ratio with gradient overlay, event type badge, status badge
+    - **EventInfo**: Collapsible description section with inline edit capability
+    - **BasicInfoEditModal**: Edit event name, type, date, time, location
+    - **DescriptionEditModal**: Edit event description in textarea
+    - **BannerUploader**: Click-to-upload with hover effect, supports file upload
+    - **MediaGallery**: Grid layout with preview modal, manage (add/remove) media items
+    - **AttendanceManager**: Full attendance management with search, bulk operations, pagination
+      - Real-time search across all attendees with status badges
+      - Bulk check-in with checkbox selection
+      - Remove attendees with confirmation dialog
+      - Paginated list (Previous/Next) with items per page selector (10, 25, 50)
+      - "Add Attendee" button always visible below search
+    - **Status-based action buttons**: Start Event, Complete Event, Cancel Event (context-aware)
+    - Dashboard mode shows "View All Events →" link
+    - Detail mode shows "← Back to Events" button
+    - Toast notifications for all CRUD operations
+    - Fully responsive design with mobile optimization
+
 ### Fixed
 
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)

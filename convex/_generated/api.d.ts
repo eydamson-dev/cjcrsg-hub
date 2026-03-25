@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as attendance_mutations from "../attendance/mutations.js";
+import type * as attendance_queries from "../attendance/queries.js";
+import type * as attendance_validators from "../attendance/validators.js";
 import type * as attendees_mutations from "../attendees/mutations.js";
 import type * as attendees_queries from "../attendees/queries.js";
 import type * as attendees_seed from "../attendees/seed.js";
@@ -16,6 +19,9 @@ import type * as auth from "../auth.js";
 import type * as eventTypes_mutations from "../eventTypes/mutations.js";
 import type * as eventTypes_queries from "../eventTypes/queries.js";
 import type * as eventTypes_validators from "../eventTypes/validators.js";
+import type * as events_mutations from "../events/mutations.js";
+import type * as events_queries from "../events/queries.js";
+import type * as events_validators from "../events/validators.js";
 import type * as http from "../http.js";
 import type * as myFunctions from "../myFunctions.js";
 
@@ -26,6 +32,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "attendance/mutations": typeof attendance_mutations;
+  "attendance/queries": typeof attendance_queries;
+  "attendance/validators": typeof attendance_validators;
   "attendees/mutations": typeof attendees_mutations;
   "attendees/queries": typeof attendees_queries;
   "attendees/seed": typeof attendees_seed;
@@ -34,6 +43,9 @@ declare const fullApi: ApiFromModules<{
   "eventTypes/mutations": typeof eventTypes_mutations;
   "eventTypes/queries": typeof eventTypes_queries;
   "eventTypes/validators": typeof eventTypes_validators;
+  "events/mutations": typeof events_mutations;
+  "events/queries": typeof events_queries;
+  "events/validators": typeof events_validators;
   http: typeof http;
   myFunctions: typeof myFunctions;
 }>;
