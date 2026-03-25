@@ -9,11 +9,11 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 ## Current Progress
 
-**Updated:** 2026-03-21
+**Updated:** 2026-03-26
 
-**Phase:** Phase 4 - Event Types Tests  
-**Status:** ✅ Completed | Tasks 4.10-4.12 Done  
-**Current Task:** Event Types route and E2E tests added
+**Phase:** Phase 6 - Events Backend Tests  
+**Status:** ⏳ Planned | Ready to start  
+**Current Task:** Planning complete - ready to implement Phase 6-10
 
 **Summary:**
 
@@ -885,6 +885,264 @@ Tests to add after core features are stable:
 
 ---
 
-**Last Updated:** 2026-03-21
-**Status:** ✅ Complete | All phases implemented
+## Phase 6: Events Backend Tests (Convex)
+
+**Estimated Time:** 3-4 hours
+**Location:** `tests/unit/convex/events/`
+**Priority:** HIGH
+
+### Task 6.1: Event Mutations Tests
+
+**File:** `mutations.test.ts`
+**Time:** 2 hours
+**Estimated Tests:** ~15
+
+| Test Case | Description |
+|-----------|-------------|
+| `create` | Creates event with valid data, defaults to 'upcoming' |
+| `create` | Validates eventTypeId exists |
+| `create` | Validates image URL format |
+| `create` | Validates startTime < endTime logic |
+| `create` | Sets createdAt/updatedAt timestamps |
+| `update` | Updates event fields |
+| `update` | Validates status transitions (upcoming→active→completed) |
+| `update` | Prevents invalid transitions (completed→upcoming) |
+| `startEvent` | Transitions to 'active', checks no other active |
+| `completeEvent` | Transitions to 'completed', calculates duration |
+| `cancelEvent` | Transitions to 'cancelled' |
+| `cancelEvent` | Prevents cancelling completed events |
+| `archive` | Soft deletes by setting isActive=false |
+| Error cases | Non-existent event throws 'Event not found' |
+| Error cases | Duplicate active event throws error |
+
+### Task 6.2: Event Queries Tests
+
+**File:** `queries.test.ts`
+**Time:** 1.5 hours
+**Estimated Tests:** ~12
+
+| Test Case | Description |
+|-----------|-------------|
+| `list` | Returns paginated events |
+| `list` | Filters by status |
+| `list` | Filters by eventTypeId |
+| `list` | Filters by date range |
+| `list` | Joins eventType data |
+| `getById` | Returns event with eventType |
+| `getById` | Returns null for non-existent ID |
+| `getCurrentEvent` | Returns single active event |
+| `getCurrentEvent` | Returns null when no active event |
+| `listArchive` | Returns completed events only |
+| `getStats` | Returns total, byStatus, thisMonth counts |
+| `getStats` | Calculates next upcoming event |
+
+---
+
+## Phase 7: Attendance Backend Tests (Convex)
+
+**Estimated Time:** 2-3 hours
+**Location:** `tests/unit/convex/attendance/`
+**Priority:** HIGH
+
+### Task 7.1: Attendance Mutations Tests
+
+**File:** `mutations.test.ts`
+**Time:** 1.5 hours
+**Estimated Tests:** ~10
+
+| Test Case | Description |
+|-----------|-------------|
+| `checkIn` | Creates attendance record |
+| `checkIn` | Sets checkedInAt timestamp |
+| `checkIn` | Prevents duplicate check-ins |
+| `checkIn` | Requires authentication |
+| `unCheckIn` | Removes attendance record |
+| `unCheckIn` | Returns error if not checked in |
+| `bulkCheckIn` | Checks in multiple attendees |
+| `bulkCheckIn` | Skips already checked in |
+| `bulkCheckIn` | Returns results with statuses |
+| `updateInviteInfo` | Updates invitedBy field |
+
+### Task 7.2: Attendance Queries Tests
+
+**File:** `queries.test.ts`
+**Time:** 1 hour
+**Estimated Tests:** ~6
+
+| Test Case | Description |
+|-----------|-------------|
+| `listByEvent` | Returns attendance for event |
+| `listByAttendee` | Returns attendee's history |
+| `getById` | Returns single record |
+| `getCount` | Returns attendance count |
+| `search` | Finds attendees not yet checked in |
+| `search` | Filters by status and search term |
+
+---
+
+## Phase 8: Events Frontend Hooks Tests
+
+**Estimated Time:** 2-3 hours
+**Location:** `tests/unit/events/hooks/`
+**Priority:** MEDIUM
+
+### Task 8.1: useEvents Hook Tests
+
+**File:** `useEvents.test.ts`
+**Time:** 1 hour
+**Estimated Tests:** ~8
+
+| Test Case | Description |
+|-----------|-------------|
+| `useEventsList` | Fetches paginated events |
+| `useEventsList` | Applies filters correctly |
+| `useEvent` | Fetches single event by ID |
+| `useCurrentEvent` | Returns active event data |
+| `useArchiveEvents` | Returns completed events |
+| `useArchiveEvents` | Supports pagination |
+| `useEventStats` | Returns dashboard statistics |
+| Error handling | Returns error on failure |
+
+### Task 8.2: useEventMutations Hook Tests
+
+**File:** `useEventMutations.test.ts`
+**Time:** 1 hour
+**Estimated Tests:** ~10
+
+| Test Case | Description |
+|-----------|-------------|
+| `useCreateEvent` | Creates event and invalidates cache |
+| `useCreateEvent` | Returns error on failure |
+| `useUpdateEvent` | Updates event and refreshes |
+| `useStartEvent` | Transitions to active status |
+| `useCompleteEvent` | Completes active event |
+| `useCancelEvent` | Cancels event |
+| `useArchiveEvent` | Archives event |
+| Loading states | Sets isLoading correctly |
+| Success callbacks | Calls onSuccess when provided |
+| Error callbacks | Shows toast on error |
+
+### Task 8.3: useAttendance Hook Tests
+
+**File:** `useAttendance.test.ts`
+**Time:** 1 hour
+**Estimated Tests:** ~8
+
+| Test Case | Description |
+|-----------|-------------|
+| `useAttendanceByEvent` | Returns attendance list |
+| `useAttendanceStats` | Returns stats for event |
+| `useCheckIn` | Checks in attendee |
+| `useCheckIn` | Shows success toast |
+| `useUnCheckIn` | Removes attendance |
+| `useBulkCheckIn` | Checks in multiple |
+| Optimistic updates | Updates UI immediately |
+| Real-time | Subscribes to changes |
+
+---
+
+## Phase 9: Events Components Tests
+
+**Estimated Time:** 4-5 hours
+**Location:** `tests/unit/components/events/`
+**Priority:** MEDIUM
+
+### Task 9.1: Critical Event Components
+
+**Files:** `EventForm.test.tsx`, `EventDetail.test.tsx`, `AttendanceManager.test.tsx`
+**Time:** 2 hours
+**Estimated Tests:** ~8
+
+| Component | Tests |
+|-----------|-------|
+| `EventForm` | Renders all fields, validates required, submits data, handles errors |
+| `EventDetail` | Displays event info, shows attendance count, handles actions |
+| `AttendanceManager` | Searches attendees, checks in/out, bulk operations |
+
+### Task 9.2: Archive Components
+
+**Files:** `EventArchive.test.tsx`, `EventFilters.test.tsx`
+**Time:** 1.5 hours
+**Estimated Tests:** ~6
+
+| Component | Tests |
+|-----------|-------|
+| `EventArchive` | Renders events, switches view, applies filters |
+| `EventFilters` | Updates filter state, clears filters |
+
+### Task 9.3: Dashboard Components
+
+**Files:** `CurrentEventDashboard.test.tsx`, `QuickStats.test.tsx`
+**Time:** 1 hour
+**Estimated Tests:** ~4
+
+| Component | Tests |
+|-----------|-------|
+| `CurrentEventDashboard` | Shows active event, empty state, navigation |
+| `QuickStats` | Displays stats correctly |
+
+---
+
+## Phase 10: Events E2E Tests (Chrome Only)
+
+**Estimated Time:** 3-4 hours
+**Location:** `tests/e2e/specs/events/`
+**Priority:** MEDIUM
+**Note:** Chrome browser only (as requested)
+
+### Task 10.1: Event CRUD Flows
+
+**File:** `events-crud.spec.ts`
+**Time:** 2 hours
+**Estimated Tests:** ~6
+
+| Test | Steps |
+|------|-------|
+| Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created |
+| Edit event | Create event → Click edit → Modify → Save → Verify changes |
+| View event detail | Create event → Click event → Verify all info displayed |
+| Archive event | Create event → Archive → Verify not in list |
+| Event lifecycle | Create → Start → Complete → Verify in archive |
+| Cancel event | Create → Cancel → Verify status |
+
+### Task 10.2: Attendance Workflows
+
+**File:** `events-attendance.spec.ts`
+**Time:** 2 hours
+**Estimated Tests:** ~6
+
+| Test | Steps |
+|------|-------|
+| Check in attendee | Start event → Search attendee → Check in → Verify in list |
+| Check out attendee | Check in → Remove → Verify removed |
+| Bulk check-in | Start event → Select multiple → Bulk check-in → Verify all added |
+| Real-time updates | Open two windows → Check in from one → Verify appears in other |
+| Attendance stats | Check in members/visitors → Verify counts correct |
+| Invite tracking | Check in with inviter → Verify invite tracking |
+
+---
+
+## Updated Test Summary
+
+| Phase | Tasks | Est. Time | Tests | Status |
+|-------|-------|-----------|-------|--------|
+| **Phase 1** | Infrastructure | 2 hours | 1 | ✅ Complete |
+| **Phase 2** | Attendee Convex | 2.5 hours | 37 | ✅ Complete |
+| **Phase 3** | Component Tests | 2 hours | 44 | ✅ Complete |
+| **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
+| **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
+| **Phase 6** | Events Backend | 3-4 hours | 27 | ⏳ Planned |
+| **Phase 7** | Attendance Backend | 2-3 hours | 16 | ⏳ Planned |
+| **Phase 8** | Events Hooks | 2-3 hours | 26 | ⏳ Planned |
+| **Phase 9** | Events Components | 4-5 hours | 18 | ⏳ Planned |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
+| **Total** | | **11 + 14-19 hrs** | **263** | |
+
+**Current Status:** 164 tests passing (existing)
+**After Events Testing:** 263 total tests (99 new)
+
+---
+
+**Last Updated:** 2026-03-26
+**Status:** 🚧 Phase 6-10 Planned | Ready to implement Events testing`
 ````
