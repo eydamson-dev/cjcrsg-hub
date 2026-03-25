@@ -11,9 +11,41 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-26
 
-**Phase:** Phase 7 - Attendance Backend Tests  
-**Status:** 🚧 In Progress | Task 7.1-7.2  
-**Current Task:** Implementing attendance mutations and queries tests
+**Phase:** Phase 8 - Events Frontend Hooks Tests  
+**Status:** ✅ Completed | Tasks 8.1-8.3 Done  
+**Current Task:** Phase 8 complete - 65 hooks tests passing
+
+**Summary:**
+
+- ✅ Phase 1: Infrastructure (6/6 tasks complete)
+- ✅ Phase 2: Critical Convex Unit Tests (4/4 tasks complete, 37 tests passing)
+  - ✅ Task 2.1: Test Attendee Mutations (7/7 tests passing)
+  - ✅ Task 2.2: Test Attendee Queries (15/15 tests passing)
+  - ✅ Task 2.3: Test Event Types Queries (6/6 tests passing)
+  - ✅ Task 2.4: Test Event Types Mutations (9/9 tests passing)
+- ✅ Phase 3: Shared Component Tests (3/3 tasks complete, 44 tests passing)
+  - ✅ Task 3.1: Test Form Component (15/15 tests passing)
+  - ✅ Task 3.2: Test ErrorState Component (21/21 tests passing)
+  - ✅ Task 3.3: Test Layout Component (6/6 tests passing)
+- ✅ Phase 4: E2E Critical Flows (2/2 tasks complete, 9 E2E tests)
+  - ✅ Task 4.1: Create Auth Tests (3 tests - signup/login, invalid credentials, session persistence)
+  - ✅ Task 4.2: Create Attendee CRUD Tests (4 tests - navigation, form submission, validation, list view)
+  - ✅ Setup tests (2 tests - homepage loads, login page accessible)
+- ✅ Phase 4b: Event Types Unit Tests (4/4 tasks complete, 48 tests added)
+  - ✅ Task 4.6: Test useEventTypes hooks (9 tests - list, getById, checkAssociations)
+  - ✅ Task 4.7: Test useEventTypeMutations hooks (12 tests - create, update, delete with toast notifications)
+  - ✅ Task 4.8: Test EventTypeForm component (15 tests - rendering, validation, color picker, submission)
+  - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
+- ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
+  - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
+  - ✅ Task 4.12: Test Event Types E2E (16 tests - navigation, CRUD, validation, color picker, 2 browsers)
+- ✅ Phase 6: Events Backend Tests (2/2 tasks complete, 57 tests added) [COMMITTED]
+  - ✅ Task 6.1: Test Event Mutations (31 tests - create, update, start, complete, cancel, archive)
+  - ✅ Task 6.2: Test Event Queries (26 tests - list, getById, getCurrentEvent, listArchive, getStats)
+- ✅ Phase 8: Events Frontend Hooks Tests (3/3 tasks complete, 65 tests added)
+  - ✅ Task 8.1: Test useEvents hooks (22 tests - list, getById, getCurrent, archive, stats)
+  - ✅ Task 8.2: Test useEventMutations hooks (24 tests - create, update, start, complete, cancel, archive)
+  - ✅ Task 8.3: Test useAttendance hooks (19 tests - byEvent, stats, byAttendee, inviters, checkIn, unCheckIn, bulkCheckIn)
 
 **Summary:**
 
@@ -1136,7 +1168,7 @@ Tests to add after core features are stable:
 | **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
 | **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
 | **Phase 7** | Attendance Backend | 2-3 hours | 16 | 🚧 In Progress |
-| **Phase 8** | Events Hooks | 2-3 hours | 26 | ⏳ Planned |
+| **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 18 | ⏳ Planned |
 | **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
 | **Total** | | **11 + 14-19 hrs** | **263** | |
