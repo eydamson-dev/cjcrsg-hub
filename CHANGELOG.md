@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/unit/events/components/EventFilters.test.tsx`: 16 tests for event type dropdown, search functionality, clear filters behavior, and component integration
   - Total 33 new tests, bringing component test count to 362
 
+- **Phase 9.3: Dashboard Components Tests** - Comprehensive test suite for dashboard components
+  - `tests/unit/components/events/CurrentEventDashboard.test.tsx`: 25 tests covering event rendering with child components (EventBanner, EventInfo, AttendanceManager), LIVE badge with animation, action button visibility and callbacks, component integration with props, edge cases (minimal data, zero attendance), debug logging, button variants, icon rendering, and responsive layout
+  - Total 25 new tests, bringing component test count to 410 and overall test count to 560
+
 - **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
   - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
   - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member
