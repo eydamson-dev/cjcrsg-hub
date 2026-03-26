@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 9.1: Event Components Tests** - Comprehensive test suite for event management UI components
+  - `tests/unit/events/components/BasicInfoEditModal.test.tsx`: 10 tests covering rendering, validation, and modal state
+  - `tests/unit/events/components/EventDetails.test.tsx`: 18 tests for dashboard/detail modes, status actions, and modal interactions
+  - `tests/unit/events/components/AttendanceManager.test.tsx`: 15 tests for search, check-in, bulk operations, and pagination
+  - Added `scrollIntoView` mock to test setup for Command component compatibility
+
 - **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
   - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
   - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member
