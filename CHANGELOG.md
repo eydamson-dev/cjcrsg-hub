@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/unit/events/components/AttendanceManager.test.tsx`: 15 tests for search, check-in, bulk operations, and pagination
   - Added `scrollIntoView` mock to test setup for Command component compatibility
 
+- **Phase 9.2: Archive Components Tests** - Complete test coverage for Event Archive and Filter components
+  - `tests/unit/events/components/EventArchive.test.tsx`: 17 tests covering table/cards view toggle, filtering by event type and search query, pagination controls, empty states, and event click handlers
+  - `tests/unit/events/components/EventFilters.test.tsx`: 16 tests for event type dropdown, search functionality, clear filters behavior, and component integration
+  - Total 33 new tests, bringing component test count to 362
+
 - **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
   - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
   - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member

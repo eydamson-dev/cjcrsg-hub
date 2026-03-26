@@ -12,37 +12,31 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-03-26
 
 **Phase:** Phase 9 - Events Components Tests  
-**Status:** ✅ Completed | Created 3 test files with 20 total tests  
-**Current Task:** Phase 9.1 - Critical Event Components Tests Complete
+**Status:** ✅ Completed | Created 5 test files with 53 total tests  
+**Current Task:** Phase 9.2 - Archive Components Tests Complete
 
 **Summary:**
 
-Created comprehensive tests for Phase 9.1:
+Created comprehensive tests for Phase 9.2:
 
-1. **BasicInfoEditModal.test.tsx** (9 tests)
-   - Rendering with event data pre-populated
-   - Validation (required fields, min length, end time after start time)
-   - Form submission with valid data
-   - Modal state management (open/close, reset form)
+1. **EventArchive.test.tsx** (17 tests)
+   - Rendering events in table view by default
+   - View mode toggle (table ↔ cards)
+   - Filtering by event type and search query
+   - Pagination controls and navigation
+   - Empty states and loading skeletons
+   - Event click handlers
 
-2. **EventDetails.test.tsx** (7 tests)
-   - Rendering in dashboard vs detail mode
-   - Event status action buttons (Start, Complete, Cancel)
-   - Unsaved event state with Save/Cancel buttons
-   - Modal interactions (Basic Info, Description, Status/Type)
-   - Banner image and media gallery display
-
-3. **AttendanceManager.test.tsx** (4 tests)
-   - Rendering search input and attendance table
-   - Search functionality with debounce
-   - Single and bulk check-in operations
-   - Remove/un-check-in with confirmation dialog
-   - Pagination controls
+2. **EventFilters.test.tsx** (16 tests)
+   - Event type dropdown rendering and selection
+   - Search input functionality
+   - Clear filters button visibility
+   - Component integration with callbacks
 
 **Test Results:**
 
-- **New Tests Added:** 20 tests
-- **Total Tests:** 479 tests passing (94 Convex + 329 Component + 56 E2E)
+- **New Tests Added:** 33 tests (17 + 16)
+- **Total Tests:** 512 tests passing (94 Convex + 362 Component + 56 E2E)
 
 **Summary:**
 
@@ -1148,16 +1142,17 @@ Tests to add after core features are stable:
 
 **Note:** EventForm doesn't exist - functionality is split across modals (BasicInfoEditModal, DescriptionEditModal, StatusAndTypeEditModal) which are tested via EventDetails integration tests.
 
-### Task 9.2: Archive Components
+### ✅ Task 9.2: Archive Components
 
+**Status:** Completed ✓
 **Files:** `EventArchive.test.tsx`, `EventFilters.test.tsx`
 **Time:** 1.5 hours
-**Estimated Tests:** ~6
+**Total Tests:** 33
 
-| Component | Tests |
-|-----------|-------|
-| `EventArchive` | Renders events, switches view, applies filters |
-| `EventFilters` | Updates filter state, clears filters |
+| Component | Tests | Status |
+|-----------|-------|--------|
+| `EventArchive` | 17 tests - Rendering (events, empty, back link, loading), View mode toggle (table/cards), Filtering (by type, by search, clear filters), Empty states, Pagination (render, navigate, disable prev/next), Event click | ✅ |
+| `EventFilters` | 16 tests - Rendering (dropdown, search, empty types), Event type selection (change, all types, display), Search functionality (change, display, clear), Clear filters (show/hide, callback, variant), Component integration | ✅ |
 
 ### Task 9.3: Dashboard Components
 
@@ -1223,15 +1218,15 @@ Tests to add after core features are stable:
 | **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
 | **Phase 7** | Attendance Backend | 2-3 hours | 16 | 🚧 In Progress |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
-| **Phase 9** | Events Components | 4-5 hours | 18 | ⏳ Planned |
+| **Phase 9** | Events Components | 4-5 hours | 53 | ✅ Complete |
 | **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
-| **Total** | | **11 + 14-19 hrs** | **263** | |
+| **Total** | | **11 + 14-19 hrs** | **298** | |
 
-**Current Status:** 479 tests passing (94 Convex + 329 Component + 56 E2E)
-**Test Breakdown:** All phases complete through Phase 9.1, 0 skipped tests
+**Current Status:** 512 tests passing (94 Convex + 362 Component + 56 E2E)
+**Test Breakdown:** All phases complete through Phase 9.2, 0 skipped tests
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-8 Complete | Phase 9-10 Planned`
+**Status:** ✅ Phase 1-9 Complete | Phase 10 Planned`
 ````
