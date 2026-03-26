@@ -117,6 +117,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **EventTypeList Tests** - Fixed 6 previously skipped delete confirmation tests
+  - Enabled all delete functionality tests (opens dialog, shows name, calls mutation, closes on cancel, loading state, disabled buttons)
+  - Added `data-testid` to delete button for reliable test targeting
+  - Fixed mock variable scoping issue
+  - Updated assertions to use `waitFor()` for async dialog state changes
+  - Test results: 453 passing → 459 passing (0 skipped)
+
 - Properly handle undefined id in useEventType hook (pass 'skip' instead of undefined)
 
 ### Added

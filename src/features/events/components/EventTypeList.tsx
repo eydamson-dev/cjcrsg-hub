@@ -128,6 +128,7 @@ export function EventTypeList({ onEdit, onCreate }: EventTypeListProps) {
                   <Button
                     variant="ghost"
                     size="sm"
+                    data-testid={`delete-button-${eventType._id}`}
                     onClick={(e) => {
                       e.stopPropagation()
                       setDeleteId(eventType._id)
