@@ -27,7 +27,7 @@
       "enabled": true
     }
   },
-  "plugin": ["opencode-agent-skills"],
+  "plugin": ["opencode-agent-skills", "@mohak34/opencode-notifier@latest"],
   "instructions": [
     ".agents/skills/cjcrsg-hub/SKILL.md",
     ".agents/skills/cjcrsg-hub/project-overview.md",
