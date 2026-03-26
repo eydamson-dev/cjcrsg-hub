@@ -11,6 +11,51 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-26
 
+**Phase:** Phase 10 - Events E2E Tests  
+**Status:** ⏳ In Progress | Task 10.1 (Create Event) Complete  
+**Current Task:** Phase 10.1 - Create Event E2E Test
+
+**Summary:**
+
+Completed first E2E test for event creation workflow:
+
+1. **Task 10.1: Create Event (1 test)** ✅
+   - File: `tests/e2e/specs/events-crud.spec.ts`
+   - Test: `user can create a new event`
+   - Coverage: User signup/login, form filling (name, event type, date), submission, redirect, success toast
+   - Browsers: Chrome + Mobile Chrome (2 tests passing)
+
+**Test Results:**
+
+- **New Tests Added:** 2 tests (Chrome + Mobile Chrome)
+- **Events E2E Tests:** 2 tests passing (1 test × 2 browsers)
+- **Total Tests:** 582 tests passing (114 Convex + 410 Component + 58 E2E)
+
+**Summary:**
+
+Completed comprehensive attendance backend tests for Phase 7:
+
+1. **Task 7.1: Attendance Mutations (19 tests)** ✅
+   - `checkIn`: Authentication, event/attendee validation, duplicate prevention, invitedBy, notes
+   - `unCheckIn`: Remove records, auth required, not found error
+   - `bulkCheckIn`: Multiple attendees, skip duplicates, empty arrays, invitedBy support
+
+2. **Task 7.2: Attendance Queries (21 tests)** ✅
+   - `getByEvent`: Records with attendee/inviter joins, pagination, ordering, empty events
+   - `getStats`: Total counts, member/visitor separation, invite tracking, zero counts
+   - `getByAttendee`: Attendance history, event/eventType joins, pagination, ordering
+   - `getInviters`: Top inviters, sorting by count, exclusions, multiple inviters
+
+**Test Results:**
+
+- **New Tests Added:** 40 tests (exceeded 16 estimated)
+- **Attendance Backend Tests:** 40 tests passing (19 mutations + 21 queries)
+- **Total Tests:** 580 tests passing (114 Convex + 410 Component + 56 E2E)
+
+---
+
+**Previous:**
+
 **Phase:** Phase 9 - Events Components Tests  
 **Status:** ✅ Completed | Created 6 test files with 78 total tests  
 **Current Task:** Phase 9.3 - Dashboard Components Complete
@@ -1034,39 +1079,34 @@ Tests to add after core features are stable:
 **Location:** `tests/unit/convex/attendance/`
 **Priority:** HIGH
 
-### Task 7.1: Attendance Mutations Tests
+### ✅ Task 7.1: Attendance Mutations Tests
 
+**Status:** Completed ✓
 **File:** `mutations.test.ts`
 **Time:** 1.5 hours
-**Estimated Tests:** ~10
+**Total Tests:** 19 (exceeded 10 estimated)
 
-| Test Case | Description |
-|-----------|-------------|
-| `checkIn` | Creates attendance record |
-| `checkIn` | Sets checkedInAt timestamp |
-| `checkIn` | Prevents duplicate check-ins |
-| `checkIn` | Requires authentication |
-| `unCheckIn` | Removes attendance record |
-| `unCheckIn` | Returns error if not checked in |
-| `bulkCheckIn` | Checks in multiple attendees |
-| `bulkCheckIn` | Skips already checked in |
-| `bulkCheckIn` | Returns results with statuses |
-| `updateInviteInfo` | Updates invitedBy field |
+| Mutation | Tests | Status |
+|----------|-------|--------|
+| `checkIn` | 8 tests | ✅ Authentication, event/attendee validation, duplicate prevention, invitedBy, notes |
+| `unCheckIn` | 3 tests | ✅ Remove record, auth required, not found error |
+| `bulkCheckIn` | 9 tests | ✅ Multiple attendees, skip duplicates, auth, empty array, invitedBy support |
 
-### Task 7.2: Attendance Queries Tests
+**Note:** `updateInviteInfo` mutation doesn't exist in the codebase - invite tracking is handled via `invitedBy` field in `checkIn` and `bulkCheckIn`.
 
+### ✅ Task 7.2: Attendance Queries Tests
+
+**Status:** Completed ✓
 **File:** `queries.test.ts`
 **Time:** 1 hour
-**Estimated Tests:** ~6
+**Total Tests:** 21 (exceeded 6 estimated)
 
-| Test Case | Description |
-|-----------|-------------|
-| `listByEvent` | Returns attendance for event |
-| `listByAttendee` | Returns attendee's history |
-| `getById` | Returns single record |
-| `getCount` | Returns attendance count |
-| `search` | Finds attendees not yet checked in |
-| `search` | Filters by status and search term |
+| Query | Tests | Status |
+|-------|-------|--------|
+| `getByEvent` | 6 tests | ✅ Records with attendee/inviter joins, pagination, ordering, empty events |
+| `getStats` | 4 tests | ✅ Total counts, member/visitor separation, invite tracking, zero counts |
+| `getByAttendee` | 6 tests | ✅ Attendance history, event/eventType joins, pagination, ordering |
+| `getInviters` | 5 tests | ✅ Top inviters, sorting by count, exclusions, multiple inviters |
 
 ---
 
@@ -1190,15 +1230,35 @@ Tests to add after core features are stable:
 **File:** `events-crud.spec.ts`
 **Time:** 2 hours
 **Estimated Tests:** ~6
+**Status:** ✅ In Progress - 1/6 tests complete
 
-| Test | Steps |
-|------|-------|
-| Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created |
-| Edit event | Create event → Click edit → Modify → Save → Verify changes |
-| View event detail | Create event → Click event → Verify all info displayed |
-| Archive event | Create event → Archive → Verify not in list |
-| Event lifecycle | Create → Start → Complete → Verify in archive |
-| Cancel event | Create → Cancel → Verify status |
+| Test | Steps | Status |
+|------|-------|--------|
+| Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created | ✅ Complete |
+| Edit event | Create event → Click edit → Modify → Save → Verify changes | ⏳ Pending |
+| View event detail | Create event → Click event → Verify all info displayed | ⏳ Pending |
+| Archive event | Create event → Archive → Verify not in list | ⏳ Pending |
+| Event lifecycle | Create → Start → Complete → Verify in archive | ⏳ Pending |
+| Cancel event | Create → Cancel → Verify status | ⏳ Pending |
+
+#### ✅ Create Event Test (Complete)
+
+**Test:** `user can create a new event`
+
+**Implementation:**
+- File: `tests/e2e/specs/events-crud.spec.ts`
+- Authentication: Signs up unique user in `beforeEach`
+- Navigation: Goes to `/events/new`
+- Form filling:
+  - Event Name: Unique name with timestamp
+  - Event Type: Selects first available option from dropdown
+  - Date: Uses pre-filled today's date
+- Submission: Clicks submit button
+- Verification:
+  - Redirects to `/events`
+  - Shows success toast "Event created successfully"
+
+**Browsers:** Chrome + Mobile Chrome (2 tests passing)
 
 ### Task 10.2: Attendance Workflows
 
@@ -1227,17 +1287,17 @@ Tests to add after core features are stable:
 | **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
 | **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
 | **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
-| **Phase 7** | Attendance Backend | 2-3 hours | 16 | 🚧 In Progress |
+| **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
-| **Total** | | **11 + 14-19 hrs** | **323** | |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **1** | ⏳ In Progress |
+| **Total** | | **11 + 14-19 hrs** | **582** | |
 
-**Current Status:** 560 tests passing (94 Convex + 410 Component + 56 E2E)
-**Test Breakdown:** All phases complete through Phase 9.3, 0 skipped tests
+**Current Status:** 582 tests passing (114 Convex + 410 Component + 58 E2E)
+**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 started (1/6 tests)
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-9 Complete | Phase 10 Planned`
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (1/6 tests)
 ````

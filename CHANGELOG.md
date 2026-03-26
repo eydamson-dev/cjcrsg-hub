@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/unit/components/events/CurrentEventDashboard.test.tsx`: 25 tests covering event rendering with child components (EventBanner, EventInfo, AttendanceManager), LIVE badge with animation, action button visibility and callbacks, component integration with props, edge cases (minimal data, zero attendance), debug logging, button variants, icon rendering, and responsive layout
   - Total 25 new tests, bringing component test count to 410 and overall test count to 560
 
+- **Phase 10.1: Event CRUD E2E Test** - First E2E test for event creation workflow
+  - `tests/e2e/specs/events-crud.spec.ts`: New test file with comprehensive event creation test
+  - Test covers: User signup/login, navigation to create event page, filling required fields (name, event type, date), form submission, redirect to events dashboard, success toast verification
+  - Runs on both Chrome and Mobile Chrome (2 test instances)
+  - Total E2E test count: 58 (from 56)
+
 - **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
   - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member
   - `attendees` table: Add `by_invited_by` index — query all people originally invited by a specific member
