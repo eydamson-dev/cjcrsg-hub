@@ -13,6 +13,7 @@ vi.mock('~/features/events/hooks/useEventMutations', () => ({
   useStartEvent: vi.fn(),
   useCompleteEvent: vi.fn(),
   useCancelEvent: vi.fn(),
+  useArchiveEvent: vi.fn(),
 }))
 
 // Mock child components
@@ -58,6 +59,7 @@ import {
   useStartEvent,
   useCompleteEvent,
   useCancelEvent,
+  useArchiveEvent,
 } from '~/features/events/hooks/useEventMutations'
 
 describe('EventDetails', () => {
@@ -106,6 +108,10 @@ describe('EventDetails', () => {
       isPending: false,
     })
     ;(useCancelEvent as any).mockReturnValue({
+      mutateAsync: mockMutateAsync,
+      isPending: false,
+    })
+    ;(useArchiveEvent as any).mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
     })

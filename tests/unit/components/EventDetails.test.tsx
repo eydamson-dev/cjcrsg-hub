@@ -25,6 +25,10 @@ vi.mock('~/features/events/hooks/useEventMutations', () => ({
     mutateAsync: vi.fn(),
     isPending: false,
   })),
+  useArchiveEvent: vi.fn(() => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  })),
 }))
 
 vi.mock('~/features/events/components/AttendanceManager', () => ({

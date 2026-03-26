@@ -12,8 +12,8 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-03-26
 
 **Phase:** Phase 10 - Events E2E Tests  
-**Status:** ⏳ In Progress | Task 10.1 (Create Event + Edit Event + View Event Detail) Complete  
-**Current Task:** Phase 10.1 - Archive Event E2E Test
+**Status:** ⏳ In Progress | Task 10.1 (4/6 tests complete)  
+**Current Task:** Phase 10.1 - Event Lifecycle E2E Test
 
 **Summary:**
 
@@ -37,11 +37,18 @@ Completed E2E tests for event CRUD workflows:
    - Coverage: Create event, navigate to archive, click event, verify event name, status badge (Upcoming), Date label, Edit button, Back to Events button
    - Browsers: Chrome + Mobile Chrome (2 tests passing)
 
+4. **Task 10.1: Archive Event (1 test)** ✅
+   - File: `tests/e2e/specs/events-crud.spec.ts`
+   - Test: `user can archive an event`
+   - Coverage: Create event, navigate to archive, click event, click archive button, verify toast, verify event removed from list
+   - Implementation: Added Archive button to EventDetails component with useArchiveEvent hook
+   - Browsers: Chrome + Mobile Chrome (2 tests passing)
+
 **Test Results:**
 
-- **New Tests Added:** 6 tests (Chrome + Mobile Chrome for all 3 tests)
-- **Events E2E Tests:** 6 tests passing (3 tests × 2 browsers)
-- **Total Tests:** 586 tests passing (114 Convex + 410 Component + 62 E2E)
+- **New Tests Added:** 8 tests (Chrome + Mobile Chrome for all 4 tests)
+- **Events E2E Tests:** 8 tests passing (4 tests × 2 browsers)
+- **Total Tests:** 588 tests passing (114 Convex + 410 Component + 64 E2E)
 
 **Summary:**
 
@@ -1249,7 +1256,7 @@ Tests to add after core features are stable:
 | Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created | ✅ Complete |
 | Edit event | Create event → Click edit → Modify → Save → Verify changes | ✅ Complete |
 | View event detail | Create event → Click event → Verify all info displayed | ✅ Complete |
-| Archive event | Create event → Archive → Verify not in list | ⏳ Pending |
+| Archive event | Create event → Archive → Verify not in list | ✅ Complete |
 | Event lifecycle | Create → Start → Complete → Verify in archive | ⏳ Pending |
 | Cancel event | Create → Cancel → Verify status | ⏳ Pending |
 
@@ -1342,14 +1349,14 @@ Tests to add after core features are stable:
 | **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **3** | ⏳ In Progress |
-| **Total** | | **11 + 14-19 hrs** | **586** | |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **4** | ⏳ In Progress |
+| **Total** | | **11 + 14-19 hrs** | **588** | |
 
-**Current Status:** 586 tests passing (114 Convex + 410 Component + 62 E2E)
-**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 in progress (3/6 tests)
+**Current Status:** 588 tests passing (114 Convex + 410 Component + 64 E2E)
+**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 in progress (4/6 tests)
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (3/6 tests)
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (4/6 tests)
 ````

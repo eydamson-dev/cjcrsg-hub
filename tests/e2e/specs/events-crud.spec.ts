@@ -216,4 +216,75 @@ test.describe('Events CRUD', () => {
       page.getByRole('button', { name: /back to events/i }),
     ).toBeVisible()
   })
+
+  test('user can archive an event', async ({ page }) => {
+    const uniqueEventName = `E2E Archive Test ${Date.now()}`
+
+    // Step 1: Create an event first
+    await page.goto('/events/new')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.getByText(/create new event/i)).toBeVisible()
+
+    // Fill in required fields
+    await page.fill('#name', uniqueEventName)
+
+    // Select Event Type (first available option)
+    await page.click('#eventType')
+    await page.waitForTimeout(500)
+    await page.locator('[role="option"]').first().click()
+
+    // Submit the form
+    await page.click('button[type="submit"]')
+
+    // Wait for navigation to events dashboard
+    await expect(page).toHaveURL('/events', { timeout: 10000 })
+
+    // Verify event was created
+    await expect(page.getByText(/event created successfully/i)).toBeVisible({
+      timeout: 5000,
+    })
+
+    // Step 2: Navigate to events archive to find the event
+    await page.goto('/events/archive')
+    await page.waitForLoadState('networkidle')
+
+    // Wait for the events list to load
+    await expect(page.getByText(/event archive/i)).toBeVisible()
+
+    // Step 3: Find and click on the event to view details
+    await expect(page.getByText(uniqueEventName)).toBeVisible({ timeout: 5000 })
+    await page
+      .locator('tr', { hasText: uniqueEventName })
+      .locator('td')
+      .first()
+      .click()
+
+    // Wait for navigation to event detail page
+    await page.waitForLoadState('networkidle')
+
+    // Step 4: Verify we're on the event detail page
+    await expect(page.getByText(uniqueEventName)).toBeVisible()
+
+    // Step 5: Click the Archive button
+    await expect(
+      page.getByRole('button', { name: /archive event/i }),
+    ).toBeVisible()
+    await page.getByRole('button', { name: /archive event/i }).click()
+
+    // Step 6: Verify the toast notification
+    await expect(page.getByText(/event archived/i)).toBeVisible({
+      timeout: 5000,
+    })
+
+    // Step 7: Navigate back to archive and verify event is not in the list
+    await page.goto('/events/archive')
+    await page.waitForLoadState('networkidle')
+
+    // Wait for the events list to load
+    await expect(page.getByText(/event archive/i)).toBeVisible()
+
+    // The archived event should no longer appear in the archive list
+    await expect(page.getByText(uniqueEventName)).not.toBeVisible()
+  })
 })

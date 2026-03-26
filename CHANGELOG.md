@@ -24,15 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/unit/components/events/CurrentEventDashboard.test.tsx`: 25 tests covering event rendering with child components (EventBanner, EventInfo, AttendanceManager), LIVE badge with animation, action button visibility and callbacks, component integration with props, edge cases (minimal data, zero attendance), debug logging, button variants, icon rendering, and responsive layout
   - Total 25 new tests, bringing component test count to 410 and overall test count to 560
 
-- **Phase 10.1: Event CRUD E2E Tests** - E2E tests for event creation, editing, and viewing workflows
+- **Phase 10.1: Event CRUD E2E Tests** - E2E tests for event creation, editing, viewing, and archiving workflows
   - `tests/e2e/specs/events-crud.spec.ts`: Comprehensive event creation test
     - Test covers: User signup/login, navigation to create event page, filling required fields (name, event type, date), form submission, redirect to events dashboard, success toast verification
   - `tests/e2e/specs/events-crud.spec.ts`: Event editing test
     - Test covers: Creating event, navigating to archive, clicking event for details, opening edit modal, updating event name, saving changes, verifying success toast, confirming updated name displays
   - `tests/e2e/specs/events-crud.spec.ts`: Event detail viewing test
     - Test covers: Creating event, navigating to archive, clicking event to view details, verifying event name displayed, status badge (Upcoming), Date label visible, Edit button available, Back to Events button present
-  - Runs on both Chrome and Mobile Chrome (6 test instances total)
-  - Total E2E test count: 62 (from 60)
+  - `tests/e2e/specs/events-crud.spec.ts`: Event archiving test
+    - Test covers: Creating event, navigating to archive, clicking event for details, clicking Archive Event button, verifying "Event archived" toast, navigating back to archive, confirming event no longer appears in list
+  - Added Archive button to `EventDetails` component with `useArchiveEvent` hook integration
+  - Runs on both Chrome and Mobile Chrome (8 test instances total)
+  - Total E2E test count: 64 (from 62)
 
 - **Task 5.7 Phase 1: Schema Updates** - Updated `convex/schema.ts` with full event management and attendance tracking support
   - `attendees` table: Add `invitedBy` field — permanent record of who originally invited this person to church; stays on profile even after becoming a member

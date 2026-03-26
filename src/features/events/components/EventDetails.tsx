@@ -9,6 +9,7 @@ import {
   Image as ImageIcon,
   Save,
   Trash2,
+  Archive,
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -26,6 +27,7 @@ import {
   useStartEvent,
   useCompleteEvent,
   useCancelEvent,
+  useArchiveEvent,
 } from '../hooks/useEventMutations'
 import type { Event } from '../types'
 
@@ -57,6 +59,7 @@ export function EventDetails({
   const startEvent = useStartEvent()
   const completeEvent = useCompleteEvent()
   const cancelEvent = useCancelEvent()
+  const archiveEvent = useArchiveEvent()
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -196,6 +199,14 @@ export function EventDetails({
   const handleCancelEvent = async () => {
     try {
       await cancelEvent.mutateAsync(event._id)
+    } catch (error) {
+      // Error handled by hook
+    }
+  }
+
+  const handleArchiveEvent = async () => {
+    try {
+      await archiveEvent.mutateAsync(event._id)
     } catch (error) {
       // Error handled by hook
     }
@@ -535,6 +546,17 @@ export function EventDetails({
                 </Button>
               </>
             )}
+
+            {/* Archive button - available for all saved events */}
+            <Button
+              variant="outline"
+              onClick={handleArchiveEvent}
+              disabled={archiveEvent.isPending}
+              data-testid="archive-event-button"
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              Archive Event
+            </Button>
           </>
         )}
       </div>
