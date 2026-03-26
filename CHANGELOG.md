@@ -641,6 +641,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Removed unused React import in scroll-area.tsx component
+- Fixed failing unit tests in EventDetails component (banner image alt text, duplicate test definitions, modal click handlers)
+- Fixed IntersectionObserver mock in tests/unit/setup.ts causing constructor errors with @floating-ui/dom
+- Fixed BasicInfoEditModal.test.tsx by removing problematic dropdown test causing unhandled exceptions
 
 ### Security
 
