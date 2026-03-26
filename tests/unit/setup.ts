@@ -2,11 +2,13 @@ import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 
 // Mock ResizeObserver for components that use it (e.g., Command)
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}))
+class MockResizeObserver {
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+}
+
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver
 
 // Mock IntersectionObserver
 const MockIntersectionObserver = vi.fn(() => ({
@@ -18,6 +20,9 @@ const MockIntersectionObserver = vi.fn(() => ({
 
 global.IntersectionObserver =
   MockIntersectionObserver as unknown as typeof IntersectionObserver
+
+// Mock scrollIntoView for Command component
+Element.prototype.scrollIntoView = vi.fn()
 
 // Suppress React act() warnings from Radix UI components
 const originalError = console.error

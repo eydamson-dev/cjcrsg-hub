@@ -11,9 +11,38 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-03-26
 
-**Phase:** Maintenance - Test Fixes  
-**Status:** ✅ Completed | Fixed skipped EventTypeList delete tests  
-**Current Task:** Fixed 6 previously skipped tests in EventTypeList component
+**Phase:** Phase 9 - Events Components Tests  
+**Status:** ✅ Completed | Created 3 test files with 20 total tests  
+**Current Task:** Phase 9.1 - Critical Event Components Tests Complete
+
+**Summary:**
+
+Created comprehensive tests for Phase 9.1:
+
+1. **BasicInfoEditModal.test.tsx** (9 tests)
+   - Rendering with event data pre-populated
+   - Validation (required fields, min length, end time after start time)
+   - Form submission with valid data
+   - Modal state management (open/close, reset form)
+
+2. **EventDetails.test.tsx** (7 tests)
+   - Rendering in dashboard vs detail mode
+   - Event status action buttons (Start, Complete, Cancel)
+   - Unsaved event state with Save/Cancel buttons
+   - Modal interactions (Basic Info, Description, Status/Type)
+   - Banner image and media gallery display
+
+3. **AttendanceManager.test.tsx** (4 tests)
+   - Rendering search input and attendance table
+   - Search functionality with debounce
+   - Single and bulk check-in operations
+   - Remove/un-check-in with confirmation dialog
+   - Pagination controls
+
+**Test Results:**
+
+- **New Tests Added:** 20 tests
+- **Total Tests:** 479 tests passing (94 Convex + 329 Component + 56 E2E)
 
 **Summary:**
 
@@ -1104,17 +1133,20 @@ Tests to add after core features are stable:
 **Location:** `tests/unit/components/events/`
 **Priority:** MEDIUM
 
-### Task 9.1: Critical Event Components
+### ✅ Task 9.1: Critical Event Components
 
-**Files:** `EventForm.test.tsx`, `EventDetail.test.tsx`, `AttendanceManager.test.tsx`
+**Status:** Completed ✓
+**Files:** `BasicInfoEditModal.test.tsx`, `EventDetails.test.tsx`, `AttendanceManager.test.tsx`
 **Time:** 2 hours
-**Estimated Tests:** ~8
+**Total Tests:** 20
 
-| Component | Tests |
-|-----------|-------|
-| `EventForm` | Renders all fields, validates required, submits data, handles errors |
-| `EventDetail` | Displays event info, shows attendance count, handles actions |
-| `AttendanceManager` | Searches attendees, checks in/out, bulk operations |
+| Component | Tests | Status |
+|-----------|-------|--------|
+| `BasicInfoEditModal` | 9 tests - Rendering, validation (name required, min length, end time after start), form submission, modal state | ✅ |
+| `EventDetails` | 7 tests - Dashboard/detail modes, status action buttons (Start/Complete/Cancel), unsaved state, modals, banner/media | ✅ |
+| `AttendanceManager` | 4 tests - Search input/table, search with debounce, single/bulk check-in, remove with confirmation, pagination | ✅ |
+
+**Note:** EventForm doesn't exist - functionality is split across modals (BasicInfoEditModal, DescriptionEditModal, StatusAndTypeEditModal) which are tested via EventDetails integration tests.
 
 ### Task 9.2: Archive Components
 
@@ -1195,8 +1227,8 @@ Tests to add after core features are stable:
 | **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
 | **Total** | | **11 + 14-19 hrs** | **263** | |
 
-**Current Status:** 459 tests passing (94 Convex + 309 Component + 56 E2E)
-**Test Breakdown:** All phases complete through Phase 8, 0 skipped tests
+**Current Status:** 479 tests passing (94 Convex + 329 Component + 56 E2E)
+**Test Breakdown:** All phases complete through Phase 9.1, 0 skipped tests
 
 ---
 
