@@ -38,10 +38,11 @@ const createWrapper = () => {
 describe('EventTypeList', () => {
   const mockOnEdit = vi.fn()
   const mockOnCreate = vi.fn()
-  const mockDeleteMutate = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset the module-level mock
+    mockDeleteMutate.mockClear()
   })
 
   describe('Loading State', () => {
@@ -312,54 +313,51 @@ describe('EventTypeList', () => {
         isLoading: false,
         error: null,
       })
+      // Reset delete pending state
+      isDeletePending = false
     })
 
-    // TODO: Fix AlertDialog tests - requires Radix UI dialog test setup
-    it.skip('opens confirmation dialog on delete click', () => {
+    it('opens confirmation dialog on delete click', async () => {
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
-
-      expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
       expect(screen.getByText(/confirm deletion/i)).toBeInTheDocument()
     })
 
-    it.skip('shows event type name in confirmation', () => {
+    it('shows event type name in confirmation', async () => {
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
-
-      expect(screen.getByText(/sunday service/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
+      // Check that the name appears in the dialog description (confirmation message)
+      const dialog = screen.getByRole('alertdialog')
+      expect(dialog.textContent).toMatch(/sunday service/i)
     })
 
-    it.skip('calls delete mutation on confirm', async () => {
+    it('calls delete mutation on confirm', async () => {
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
 
       const confirmButton = screen.getByRole('button', { name: /confirm/i })
       fireEvent.click(confirmButton)
@@ -369,66 +367,59 @@ describe('EventTypeList', () => {
       })
     })
 
-    it.skip('closes dialog on cancel', () => {
+    it('closes dialog on cancel', async () => {
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
 
       const cancelButton = screen.getByRole('button', { name: /cancel/i })
       fireEvent.click(cancelButton)
 
-      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      })
     })
 
-    it.skip('shows loading state during delete', () => {
+    it('shows loading state during delete', async () => {
       isDeletePending = true
 
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
 
       expect(screen.getByText(/deleting/i)).toBeInTheDocument()
-
-      // Reset for other tests
-      isDeletePending = false
     })
 
-    it.skip('disables buttons while deleting', () => {
+    it('disables buttons while deleting', async () => {
       isDeletePending = true
 
       render(<EventTypeList onEdit={mockOnEdit} onCreate={mockOnCreate} />, {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
+      await waitFor(() => {
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      })
 
       expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled()
       expect(screen.getByRole('button', { name: /deleting/i })).toBeDisabled()
-
-      // Reset for other tests
-      isDeletePending = false
     })
 
     it('prevents row click when clicking delete button', () => {
@@ -436,13 +427,8 @@ describe('EventTypeList', () => {
         wrapper: createWrapper(),
       })
 
-      const deleteButton = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg'))
-
-      if (deleteButton) {
-        fireEvent.click(deleteButton)
-      }
+      const deleteButton = screen.getByTestId('delete-button-eventType_1')
+      fireEvent.click(deleteButton)
 
       // onEdit should not be called when clicking delete
       expect(mockOnEdit).not.toHaveBeenCalled()

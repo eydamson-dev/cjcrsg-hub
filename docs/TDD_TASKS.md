@@ -12,27 +12,30 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-03-26
 
 **Phase:** Maintenance - Test Fixes  
-**Status:** ✅ Completed | Fixed broken unit tests  
-**Current Task:** Fixed EventDetails component tests and IntersectionObserver mock
+**Status:** ✅ Completed | Fixed skipped EventTypeList delete tests  
+**Current Task:** Fixed 6 previously skipped tests in EventTypeList component
 
 **Summary:**
 
-Fixed 3 failing tests in EventDetails.test.tsx:
+Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
 
-- Fixed banner image alt text to match actual event name
-- Removed duplicate test definitions causing conflicts
-- Updated edit button click handlers to work with component structure
+- Removed `.skip()` from all delete functionality tests
+- Added `data-testid` attribute to delete button in EventTypeList component for reliable test targeting
+- Fixed mock variable scoping issue (removed duplicate `mockDeleteMutate` declaration)
+- Updated test assertions to use `waitFor()` for async dialog state changes
+- Scoped text search to dialog element to avoid matching duplicate content in table
 
-Fixed 1 unhandled error in BasicInfoEditModal.test.tsx:
+**Test Results:**
 
-- Skipped problematic dropdown test causing unhandled exceptions with Select component
+- Before: 453 passing, 6 skipped
+- After: **459 passing, 0 skipped**
 
-Fixed test infrastructure:
+**Files Modified:**
 
-- Updated IntersectionObserver mock in tests/unit/setup.ts to use vi.fn() constructor
-- Prevents "is not a constructor" errors with @floating-ui/dom
+- `tests/unit/events/components/EventTypeList.test.tsx` - Enabled and fixed 6 tests
+- `src/features/events/components/EventTypeList.tsx` - Added `data-testid` to delete button
 
-**Total Tests:** 453 tests passing (94 Convex + 303 Component + 56 E2E)
+**Total Tests:** 459 tests passing (94 Convex + 309 Component + 56 E2E)
 
 **Summary:**
 
@@ -94,7 +97,7 @@ Fixed test infrastructure:
   - ✅ Task 6.1: Test Event Mutations (31 tests - create, update, start, complete, cancel, archive)
   - ✅ Task 6.2: Test Event Queries (26 tests - list, getById, getCurrentEvent, listArchive, getStats)
 
-**Total Tests:** 453 tests passing (94 Convex + 303 Component + 56 E2E) - 2026-03-26
+**Total Tests:** 459 tests passing (94 Convex + 309 Component + 56 E2E) - 2026-03-26
 
 ---
 
@@ -1192,11 +1195,11 @@ Tests to add after core features are stable:
 | **Phase 10** | Events E2E (Chrome) | 3-4 hours | 12 | ⏳ Planned |
 | **Total** | | **11 + 14-19 hrs** | **263** | |
 
-**Current Status:** 164 tests passing (existing)
-**After Events Testing:** 263 total tests (99 new)
+**Current Status:** 459 tests passing (94 Convex + 309 Component + 56 E2E)
+**Test Breakdown:** All phases complete through Phase 8, 0 skipped tests
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** 🚧 Phase 6-10 Planned | Ready to implement Events testing`
+**Status:** ✅ Phase 1-8 Complete | Phase 9-10 Planned`
 ````
