@@ -12,12 +12,12 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-03-26
 
 **Phase:** Phase 10 - Events E2E Tests  
-**Status:** ⏳ In Progress | Task 10.1 (Create Event) Complete  
-**Current Task:** Phase 10.1 - Create Event E2E Test
+**Status:** ⏳ In Progress | Task 10.1 (Create Event + Edit Event) Complete  
+**Current Task:** Phase 10.1 - Edit Event E2E Test
 
 **Summary:**
 
-Completed first E2E test for event creation workflow:
+Completed E2E tests for event CRUD workflows:
 
 1. **Task 10.1: Create Event (1 test)** ✅
    - File: `tests/e2e/specs/events-crud.spec.ts`
@@ -25,11 +25,17 @@ Completed first E2E test for event creation workflow:
    - Coverage: User signup/login, form filling (name, event type, date), submission, redirect, success toast
    - Browsers: Chrome + Mobile Chrome (2 tests passing)
 
+2. **Task 10.1: Edit Event (1 test)** ✅
+   - File: `tests/e2e/specs/events-crud.spec.ts`
+   - Test: `user can edit an existing event`
+   - Coverage: Create event, navigate to archive, click event, edit basic info, save changes, verify toast
+   - Browsers: Chrome + Mobile Chrome (2 tests passing)
+
 **Test Results:**
 
-- **New Tests Added:** 2 tests (Chrome + Mobile Chrome)
-- **Events E2E Tests:** 2 tests passing (1 test × 2 browsers)
-- **Total Tests:** 582 tests passing (114 Convex + 410 Component + 58 E2E)
+- **New Tests Added:** 4 tests (Chrome + Mobile Chrome for both tests)
+- **Events E2E Tests:** 4 tests passing (2 tests × 2 browsers)
+- **Total Tests:** 584 tests passing (114 Convex + 410 Component + 60 E2E)
 
 **Summary:**
 
@@ -1230,12 +1236,12 @@ Tests to add after core features are stable:
 **File:** `events-crud.spec.ts`
 **Time:** 2 hours
 **Estimated Tests:** ~6
-**Status:** ✅ In Progress - 1/6 tests complete
+**Status:** ✅ In Progress - 2/6 tests complete
 
 | Test | Steps | Status |
 |------|-------|--------|
 | Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created | ✅ Complete |
-| Edit event | Create event → Click edit → Modify → Save → Verify changes | ⏳ Pending |
+| Edit event | Create event → Click edit → Modify → Save → Verify changes | ✅ Complete |
 | View event detail | Create event → Click event → Verify all info displayed | ⏳ Pending |
 | Archive event | Create event → Archive → Verify not in list | ⏳ Pending |
 | Event lifecycle | Create → Start → Complete → Verify in archive | ⏳ Pending |
@@ -1257,6 +1263,26 @@ Tests to add after core features are stable:
 - Verification:
   - Redirects to `/events`
   - Shows success toast "Event created successfully"
+
+**Browsers:** Chrome + Mobile Chrome (2 tests passing)
+
+#### ✅ Edit Event Test (Complete)
+
+**Test:** `user can edit an existing event`
+
+**Implementation:**
+- File: `tests/e2e/specs/events-crud.spec.ts`
+- Authentication: Signs up unique user in `beforeEach`
+- Test flow:
+  1. Creates an event with unique name
+  2. Navigates to events archive page
+  3. Clicks on the event to view details
+  4. Clicks Edit button in Event Details card
+  5. Updates event name in the modal
+  6. Saves changes
+- Verification:
+  - Shows success toast "Event updated"
+  - Displays updated event name on page
 
 **Browsers:** Chrome + Mobile Chrome (2 tests passing)
 
@@ -1290,14 +1316,14 @@ Tests to add after core features are stable:
 | **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **1** | ⏳ In Progress |
-| **Total** | | **11 + 14-19 hrs** | **582** | |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **2** | ⏳ In Progress |
+| **Total** | | **11 + 14-19 hrs** | **584** | |
 
-**Current Status:** 582 tests passing (114 Convex + 410 Component + 58 E2E)
-**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 started (1/6 tests)
+**Current Status:** 584 tests passing (114 Convex + 410 Component + 60 E2E)
+**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 in progress (2/6 tests)
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (1/6 tests)
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (2/6 tests)
 ````
