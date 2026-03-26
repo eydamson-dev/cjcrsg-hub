@@ -145,4 +145,75 @@ test.describe('Events CRUD', () => {
     // Verify the updated name is displayed
     await expect(page.getByText(updatedEventName)).toBeVisible()
   })
+
+  test('user can view event details', async ({ page }) => {
+    const uniqueEventName = `E2E View Test ${Date.now()}`
+
+    // Step 1: Create an event first
+    await page.goto('/events/new')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.getByText(/create new event/i)).toBeVisible()
+
+    // Fill in required fields
+    await page.fill('#name', uniqueEventName)
+
+    // Select Event Type (first available option)
+    await page.click('#eventType')
+    await page.waitForTimeout(500)
+    await page.locator('[role="option"]').first().click()
+
+    // Submit the form
+    await page.click('button[type="submit"]')
+
+    // Wait for navigation to events dashboard
+    await expect(page).toHaveURL('/events', { timeout: 10000 })
+
+    // Verify event was created
+    await expect(page.getByText(/event created successfully/i)).toBeVisible({
+      timeout: 5000,
+    })
+
+    // Step 2: Navigate to events archive to find the event
+    await page.goto('/events/archive')
+    await page.waitForLoadState('networkidle')
+
+    // Wait for the events list to load
+    await expect(page.getByText(/event archive/i)).toBeVisible()
+
+    // Step 3: Find and click on the event to view details
+    await expect(page.getByText(uniqueEventName)).toBeVisible({ timeout: 5000 })
+    // Click on the event name which should be a link
+    await page
+      .locator('tr', { hasText: uniqueEventName })
+      .locator('td')
+      .first()
+      .click()
+
+    // Wait for navigation to event detail page
+    await page.waitForLoadState('networkidle')
+
+    // Step 4: Verify event details are displayed
+    // Verify event name is displayed
+    await expect(page.getByText(uniqueEventName)).toBeVisible()
+
+    // Verify Event Details section exists
+    await expect(page.getByText(/Event Details/i)).toBeVisible()
+
+    // Verify Status badge is displayed (should be 'Upcoming' for new event - capitalized)
+    await expect(page.getByText(/Upcoming/i)).toBeVisible()
+
+    // Verify Date is displayed
+    await expect(page.getByText(/Date/i)).toBeVisible()
+
+    // Verify Edit button is available (get the first one - Event Details edit)
+    await expect(
+      page.getByRole('button', { name: /^Edit$/i }).first(),
+    ).toBeVisible()
+
+    // Verify Back to Events button is available
+    await expect(
+      page.getByRole('button', { name: /back to events/i }),
+    ).toBeVisible()
+  })
 })

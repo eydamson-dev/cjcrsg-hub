@@ -12,8 +12,8 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-03-26
 
 **Phase:** Phase 10 - Events E2E Tests  
-**Status:** ⏳ In Progress | Task 10.1 (Create Event + Edit Event) Complete  
-**Current Task:** Phase 10.1 - Edit Event E2E Test
+**Status:** ⏳ In Progress | Task 10.1 (Create Event + Edit Event + View Event Detail) Complete  
+**Current Task:** Phase 10.1 - Archive Event E2E Test
 
 **Summary:**
 
@@ -31,11 +31,17 @@ Completed E2E tests for event CRUD workflows:
    - Coverage: Create event, navigate to archive, click event, edit basic info, save changes, verify toast
    - Browsers: Chrome + Mobile Chrome (2 tests passing)
 
+3. **Task 10.1: View Event Detail (1 test)** ✅
+   - File: `tests/e2e/specs/events-crud.spec.ts`
+   - Test: `user can view event details`
+   - Coverage: Create event, navigate to archive, click event, verify event name, status badge (Upcoming), Date label, Edit button, Back to Events button
+   - Browsers: Chrome + Mobile Chrome (2 tests passing)
+
 **Test Results:**
 
-- **New Tests Added:** 4 tests (Chrome + Mobile Chrome for both tests)
-- **Events E2E Tests:** 4 tests passing (2 tests × 2 browsers)
-- **Total Tests:** 584 tests passing (114 Convex + 410 Component + 60 E2E)
+- **New Tests Added:** 6 tests (Chrome + Mobile Chrome for all 3 tests)
+- **Events E2E Tests:** 6 tests passing (3 tests × 2 browsers)
+- **Total Tests:** 586 tests passing (114 Convex + 410 Component + 62 E2E)
 
 **Summary:**
 
@@ -1242,7 +1248,7 @@ Tests to add after core features are stable:
 |------|-------|--------|
 | Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created | ✅ Complete |
 | Edit event | Create event → Click edit → Modify → Save → Verify changes | ✅ Complete |
-| View event detail | Create event → Click event → Verify all info displayed | ⏳ Pending |
+| View event detail | Create event → Click event → Verify all info displayed | ✅ Complete |
 | Archive event | Create event → Archive → Verify not in list | ⏳ Pending |
 | Event lifecycle | Create → Start → Complete → Verify in archive | ⏳ Pending |
 | Cancel event | Create → Cancel → Verify status | ⏳ Pending |
@@ -1286,6 +1292,26 @@ Tests to add after core features are stable:
 
 **Browsers:** Chrome + Mobile Chrome (2 tests passing)
 
+#### ✅ View Event Detail Test (Complete)
+
+**Test:** `user can view event details`
+
+**Implementation:**
+- File: `tests/e2e/specs/events-crud.spec.ts`
+- Authentication: Signs up unique user in `beforeEach`
+- Test flow:
+  1. Creates an event with unique name
+  2. Navigates to events archive page
+  3. Clicks on the event to view details
+- Verification:
+  - Event name is displayed in the header
+  - Status badge shows "Upcoming" (capitalized)
+  - Date label is visible
+  - Edit button is available in Event Details card
+  - Back to Events button is present
+
+**Browsers:** Chrome + Mobile Chrome (2 tests passing)
+
 ### Task 10.2: Attendance Workflows
 
 **File:** `events-attendance.spec.ts`
@@ -1316,14 +1342,14 @@ Tests to add after core features are stable:
 | **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **2** | ⏳ In Progress |
-| **Total** | | **11 + 14-19 hrs** | **584** | |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **3** | ⏳ In Progress |
+| **Total** | | **11 + 14-19 hrs** | **586** | |
 
-**Current Status:** 584 tests passing (114 Convex + 410 Component + 60 E2E)
-**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 in progress (2/6 tests)
+**Current Status:** 586 tests passing (114 Convex + 410 Component + 62 E2E)
+**Test Breakdown:** All phases complete through Phase 9.3, Phase 10.1 in progress (3/6 tests)
 
 ---
 
 **Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (2/6 tests)
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (3/6 tests)
 ````
