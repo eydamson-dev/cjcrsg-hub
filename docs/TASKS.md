@@ -3,8 +3,8 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-27  
-**Current Phase:** Phase 7 - Attendance Inviter Tracking  
-**Status:** 🚧 In Progress | Task 7.4 - Testing & Validation
+**Current Phase:** Phase 7 Refined - Attendance Workflow Redesign  
+**Status:** 🚧 Ready for Implementation | Task 7.5 - Simplify Search Flow
 
 ---
 
@@ -202,6 +202,218 @@ interface AttendanceRecordItem {
 - Manual test: Toggle between list and by-inviter views
 - Manual test: Expand/collapse inviter groups
 - Manual test: Walk-in (no inviter) flows correctly
+
+### Phase 7 Refined: Attendance Workflow Redesign
+
+**Status:** 🚧 Ready for Implementation
+**Goal:** Simplify check-in flow - default to "Walk-in", assign inviters later via table actions
+
+#### Refined Workflow Overview
+
+**Core Changes:**
+
+1. **Remove inviter selection from initial check-in** - All attendees default to "Walk-in"
+2. **Add inviter assignment later** - Via Actions dropdown in table rows
+3. **Support multi-select in table** - For bulk inviter assignment
+4. **Group view quick-add** - "+ Add" button on each inviter group
+
+#### Task 7.5: Simplify Search Flow
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**Changes:**
+
+- Remove `InviterSelectionModal` trigger from search check-in
+- Default all check-ins to "Walk-in" (no inviter)
+- Keep multi-select checkboxes in search dropdown
+- Add "Add X" button in dropdown footer
+- After adding, clear search and close dropdown
+- Toast: "X attendees checked in"
+
+**UI:**
+
+```
+Search Results:
+┌─────────────────────────────────────┐
+│ ☐ John Smith        [Member]        │
+│ ☐ Jane Doe          [Visitor]       │
+│ ☐ Bob Wilson        [Member]        │
+│                                     │
+│ [Cancel]              [Add 3]       │
+└─────────────────────────────────────┘
+```
+
+#### Task 7.6: Add Table Multi-Select (List View)
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**Changes:**
+
+- Add checkbox column (first column)
+- Header checkbox selects all visible rows on current page
+- Show "X selected" count badge
+- "Clear" button to deselect all
+- Selection clears when: switching views, changing pages
+- Persist selection on data refresh (same page)
+
+**Bulk Actions Dropdown** (appears when ≥1 selected):
+
+- "Assign Inviter" → Opens `InviterSelectionModal`
+- "Remove Selected" → Deletes attendance records
+
+**Keyboard Shortcuts:**
+
+- Space: Toggle checkbox
+- Escape: Close modals
+- Ctrl/Cmd+A: Select all visible
+
+#### Task 7.7: Add Row Actions - Assign/Remove Inviter
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**Actions Dropdown per Row:**
+
+```
+Actions ▼
+├── View Profile
+├── Assign Inviter → Opens InviterSelectionModal
+├── Remove Inviter → Sets to "Walk-in"
+└── Remove → Deletes attendance record
+```
+
+**Flow for Assign Inviter:**
+
+1. Click "Assign Inviter"
+2. `InviterSelectionModal` opens with title: "Assign Inviter to [Name]"
+3. Select inviter or "Walk-in"
+4. Save updates `invitedBy` field
+5. Toast: "John Smith invited by Mary Johnson"
+6. Table refreshes showing inviter name
+
+**Flow for Remove Inviter:**
+
+1. Click trash icon → "Remove Inviter"
+2. Sets `invitedBy` to `null`
+3. Attendee becomes "Walk-in"
+4. Toast: "Inviter removed for John Smith"
+
+#### Task 7.8: By Inviter View - Group Quick-Add
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**Group Header UI:**
+
+```
+┌────────────────────────────────────────────────────┐
+│ Mary Johnson                              [5] [+] │
+├────────────────────────────────────────────────────┤
+│ ☐ | John Smith    | Member | 9:00 AM | [...]     │
+│ ☐ | Alice Brown   | Visitor| 9:15 AM | [...]     │
+└────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+
+- **NO group header checkbox** (individual row checkboxes only)
+- **"+ Add" button** on each group header
+- Selection locked to **one group only** (cannot select across groups)
+- Clicking "+ Add" opens `AttendeeSearchModal` with that inviter pre-selected
+
+**Auto-Hide Empty Groups:**
+
+- When group reaches 0 attendees, remove immediately from list
+- Fade out animation before removal
+- If attendee removed from group and count becomes 0, hide group
+
+#### Task 7.9: Create AttendeeSearchModal Component
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendeeSearchModal.tsx` (New)
+
+**Props:**
+
+```typescript
+interface AttendeeSearchModalProps {
+  open: boolean
+  inviterName: string // "Mary Johnson" or "Walk-in"
+  onSelect: (attendeeIds: string[]) => void
+  onClose: () => void
+}
+```
+
+**Features:**
+
+- Title: "Add Attendees to [Inviter Name]'s Invites"
+- Search input with debounce (300ms)
+- Filters out already-checked-in attendees
+- Multi-select checkboxes (no limit)
+- "Create new attendee" option when no results found
+  - Opens `CreateAttendeeModal`
+  - After creation, auto-adds to current inviter
+  - Returns to search modal with new attendee selected
+- "Add X" button saves attendance with pre-selected inviter
+- Toast: "3 attendees added to Mary's invites"
+
+**UI:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Add Attendees to Mary Johnson's Invites          [X]   │
+├─────────────────────────────────────────────────────────┤
+│ Search for attendees...                                 │
+│                                                         │
+│ ☐ John Smith        [Member]                            │
+│ ☐ Sarah Lee         [Visitor]                           │
+│ ☐ Mike Brown        [Member]                            │
+│                                                         │
+│ [Create new attendee: "SearchQuery"]                    │
+│                                                         │
+│ [2 selected]                              [Add 2]       │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### Task 7.10: Update InviterSelectionModal
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/InviterSelectionModal.tsx`
+
+**Enhancements:**
+
+- Add `title` prop for customization
+  - Single: "Assign Inviter to [Attendee Name]"
+  - Bulk: "Assign Inviter to X Attendees"
+- Keep "Walk-in" option at top
+- Support both single and bulk contexts
+
+#### Task 7.11: Update AttendanceRecordItem Interface
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**No changes needed** - interface already supports `invitedBy` and `inviter` fields
+
+#### Task 7.12: Testing & Validation (Refined)
+
+**Status:** ⏳ Pending
+
+**Test Checklist:**
+
+- [ ] Search and check-in defaults to "Walk-in"
+- [ ] Can check-in multiple attendees from search (all walk-in)
+- [ ] Table multi-select works in List View
+- [ ] Table multi-select works in By Inviter view (one group only)
+- [ ] Can assign inviter via row Actions
+- [ ] Can remove inviter (reverts to walk-in)
+- [ ] Can bulk assign inviter to multiple selected rows
+- [ ] Group view "+ Add" button works
+- [ ] Creating attendee from group view auto-assigns that inviter
+- [ ] Empty groups auto-hide
+- [ ] Keyboard shortcuts work (Space, Escape, Ctrl+A)
+- [ ] Selection clears on view switch and page change
 
 ---
 
