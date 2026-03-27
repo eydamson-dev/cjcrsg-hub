@@ -4,7 +4,7 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-27  
 **Current Phase:** Phase 7 Refined - Attendance Workflow Redesign  
-**Status:** 🚧 Ready for Implementation | Task 7.5 - Simplify Search Flow
+**Status:** 🚧 In Progress | Task 7.8 - By Inviter View - Group Quick-Add
 
 ---
 
@@ -219,7 +219,7 @@ interface AttendanceRecordItem {
 
 #### Task 7.5: Simplify Search Flow
 
-**Status:** ⏳ Pending
+**Status:** ✅ Completed
 **File:** `src/features/events/components/AttendanceManager.tsx`
 
 **Changes:**
@@ -246,32 +246,32 @@ Search Results:
 
 #### Task 7.6: Add Table Multi-Select (List View)
 
-**Status:** ⏳ Pending
+**Status:** ✅ Completed
 **File:** `src/features/events/components/AttendanceManager.tsx`
 
 **Changes:**
 
-- Add checkbox column (first column)
-- Header checkbox selects all visible rows on current page
-- Show "X selected" count badge
-- "Clear" button to deselect all
-- Selection clears when: switching views, changing pages
-- Persist selection on data refresh (same page)
+- ✅ Add checkbox column (first column)
+- ✅ Header checkbox selects all visible rows on current page
+- ✅ Show "X selected" count badge
+- ✅ "Clear" button to deselect all
+- ✅ Selection clears when: switching views, changing pages
+- ✅ Persist selection on data refresh (same page)
 
 **Bulk Actions Dropdown** (appears when ≥1 selected):
 
-- "Assign Inviter" → Opens `InviterSelectionModal`
-- "Remove Selected" → Deletes attendance records
+- ✅ "Assign Inviter" → Opens `InviterSelectionModal`
+- ✅ "Remove Selected" → Deletes attendance records
 
 **Keyboard Shortcuts:**
 
-- Space: Toggle checkbox
-- Escape: Close modals
-- Ctrl/Cmd+A: Select all visible
+- ✅ Space: Toggle checkbox
+- ✅ Escape: Close modals
+- ✅ Ctrl/Cmd+A: Select all visible
 
 #### Task 7.7: Add Row Actions - Assign/Remove Inviter
 
-**Status:** ⏳ Pending
+**Status:** ✅ Completed
 **File:** `src/features/events/components/AttendanceManager.tsx`
 
 **Actions Dropdown per Row:**
@@ -286,12 +286,18 @@ Actions ▼
 
 **Flow for Assign Inviter:**
 
-1. Click "Assign Inviter"
-2. `InviterSelectionModal` opens with title: "Assign Inviter to [Name]"
-3. Select inviter or "Walk-in"
-4. Save updates `invitedBy` field
-5. Toast: "John Smith invited by Mary Johnson"
-6. Table refreshes showing inviter name
+1. ✅ Click "Assign Inviter"
+2. ✅ `InviterSelectionModal` opens with title: "Assign Inviter to [Name]"
+3. ✅ Select inviter or "Walk-in"
+4. ✅ Save updates `invitedBy` field
+5. ✅ Toast: "John Smith invited by Mary Johnson"
+6. ✅ Table refreshes showing inviter name
+
+**Backend Changes:**
+
+- ✅ Created `updateInviter` mutation in `convex/attendance/mutations.ts`
+- ✅ Added `useUpdateInviter` hook in `useAttendance.ts`
+- ✅ Supports both assigning and removing inviter (set to null = walk-in)
 
 **Flow for Remove Inviter:**
 
