@@ -141,6 +141,11 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   // Track expanded groups in "by inviter" view
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
+  // Table row selection state (for bulk actions)
+  const [selectedTableRows, setSelectedTableRows] = useState<Set<string>>(
+    new Set(),
+  )
+
   const pageSizeOptions = [10, 25, 50]
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
@@ -326,6 +331,32 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     }
     setExpandedGroups(newExpanded)
   }
+
+  // Toggle table row selection
+  const toggleTableRowSelection = (recordId: string) => {
+    const newSelected = new Set(selectedTableRows)
+    if (newSelected.has(recordId)) {
+      newSelected.delete(recordId)
+    } else {
+      newSelected.add(recordId)
+    }
+    setSelectedTableRows(newSelected)
+  }
+
+  // Select/deselect all visible table rows
+  const selectAllTableRows = (selectAll: boolean) => {
+    if (selectAll) {
+      const allIds = new Set(attendance.map((record) => record._id))
+      setSelectedTableRows(allIds)
+    } else {
+      setSelectedTableRows(new Set())
+    }
+  }
+
+  // Clear table selection when view or page changes
+  useEffect(() => {
+    setSelectedTableRows(new Set())
+  }, [viewMode, cursor, pageSize])
 
   // Get attendance records
   const attendance = attendanceData?.page || []
@@ -622,9 +653,75 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           ) : viewMode === 'list' ? (
             /* List View */
             <div className="overflow-x-auto -mx-6 px-6">
+              {/* Selection Bar */}
+              {selectedTableRows.size > 0 && (
+                <div className="flex items-center justify-between py-2 mb-2 px-2 bg-muted/50 rounded-md">
+                  <span className="text-sm font-medium">
+                    {selectedTableRows.size} selected
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedTableRows(new Set())}
+                    >
+                      Clear
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button size="sm">Bulk Actions</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // TODO: Open inviter selection modal for bulk assign
+                            setPendingAttendees(
+                              attendance
+                                .filter((r) => selectedTableRows.has(r._id))
+                                .map((r) => ({
+                                  attendeeId: r.attendeeId,
+                                  firstName: r.attendee?.firstName || '',
+                                  lastName: r.attendee?.lastName || '',
+                                  status: r.attendee?.status || 'visitor',
+                                })),
+                            )
+                            setShowInviterModal(true)
+                          }}
+                        >
+                          Assign Inviter
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={async () => {
+                            // Delete selected records
+                            for (const recordId of selectedTableRows) {
+                              await unCheckIn.mutateAsync(recordId)
+                            }
+                            setSelectedTableRows(new Set())
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Remove Selected
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              )}
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={
+                          attendance.length > 0 &&
+                          attendance.every((r) => selectedTableRows.has(r._id))
+                        }
+                        onCheckedChange={(checked) =>
+                          selectAllTableRows(checked as boolean)
+                        }
+                      />
+                    </TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Invited By</TableHead>
@@ -636,7 +733,10 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                   {attendance.map((record: AttendanceRecordItem) => (
                     <TableRow
                       key={record._id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className={cn(
+                        'cursor-pointer hover:bg-muted/50',
+                        selectedTableRows.has(record._id) && 'bg-muted',
+                      )}
                       onClick={() =>
                         record.attendee?._id &&
                         navigate({
@@ -645,6 +745,14 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                         })
                       }
                     >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedTableRows.has(record._id)}
+                          onCheckedChange={() =>
+                            toggleTableRowSelection(record._id)
+                          }
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">
                         {record.attendee ? (
                           <>
