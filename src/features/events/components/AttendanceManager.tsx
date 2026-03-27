@@ -73,6 +73,7 @@ import {
   useCheckIn,
   useUnCheckIn,
   useBulkCheckIn,
+  useUpdateInviter,
 } from '../hooks/useAttendance'
 import { useNavigate } from '@tanstack/react-router'
 import { CreateAttendeeModal } from './CreateAttendeeModal'
@@ -160,6 +161,13 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   const checkIn = useCheckIn()
   const unCheckIn = useUnCheckIn()
   const bulkCheckIn = useBulkCheckIn()
+  const updateInviter = useUpdateInviter()
+
+  // State for inviter assignment modal
+  const [recordToAssignInviter, setRecordToAssignInviter] = useState<
+    string | null
+  >(null)
+  const [attendeeNameForModal, setAttendeeNameForModal] = useState<string>('')
 
   // Get already checked-in attendee IDs
   const checkedInAttendeeIds = useMemo(() => {
@@ -282,6 +290,46 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
       } catch (error) {
         // Error is handled by the hook
       }
+    }
+  }
+
+  // Handle assign inviter to a record
+  const handleAssignInviter = (record: AttendanceRecordItem) => {
+    setRecordToAssignInviter(record._id)
+    setAttendeeNameForModal(
+      record.attendee
+        ? `${record.attendee.firstName} ${record.attendee.lastName}`
+        : 'Unknown Attendee',
+    )
+    setShowInviterModal(true)
+  }
+
+  // Handle remove inviter (set to walk-in)
+  const handleRemoveInviter = async (recordId: string) => {
+    try {
+      await updateInviter.mutateAsync({
+        attendanceRecordId: recordId,
+        invitedBy: undefined, // Set to undefined = walk-in
+      })
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  }
+
+  // Handle inviter selection from modal (for single record assignment)
+  const handleInviterSelectedForRecord = async (inviterId: string | null) => {
+    if (!recordToAssignInviter) return
+
+    try {
+      await updateInviter.mutateAsync({
+        attendanceRecordId: recordToAssignInviter,
+        invitedBy: inviterId || undefined,
+      })
+      setRecordToAssignInviter(null)
+      setAttendeeNameForModal('')
+      setShowInviterModal(false)
+    } catch (error) {
+      // Error is handled by the hook
     }
   }
 
@@ -816,6 +864,25 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleAssignInviter(record)
+                              }}
+                            >
+                              Assign Inviter
+                            </DropdownMenuItem>
+                            {record.inviter && (
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleRemoveInviter(record._id)
+                                }}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Remove Inviter
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
                               className="text-destructive"
                               onClick={(e) => {
                                 e.stopPropagation()
@@ -1028,12 +1095,23 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
       {/* Inviter Selection Modal */}
       <InviterSelectionModal
         open={showInviterModal}
-        onSelect={handleInviterSelect}
+        onSelect={
+          recordToAssignInviter
+            ? handleInviterSelectedForRecord
+            : handleInviterSelect
+        }
         onClose={() => {
           setShowInviterModal(false)
           setPendingAttendees([])
+          setRecordToAssignInviter(null)
+          setAttendeeNameForModal('')
         }}
         excludeAttendeeIds={pendingAttendees.map((a) => a.attendeeId)}
+        title={
+          recordToAssignInviter
+            ? `Assign Inviter to ${attendeeNameForModal}`
+            : 'Select Inviter'
+        }
       />
     </div>
   )

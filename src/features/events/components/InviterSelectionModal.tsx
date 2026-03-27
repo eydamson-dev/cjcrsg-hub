@@ -26,6 +26,7 @@ interface InviterSelectionModalProps {
   onSelect: (inviterId: string | null) => void
   onClose?: () => void
   excludeAttendeeIds?: string[]
+  title?: string
 }
 
 export function InviterSelectionModal({
@@ -33,6 +34,7 @@ export function InviterSelectionModal({
   onSelect,
   onClose,
   excludeAttendeeIds = [],
+  title = 'Select Inviter',
 }: InviterSelectionModalProps) {
   const [isOpen, setIsOpen] = useState(open ?? false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -78,7 +80,7 @@ export function InviterSelectionModal({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Select Inviter</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">

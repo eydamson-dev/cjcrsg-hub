@@ -157,3 +157,43 @@ export const bulkCheckIn = mutation({
     return { successCount, skippedCount }
   },
 })
+
+/**
+ * Update the inviter for an existing attendance record.
+ * - Requires authentication
+ * - Validates attendance record exists
+ * - Validates inviter exists (if provided)
+ * - Updates invitedBy field (or removes it if null)
+ * - Returns updated attendance record ID
+ */
+export const updateInviter = mutation({
+  args: {
+    attendanceRecordId: v.id('attendanceRecords'),
+    invitedBy: v.optional(v.id('attendees')),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error('Not authenticated')
+    }
+
+    const record = await ctx.db.get(args.attendanceRecordId)
+    if (!record) {
+      throw new Error('Attendance record not found')
+    }
+
+    // Validate inviter exists if provided
+    if (args.invitedBy) {
+      const inviter = await ctx.db.get(args.invitedBy)
+      if (!inviter) {
+        throw new Error('Inviter not found')
+      }
+    }
+
+    await ctx.db.patch(args.attendanceRecordId, {
+      invitedBy: args.invitedBy,
+    })
+
+    return args.attendanceRecordId
+  },
+})

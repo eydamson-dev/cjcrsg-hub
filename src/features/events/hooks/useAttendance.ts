@@ -181,3 +181,39 @@ export function useBulkCheckIn() {
     },
   })
 }
+
+/**
+ * Hook to update the inviter for an existing attendance record.
+ * - On success: toast "Inviter assigned" or "Inviter removed"
+ * - On error: toast error message
+ */
+export function useUpdateInviter() {
+  const queryClient = useQueryClient()
+  const mutationFn = useConvexMutation(api.attendance.mutations.updateInviter)
+
+  return useMutation({
+    mutationFn: async (input: {
+      attendanceRecordId: string
+      invitedBy?: string
+    }) => {
+      return mutationFn({
+        attendanceRecordId: input.attendanceRecordId as Id<'attendanceRecords'>,
+        invitedBy: input.invitedBy
+          ? (input.invitedBy as Id<'attendees'>)
+          : undefined,
+      })
+    },
+    onSuccess: (_, variables) => {
+      if (variables.invitedBy) {
+        toast.success('Inviter assigned')
+      } else {
+        toast.success('Inviter removed')
+      }
+      queryClient.invalidateQueries({ queryKey: ['attendance'] })
+      queryClient.invalidateQueries({ queryKey: ['attendanceStats'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update inviter')
+    },
+  })
+}
