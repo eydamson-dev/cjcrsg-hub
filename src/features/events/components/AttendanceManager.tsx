@@ -13,6 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  ChevronDown,
+  ChevronUp,
+  UserPlus,
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -57,6 +60,12 @@ import {
   CommandItem,
   CommandList,
 } from '~/components/ui/command'
+import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '~/components/ui/collapsible'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useSearchAttendees } from '~/features/attendees/hooks/useAttendees'
 import {
@@ -67,6 +76,9 @@ import {
   useBulkCheckIn,
 } from '../hooks/useAttendance'
 import { useNavigate } from '@tanstack/react-router'
+import { CreateAttendeeModal } from './CreateAttendeeModal'
+import { InviterSelectionModal } from './InviterSelectionModal'
+import type { Attendee } from '~/features/attendees/types'
 
 interface AttendanceManagerProps {
   eventId: string
@@ -87,6 +99,7 @@ interface AttendanceRecordItem {
   checkedInAt: number
   checkedInBy: string
   notes?: string
+  invitedBy?: string
   attendee: {
     _id: string
     firstName: string
@@ -94,6 +107,11 @@ interface AttendanceRecordItem {
     status: 'member' | 'visitor' | 'inactive'
     email?: string
     phone?: string
+  } | null
+  inviter?: {
+    _id: string
+    firstName: string
+    lastName: string
   } | null
 }
 
@@ -108,6 +126,21 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   const [cursor, setCursor] = useState<string | null>(null)
   const [pageSize, setPageSize] = useState(10)
   const searchRef = useRef<HTMLDivElement>(null)
+
+  // View mode state
+  const [viewMode, setViewMode] = useState<'list' | 'byInviter'>('list')
+
+  // Modal states
+  const [showInviterModal, setShowInviterModal] = useState(false)
+  const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
+
+  // Pending attendees for check-in (waiting for inviter selection)
+  const [pendingAttendees, setPendingAttendees] = useState<AttendeeToCheckIn[]>(
+    [],
+  )
+
+  // Track expanded groups in "by inviter" view
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
   const pageSizeOptions = [10, 25, 50]
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -178,38 +211,58 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     hasPrevious: !!cursor,
   }
 
-  // Handle single check-in
-  const handleCheckIn = async (attendee: AttendeeToCheckIn) => {
-    try {
-      await checkIn.mutateAsync({
-        eventId,
-        attendeeId: attendee.attendeeId,
-      })
-      setSearchQuery('')
-      setShowSearchResults(false)
-    } catch (error) {
-      // Error is handled by the hook
-    }
+  // Handle single check-in (now opens inviter modal)
+  const handleCheckIn = (attendee: AttendeeToCheckIn) => {
+    setPendingAttendees([attendee])
+    setShowInviterModal(true)
   }
 
-  // Handle bulk check-in
-  const handleBulkCheckIn = async () => {
+  // Handle bulk check-in (now opens inviter modal)
+  const handleBulkCheckIn = () => {
     if (selectedAttendees.size === 0) return
 
     const attendeesToCheckIn = availableAttendees
       .filter((attendee) => selectedAttendees.has(attendee._id))
       .map((attendee) => ({
         attendeeId: attendee._id,
+        firstName: attendee.firstName,
+        lastName: attendee.lastName,
+        status: attendee.status,
       }))
 
+    setPendingAttendees(attendeesToCheckIn)
+    setShowInviterModal(true)
+  }
+
+  // Handle inviter selection from modal
+  const handleInviterSelect = async (inviterId: string | null) => {
+    if (pendingAttendees.length === 0) return
+
     try {
-      await bulkCheckIn.mutateAsync({
-        eventId,
-        attendees: attendeesToCheckIn,
-      })
+      if (pendingAttendees.length === 1) {
+        // Single check-in
+        await checkIn.mutateAsync({
+          eventId,
+          attendeeId: pendingAttendees[0].attendeeId,
+          invitedBy: inviterId || undefined,
+        })
+      } else {
+        // Bulk check-in
+        await bulkCheckIn.mutateAsync({
+          eventId,
+          attendees: pendingAttendees.map((attendee) => ({
+            attendeeId: attendee.attendeeId,
+            invitedBy: inviterId || undefined,
+          })),
+        })
+      }
+
+      // Reset state
       setSearchQuery('')
       setShowSearchResults(false)
       setSelectedAttendees(new Set())
+      setPendingAttendees([])
+      setShowInviterModal(false)
     } catch (error) {
       // Error is handled by the hook
     }
@@ -227,6 +280,31 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     }
   }
 
+  // Handle create new attendee from search
+  const handleCreateAttendee = () => {
+    setShowCreateAttendeeModal(true)
+  }
+
+  // Handle after attendee is created
+  const handleAttendeeCreated = (attendee: Attendee) => {
+    // Add the new attendee to selected attendees
+    setSelectedAttendees(new Set([attendee._id]))
+    // Set them as pending for check-in
+    setPendingAttendees([
+      {
+        attendeeId: attendee._id,
+        firstName: attendee.firstName,
+        lastName: attendee.lastName,
+        status: attendee.status,
+      },
+    ])
+    // Clear search
+    setSearchQuery('')
+    setShowSearchResults(false)
+    // Open inviter modal
+    setShowInviterModal(true)
+  }
+
   // Toggle attendee selection for bulk check-in
   const toggleAttendeeSelection = (attendeeId: string) => {
     const newSelected = new Set(selectedAttendees)
@@ -238,9 +316,65 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     setSelectedAttendees(newSelected)
   }
 
+  // Toggle group expansion
+  const toggleGroupExpansion = (groupKey: string) => {
+    const newExpanded = new Set(expandedGroups)
+    if (newExpanded.has(groupKey)) {
+      newExpanded.delete(groupKey)
+    } else {
+      newExpanded.add(groupKey)
+    }
+    setExpandedGroups(newExpanded)
+  }
+
   // Get attendance records
   const attendance = attendanceData?.page || []
   const totalCount = stats?.total || attendance.length
+
+  // Group attendance records by inviter
+  const attendanceByInviter = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        inviter: { _id: string; firstName: string; lastName: string } | null
+        records: AttendanceRecordItem[]
+      }
+    >()
+
+    // Walk-in group (no inviter)
+    groups.set('walk-in', {
+      inviter: null,
+      records: [],
+    })
+
+    attendance.forEach((record) => {
+      if (record.inviter) {
+        const key = record.inviter._id
+        if (!groups.has(key)) {
+          groups.set(key, {
+            inviter: record.inviter,
+            records: [],
+          })
+        }
+        groups.get(key)!.records.push(record)
+      } else {
+        groups.get('walk-in')!.records.push(record)
+      }
+    })
+
+    // Convert to array and sort: inviters alphabetically, walk-in at end
+    const sortedGroups = Array.from(groups.entries())
+      .filter(([_, group]) => group.records.length > 0)
+      .sort((a, b) => {
+        if (a[0] === 'walk-in') return 1
+        if (b[0] === 'walk-in') return -1
+        const nameA = `${a[1].inviter?.firstName || ''} ${a[1].inviter?.lastName || ''}`
+        const nameB = `${b[1].inviter?.firstName || ''} ${b[1].inviter?.lastName || ''}`
+        return nameA.localeCompare(nameB)
+      })
+
+    return sortedGroups
+  }, [attendance])
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -308,9 +442,25 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                       </div>
                     ) : availableAttendees.length === 0 ? (
                       <CommandEmpty>
-                        {searchResults?.length === 0
-                          ? 'No attendees found'
-                          : 'All matching attendees are already checked in'}
+                        {searchResults?.length === 0 ? (
+                          <div className="p-4 text-center space-y-2">
+                            <p className="text-muted-foreground">
+                              No attendees found
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCreateAttendee}
+                              className="w-full"
+                            >
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Create new attendee: &quot;{debouncedSearchQuery}
+                              &quot;
+                            </Button>
+                          </div>
+                        ) : (
+                          'All matching attendees are already checked in'
+                        )}
                       </CommandEmpty>
                     ) : (
                       <CommandGroup
@@ -457,6 +607,19 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
         </div>
       )}
 
+      {/* View Toggle Tabs */}
+      {attendance.length > 0 && (
+        <Tabs
+          value={viewMode}
+          onValueChange={(value) => setViewMode(value as 'list' | 'byInviter')}
+        >
+          <TabsList className="grid w-full sm:w-auto grid-cols-2">
+            <TabsTrigger value="list">List View</TabsTrigger>
+            <TabsTrigger value="byInviter">By Inviter</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
+
       {/* Attendance Table Card */}
       <Card>
         <CardHeader>
@@ -481,13 +644,15 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                 Search above to check someone in
               </p>
             </div>
-          ) : (
+          ) : viewMode === 'list' ? (
+            /* List View */
             <div className="overflow-x-auto -mx-6 px-6">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Invited By</TableHead>
                     <TableHead>Check-in Time</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -532,6 +697,17 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                           <Badge variant="outline">Unknown</Badge>
                         )}
                       </TableCell>
+                      <TableCell>
+                        {record.inviter ? (
+                          <span className="text-sm">
+                            {record.inviter.firstName} {record.inviter.lastName}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">
+                            Walk-in
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell>{formatTime(record.checkedInAt)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -542,13 +718,14 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                             <MoreHorizontal className="h-4 w-4" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {record.attendee?._id && (
+                            {record.attendee && (
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation()
+                                  const attendeeId = record.attendee!._id
                                   navigate({
                                     to: '/attendees/$id',
-                                    params: { id: record.attendee._id },
+                                    params: { id: attendeeId },
                                   })
                                 }}
                               >
@@ -572,6 +749,131 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          ) : (
+            /* By Inviter View */
+            <div className="space-y-4">
+              {attendanceByInviter.map(([groupKey, group]) => (
+                <Collapsible
+                  key={groupKey}
+                  open={expandedGroups.has(groupKey)}
+                  onOpenChange={() => toggleGroupExpansion(groupKey)}
+                >
+                  <div className="border rounded-lg">
+                    <CollapsibleTrigger className="w-full">
+                      <div className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          {expandedGroups.has(groupKey) ? (
+                            <ChevronUp className="size-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="size-4 text-muted-foreground" />
+                          )}
+                          <div className="flex items-center gap-2">
+                            <Users className="size-4 text-muted-foreground" />
+                            <span className="font-medium">
+                              {group.inviter
+                                ? `${group.inviter.firstName} ${group.inviter.lastName}`
+                                : 'Walk-in'}
+                            </span>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {group.records.length}
+                        </Badge>
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="border-t overflow-x-auto">
+                        <Table>
+                          <TableBody>
+                            {group.records.map((record) => (
+                              <TableRow
+                                key={record._id}
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() =>
+                                  record.attendee?._id &&
+                                  navigate({
+                                    to: '/attendees/$id',
+                                    params: { id: record.attendee._id },
+                                  })
+                                }
+                              >
+                                <TableCell className="font-medium">
+                                  {record.attendee ? (
+                                    <>
+                                      {record.attendee.firstName}{' '}
+                                      {record.attendee.lastName}
+                                    </>
+                                  ) : (
+                                    <span className="text-muted-foreground">
+                                      Unknown Attendee
+                                    </span>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {record.attendee ? (
+                                    <Badge
+                                      variant={getStatusBadgeVariant(
+                                        record.attendee.status,
+                                      )}
+                                    >
+                                      {record.attendee.status === 'member'
+                                        ? 'Member'
+                                        : 'Visitor'}
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline">Unknown</Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {formatTime(record.checkedInAt)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {record.attendee && (
+                                        <DropdownMenuItem
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            const attendeeId =
+                                              record.attendee!._id
+                                            navigate({
+                                              to: '/attendees/$id',
+                                              params: { id: attendeeId },
+                                            })
+                                          }}
+                                        >
+                                          View Profile
+                                        </DropdownMenuItem>
+                                      )}
+                                      <DropdownMenuItem
+                                        className="text-destructive"
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          setDeleteRecordId(record._id)
+                                        }}
+                                      >
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Remove
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              ))}
             </div>
           )}
         </CardContent>
@@ -632,6 +934,24 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create Attendee Modal */}
+      <CreateAttendeeModal
+        open={showCreateAttendeeModal}
+        onSave={handleAttendeeCreated}
+        onClose={() => setShowCreateAttendeeModal(false)}
+      />
+
+      {/* Inviter Selection Modal */}
+      <InviterSelectionModal
+        open={showInviterModal}
+        onSelect={handleInviterSelect}
+        onClose={() => {
+          setShowInviterModal(false)
+          setPendingAttendees([])
+        }}
+        excludeAttendeeIds={pendingAttendees.map((a) => a.attendeeId)}
+      />
     </div>
   )
 }
