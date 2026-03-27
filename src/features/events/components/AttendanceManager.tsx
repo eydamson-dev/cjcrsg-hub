@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { cn } from '~/lib/utils'
 import {
   Search,
-  Plus,
   Trash2,
   X,
   Users,
@@ -211,27 +210,28 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     hasPrevious: !!cursor,
   }
 
-  // Handle single check-in (now opens inviter modal)
-  const handleCheckIn = (attendee: AttendeeToCheckIn) => {
-    setPendingAttendees([attendee])
-    setShowInviterModal(true)
-  }
-
-  // Handle bulk check-in (now opens inviter modal)
-  const handleBulkCheckIn = () => {
+  // Handle check-in (defaults to Walk-in)
+  const handleBulkCheckIn = async () => {
     if (selectedAttendees.size === 0) return
 
     const attendeesToCheckIn = availableAttendees
       .filter((attendee) => selectedAttendees.has(attendee._id))
       .map((attendee) => ({
         attendeeId: attendee._id,
-        firstName: attendee.firstName,
-        lastName: attendee.lastName,
-        status: attendee.status,
+        // invitedBy is undefined = Walk-in
       }))
 
-    setPendingAttendees(attendeesToCheckIn)
-    setShowInviterModal(true)
+    try {
+      await bulkCheckIn.mutateAsync({
+        eventId,
+        attendees: attendeesToCheckIn,
+      })
+      setSearchQuery('')
+      setShowSearchResults(false)
+      setSelectedAttendees(new Set())
+    } catch (error) {
+      // Error is handled by the hook
+    }
   }
 
   // Handle inviter selection from modal
@@ -463,56 +463,72 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                         )}
                       </CommandEmpty>
                     ) : (
-                      <CommandGroup
-                        heading={`${availableAttendees.length} available`}
-                      >
-                        {availableAttendees.map((attendee) => (
-                          <CommandItem
-                            key={attendee._id}
-                            className="flex items-center justify-between py-2 cursor-pointer"
-                            onSelect={() => {
-                              if (selectedAttendees.size > 0) {
+                      <>
+                        <CommandGroup
+                          heading={`${availableAttendees.length} available`}
+                        >
+                          {availableAttendees.map((attendee) => (
+                            <CommandItem
+                              key={attendee._id}
+                              className="flex items-center justify-between py-2 cursor-pointer"
+                              onSelect={() => {
                                 toggleAttendeeSelection(attendee._id)
-                              } else {
-                                handleCheckIn({
-                                  attendeeId: attendee._id,
-                                  firstName: attendee.firstName,
-                                  lastName: attendee.lastName,
-                                  status: attendee.status,
-                                })
-                              }
-                            }}
-                          >
-                            <div className="flex items-center gap-3">
-                              <Checkbox
-                                checked={selectedAttendees.has(attendee._id)}
-                                onCheckedChange={() =>
-                                  toggleAttendeeSelection(attendee._id)
-                                }
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <span className="font-medium">
-                                {attendee.firstName} {attendee.lastName}
-                              </span>
-                              <Badge
-                                variant={
-                                  attendee.status === 'member'
-                                    ? 'default'
-                                    : 'secondary'
-                                }
-                                className="text-xs"
+                              }}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={selectedAttendees.has(attendee._id)}
+                                  onCheckedChange={() =>
+                                    toggleAttendeeSelection(attendee._id)
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="font-medium">
+                                  {attendee.firstName} {attendee.lastName}
+                                </span>
+                                <Badge
+                                  variant={
+                                    attendee.status === 'member'
+                                      ? 'default'
+                                      : 'secondary'
+                                  }
+                                  className="text-xs"
+                                >
+                                  {attendee.status === 'member'
+                                    ? 'Member'
+                                    : 'Visitor'}
+                                </Badge>
+                              </div>
+                              {selectedAttendees.has(attendee._id) && (
+                                <Check className="size-4 text-primary" />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                        {selectedAttendees.size > 0 && (
+                          <div className="border-t p-2 flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                              {selectedAttendees.size} selected
+                            </span>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedAttendees(new Set())}
                               >
-                                {attendee.status === 'member'
-                                  ? 'Member'
-                                  : 'Visitor'}
-                              </Badge>
+                                Clear
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={handleBulkCheckIn}
+                                disabled={bulkCheckIn.isPending}
+                              >
+                                Add {selectedAttendees.size}
+                              </Button>
                             </div>
-                            {selectedAttendees.has(attendee._id) && (
-                              <Check className="size-4 text-primary" />
-                            )}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                          </div>
+                        )}
+                      </>
                     )}
                   </CommandList>
                 </Command>
@@ -529,47 +545,6 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           >
             Type at least 3 characters to search
           </p>
-        </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          {/* Selection count display */}
-          {selectedAttendees.size > 0 && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mr-2">
-              <span>{selectedAttendees.size} selected</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedAttendees(new Set())}
-              >
-                Clear
-              </Button>
-            </div>
-          )}
-          {/* Add Button */}
-          {selectedAttendees.size === 0 ? (
-            <Button
-              onClick={() => {
-                setShowSearchResults(true)
-                const searchInput = document.querySelector(
-                  'input[placeholder="Search attendee to add..."]',
-                ) as HTMLInputElement
-                searchInput?.focus()
-              }}
-              disabled={checkIn.isPending}
-              className="flex-1 sm:flex-none"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Attendee
-            </Button>
-          ) : (
-            <Button
-              onClick={handleBulkCheckIn}
-              disabled={bulkCheckIn.isPending}
-              className="flex-1 sm:flex-none"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add {selectedAttendees.size}
-            </Button>
-          )}
         </div>
       </div>
 
