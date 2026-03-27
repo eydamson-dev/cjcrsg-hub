@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   UserPlus,
+  Plus,
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -78,6 +79,7 @@ import {
 import { useNavigate } from '@tanstack/react-router'
 import { CreateAttendeeModal } from './CreateAttendeeModal'
 import { InviterSelectionModal } from './InviterSelectionModal'
+import { AttendeeSearchModal } from './AttendeeSearchModal'
 import type { Attendee } from '~/features/attendees/types'
 
 interface AttendanceManagerProps {
@@ -168,6 +170,13 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     string | null
   >(null)
   const [attendeeNameForModal, setAttendeeNameForModal] = useState<string>('')
+
+  // State for group quick-add modal
+  const [showAttendeeSearchModal, setShowAttendeeSearchModal] = useState(false)
+  const [selectedInviterForGroupAdd, setSelectedInviterForGroupAdd] = useState<{
+    id: string | null
+    name: string
+  } | null>(null)
 
   // Get already checked-in attendee IDs
   const checkedInAttendeeIds = useMemo(() => {
@@ -311,6 +320,40 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
         attendanceRecordId: recordId,
         invitedBy: undefined, // Set to undefined = walk-in
       })
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  }
+
+  // Handle opening attendee search for group quick-add
+  const handleOpenGroupAdd = (
+    inviter: { _id: string; firstName: string; lastName: string } | null,
+  ) => {
+    setSelectedInviterForGroupAdd({
+      id: inviter?._id || null,
+      name: inviter ? `${inviter.firstName} ${inviter.lastName}` : 'Walk-in',
+    })
+    setShowAttendeeSearchModal(true)
+  }
+
+  // Handle attendees selected from AttendeeSearchModal
+  const handleAttendeesSelectedForGroup = async (attendeeIds: string[]) => {
+    if (!selectedInviterForGroupAdd || attendeeIds.length === 0) return
+
+    try {
+      // Check in all selected attendees with the pre-selected inviter
+      const attendeesToCheckIn = attendeeIds.map((id) => ({
+        attendeeId: id,
+        invitedBy: selectedInviterForGroupAdd.id || undefined,
+      }))
+
+      await bulkCheckIn.mutateAsync({
+        eventId,
+        attendees: attendeesToCheckIn,
+      })
+
+      setShowAttendeeSearchModal(false)
+      setSelectedInviterForGroupAdd(null)
     } catch (error) {
       // Error is handled by the hook
     }
@@ -927,9 +970,22 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                             </span>
                           </div>
                         </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {group.records.length}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {group.records.length}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleOpenGroupAdd(group.inviter)
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -1113,6 +1169,20 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
             : 'Select Inviter'
         }
       />
+
+      {/* Attendee Search Modal for Group Quick-Add */}
+      {selectedInviterForGroupAdd && (
+        <AttendeeSearchModal
+          open={showAttendeeSearchModal}
+          inviterName={selectedInviterForGroupAdd.name}
+          onSelect={handleAttendeesSelectedForGroup}
+          onClose={() => {
+            setShowAttendeeSearchModal(false)
+            setSelectedInviterForGroupAdd(null)
+          }}
+          excludeAttendeeIds={attendance.map((r) => r.attendeeId)}
+        />
+      )}
     </div>
   )
 }
