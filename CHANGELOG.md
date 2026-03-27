@@ -145,6 +145,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Archive Query Bug** - Fixed `listArchive` query in `convex/events/queries.ts`
+  - Changed filter from `isActive=true` to `isActive=false` to properly show archived events
+  - Previously the archive was showing non-archived (active) events instead of archived ones
+  - This was discovered while debugging the "archive event" E2E test
+
 - **EventTypeList Tests** - Fixed 6 previously skipped delete confirmation tests
   - Enabled all delete functionality tests (opens dialog, shows name, calls mutation, closes on cancel, loading state, disabled buttons)
   - Added `data-testid` to delete button for reliable test targeting

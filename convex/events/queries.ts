@@ -168,7 +168,8 @@ export const listArchive = query({
   handler: async (ctx, args) => {
     const { paginationOpts, eventTypeId, dateFrom, dateTo } = args
 
-    let eventsQuery = ctx.db
+    // Filter by isActive = false (archived events only)
+    const eventsQuery = ctx.db
       .query('events')
       .withIndex('by_date_status', (q) => {
         let q2 = q
@@ -179,17 +180,18 @@ export const listArchive = query({
       .filter((q) =>
         q.and(
           q.neq(q.field('status'), 'active'),
-          q.eq(q.field('isActive'), true),
+          q.eq(q.field('isActive'), false),
         ),
       )
 
+    let filteredQuery = eventsQuery
     if (eventTypeId !== undefined) {
-      eventsQuery = eventsQuery.filter((q) =>
+      filteredQuery = filteredQuery.filter((q) =>
         q.eq(q.field('eventTypeId'), eventTypeId),
       )
     }
 
-    const result = await eventsQuery.order('desc').paginate(paginationOpts)
+    const result = await filteredQuery.order('desc').paginate(paginationOpts)
 
     // Join eventType data and attendance count for each event
     const pageWithDetails = await Promise.all(
