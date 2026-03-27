@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import {
   AttendeeDetails,
   AttendeeDetailsSkeleton,
@@ -16,6 +16,7 @@ export const Route = createFileRoute('/attendees/$id/')({
 
 function AttendeeDetailPage() {
   const navigate = useNavigate()
+  const router = useRouter()
   const { id } = Route.useParams()
   const { data: attendee, isPending, error } = useAttendee(id)
 
@@ -24,7 +25,8 @@ function AttendeeDetailPage() {
   }
 
   const handleBack = () => {
-    navigate({ to: '/attendees' })
+    if (router.history.canGoBack()) router.history.back()
+    else navigate({ to: '/attendees' })
   }
 
   const handleRetry = () => {
