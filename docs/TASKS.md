@@ -3,8 +3,8 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-27  
-**Current Phase:** Phase 6 - Event History & EventList Component  
-**Status:** ✅ Completed
+**Current Phase:** Phase 7 - Attendance Inviter Tracking  
+**Status:** 🚧 In Progress | Task 7.1 - Create Modals & Enhanced AttendanceManager
 
 ---
 
@@ -76,6 +76,133 @@ Complete feature catalog for the church management system.
   - Added back link to events index
 - ✅ **Navigation:** Added Event History button to events index page
   - Button order: Create Event | Event History | Archive
+
+### Phase 7: Attendance Inviter Tracking
+
+**Status:** 🚧 In Progress
+**Goal:** Enhance attendance tracking with inviter selection, inline attendee creation, and grouped view by inviter
+
+#### Task 7.1: Create Supporting Modals
+
+**Status:** ✅ Completed
+**Files Created:**
+
+- `src/features/events/components/CreateAttendeeModal.tsx`
+  - ✅ Wraps `AttendeeForm` in Dialog component
+  - ✅ Props: `open: boolean`, `onSave: (attendee: Attendee) => void`, `onClose: () => void`
+  - ✅ Uses existing `useCreateAttendee` hook
+  - ✅ Returns created attendee data to parent component
+  - ✅ Modal with max height and scroll support for long forms
+- `src/features/events/components/InviterSelectionModal.tsx`
+  - ✅ Searchable list of all attendees (anyone can be inviter)
+  - ✅ "Walk-in" option at top (no inviter) with prominent button
+  - ✅ Shows attendee name + status badge (Member/Visitor)
+  - ✅ Props: `open: boolean`, `onSelect: (inviterId: string | null) => void`, `onClose: () => void`
+  - ✅ Uses `useSearchAttendees` hook for search
+  - ✅ Can exclude specific attendee IDs (for preventing self-invitation)
+  - ✅ Visual distinction between walk-in and inviter options
+
+#### Task 7.2: Enhance AttendanceManager Component
+
+**Status:** ⏳ Pending
+**File to Modify:** `src/features/events/components/AttendanceManager.tsx`
+
+**A. View Mode Toggle**
+
+- Add `viewMode` state: `'list' | 'byInviter'`
+- Add Tabs component above table with two options:
+  - "List View" - Current table view
+  - "By Inviter" - Grouped expandable view
+- Default to 'list' view
+
+**B. Enhanced Table (List View)**
+
+- Add "Invited By" column between "Check-in Time" and "Actions"
+- Shows inviter name (e.g., "John Smith") or "Walk-in" if no inviter
+- Clicking inviter name does nothing (non-interactive)
+
+**C. Grouped View (By Inviter)**
+
+- Accordion-style expandable groups using shadcn Collapsible
+- Each group header shows: Inviter name + count badge
+- Click header toggles expand/collapse
+- Groups:
+  - Individual inviters (alphabetically sorted)
+  - "Walk-in" group at bottom (attendees with no inviter)
+- Subrows show: Attendee name, status, check-in time
+- Same actions dropdown as list view
+
+**D. Enhanced Check-in Flow**
+
+**Single Check-in:**
+
+1. User searches and clicks attendee in dropdown
+2. Opens `InviterSelectionModal`
+3. User selects inviter or "Walk-in"
+4. Calls `checkIn` mutation with `invitedBy` field
+5. Closes modal, clears search, refreshes list
+
+**Bulk Check-in:**
+
+1. User selects multiple attendees via checkboxes
+2. Clicks "Add X" button (X = selected count)
+3. Opens `InviterSelectionModal`
+4. User selects inviter (same inviter applies to all)
+5. Calls `bulkCheckIn` mutation with `invitedBy` field
+6. Closes modal, clears selection, refreshes list
+
+**Create Attendee Flow:**
+
+1. User searches with no results
+2. Shows option in dropdown: "Create new attendee: '{searchQuery}'"
+3. User clicks option → opens `CreateAttendeeModal`
+4. User fills form and saves
+5. Modal closes, new attendee automatically appears in search
+6. User selects new attendee → continues to inviter selection
+
+#### Task 7.3: Update Types & Interfaces
+
+**Status:** ⏳ Pending
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+Update `AttendanceRecordItem` interface:
+
+```typescript
+interface AttendanceRecordItem {
+  _id: string
+  eventId: string
+  attendeeId: string
+  checkedInAt: number
+  checkedInBy: string
+  notes?: string
+  invitedBy?: string // Add this field
+  attendee: {
+    _id: string
+    firstName: string
+    lastName: string
+    status: 'member' | 'visitor' | 'inactive'
+    email?: string
+    phone?: string
+  } | null
+  inviter?: {
+    // Add this field
+    _id: string
+    firstName: string
+    lastName: string
+  } | null
+}
+```
+
+#### Task 7.4: Testing & Validation
+
+**Status:** ⏳ Pending
+
+- Manual test: Single check-in with inviter
+- Manual test: Bulk check-in with inviter
+- Manual test: Create attendee inline
+- Manual test: Toggle between list and by-inviter views
+- Manual test: Expand/collapse inviter groups
+- Manual test: Walk-in (no inviter) flows correctly
 
 ---
 
