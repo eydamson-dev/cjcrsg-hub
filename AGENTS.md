@@ -2,9 +2,103 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 5 - Event Management (Complete)  
-**Last Updated:** 2026-03-25  
-**Tests:** 164 passing (37 Convex + 100 Component + 27 E2E)
+**Status:** Phase 6 - Event History & EventList Component (Complete)  
+**Last Updated:** 2026-03-27
+
+---
+
+## About
+
+### Purpose & Mission
+
+CJCRSG-Hub is a comprehensive church management platform designed to streamline administrative tasks and enhance community engagement. The system helps churches track members, organize events, and monitor attendance—all in one centralized, user-friendly interface.
+
+**Core Mission:**
+
+- Simplify church administration through digital tools
+- Provide real-time insights into church activities and attendance
+- Enable efficient event planning and management
+- Foster better community connection through organized data
+
+### Key Features
+
+**Attendee Management**
+
+- Complete member and visitor tracking with detailed profiles
+- Real-time search across names, emails, and phone numbers
+- Status categorization (Member, Visitor, Inactive)
+- Inviter tracking to understand community growth
+
+**Event Management**
+
+- Dynamic event types with custom color coding
+- Full event lifecycle: Upcoming → Active → Completed/Cancelled
+- Real-time attendance tracking during events
+- Media galleries for event photos and banners
+
+**Attendance Tracking**
+
+- Quick check-in interface optimized for mobile devices
+- Bulk check-in capabilities for efficient processing
+- Detailed attendance statistics and reporting
+- Per-event and historical attendance views
+
+**Administrative Tools**
+
+- Server-side pagination for large datasets
+- Advanced filtering and search capabilities
+- Responsive design for desktop and mobile use
+- Export-ready data structure
+
+### Current Capabilities
+
+The system is fully functional for core church operations:
+
+✅ **Authentication & Security**
+
+- Multi-provider authentication (Email, Google, Facebook)
+- Protected routes with role-based access
+- Secure session management
+
+✅ **Data Management**
+
+- Complete CRUD operations for all entities
+- Real-time data synchronization via Convex
+- Soft-delete functionality with archive recovery
+- Form validation with user-friendly error handling
+
+✅ **Event Operations**
+
+- Create and manage unlimited events
+- Track attendance with check-in/check-out
+- View event history and analytics
+- Manage event media and documentation
+
+✅ **User Experience**
+
+- Responsive layout optimized for all devices
+- Mobile-first check-in interface
+- Intuitive navigation with breadcrumb trails
+- Loading states and empty state handling
+
+---
+
+## Current Status
+
+**Recently Completed:**
+
+- ✅ Phase 6: Event History page with server-side pagination
+- ✅ Reusable EventList component with table/cards views
+- ✅ New Convex queries: listActive, countActive, countArchived
+- ✅ Server-side filtering and pagination for archive page
+
+**Next Up:**
+
+- ⏳ Attendance reporting & analytics
+- ⏳ Dashboard statistics widgets
+- ⏳ Data export to CSV
+
+**See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 
 ---
 
@@ -34,7 +128,7 @@ pnpm dev
 ### 📋 Documentation
 
 - **[Tasks](docs/TASKS.md)** - Feature catalog and implementation status
-- **[TDD Tasks](docs/TDD_TASKS.md)** - Testing workflow and test coverage
+- **[TDD Tasks](docs/TDD_TASKS.md)** - Testing workflow and coverage details
 - **[Commands](docs/COMMANDS.md)** - All CLI commands
 - **[Conventions](docs/CONVENTIONS.md)** - Code standards & UI guidelines
 - **[Git Workflow](docs/GIT.md)** - Version control guide
@@ -116,50 +210,6 @@ pnpm dlx convex deploy      # Deploy to production
 
 ---
 
-## Implementation Status
-
-### ✅ Completed Features
-
-**Core Infrastructure**
-
-- Authentication (Email + Google + Facebook OAuth)
-- Protected routes with route guards
-- Responsive layout with sidebar and mobile navigation
-
-**Attendee Management**
-
-- Full CRUD operations (Create, Read, Update, Archive)
-- Real-time search with filters and pagination
-- Detailed attendee profiles
-- Form validation with react-hook-form + Zod
-
-**Event Types (Admin)**
-
-- Dynamic event categories with custom colors
-- Color picker with react-colorful
-- Inline editing via modal
-- 48 unit tests passing
-
-**Event Management**
-
-- Event lifecycle (upcoming → active → completed/cancelled)
-- Event dashboard with real-time attendance
-- Bulk check-in functionality
-- Archive page with filters
-- Inline editing and media gallery
-- Image upload and management
-
-### 📅 Upcoming Features
-
-- Attendance reporting & analytics
-- Dashboard with statistics widgets
-- Data export to CSV
-- Toast notifications
-
-**See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
-
----
-
 ## Development Workflow
 
 **Note:** All git operations use native `git` CLI commands. See [docs/GIT.md](docs/GIT.md) for complete workflow.
@@ -195,38 +245,6 @@ git push -u origin feature-name
 
 # Create PR on GitHub (you manually approve)
 ```
-
----
-
-## Development Tools
-
-### AI Assistants
-
-- **shadcn/ui MCP** - Component management and recommendations
-- **Skills** - Located in `.agents/skills/` for detailed guidance
-  - `cjcrsg-hub/` - Project-specific patterns and workflows
-  - `shadcn/` - shadcn/ui component usage
-
-### VS Code Extensions
-
-- **Convex** - Official Convex extension
-- **Tailwind CSS IntelliSense** - Autocomplete for Tailwind
-- **TypeScript Importer** - Auto-imports
-- **ESLint** - Linting
-- **Prettier** - Code formatting
-
----
-
-## Testing Summary
-
-| Category    | Count   | Status             |
-| ----------- | ------- | ------------------ |
-| Convex Unit | 37      | ✅ Passing         |
-| Component   | 100     | ✅ Passing         |
-| E2E         | 27      | ✅ Passing         |
-| **Total**   | **164** | **✅ All Passing** |
-
-**See [docs/TDD_TASKS.md](docs/TDD_TASKS.md) for detailed testing workflow.**
 
 ---
 

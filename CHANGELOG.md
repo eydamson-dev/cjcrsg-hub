@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 6: Event History & EventList Component** - New Event History page and reusable EventList component with server-side pagination
+  - New route: `/events/history` - Event History page for viewing active events (isActive=true)
+  - `src/features/events/components/EventList.tsx`: Reusable event display component
+    - View modes: Table (default) and Cards with toggle buttons
+    - Server-side filters: Event Type dropdown, Status dropdown (all 4 statuses), Search input
+    - Table view columns: Banner, Event Name, Date, Status, Type, Attendance, Actions
+    - Cards view: Responsive grid with event cards showing image, name, date, status, attendance
+    - Server-side pagination: Previous/Next buttons, page size selector (10, 25, 50), page info display
+    - Loading skeleton state with EventListSkeleton component
+    - Empty states for no events and no filter matches
+  - `src/features/events/components/EventListSkeleton.tsx`: Loading skeleton for table and cards views
+  - Convex queries: `listActive`, `countActive`, `countArchived`, updated `listArchive`
+    - All queries support filtering by eventTypeId, status, search, dateFrom, dateTo
+    - Uses `by_active_date` index for efficient isActive filtering
+    - Returns paginated events with joined eventType data and attendanceCount
+  - React hooks: `useActiveEvents`, `useActiveEventCount`, `useArchivedEvents`, `useArchivedEventCount`
+    - Support pagination options and all filter parameters
+    - Marked old `useArchiveEvents` as deprecated
+  - `src/routes/events.archive.tsx`: Refactored with server-side pagination
+    - URL-based pagination with search params (page, type, status, q)
+    - Cursor history management for Convex pagination
+    - Debounced search (300ms delay)
+    - Page size persistence in localStorage
+  - `src/features/events/components/EventArchive.tsx`: Refactored to use EventList internally
+    - Removed client-side filtering and pagination logic
+    - Now a wrapper component that passes props to EventList
+    - Maintains breadcrumbs and optional back link functionality
+  - `src/routes/events.index.tsx`: Added Event History navigation button
+    - Button order: Create Event | Event History | Archive
+    - Uses History and Archive icons from Lucide
+  - Navigation breadcrumbs: Added EventsBreadcrumb and BackLink to Event History and Archive pages
+    - Event History shows "Events > History" breadcrumb with back link
+    - Event Archive shows "Events > Archive" breadcrumb with back link
+
 - **Phase 9.1: Event Components Tests** - Comprehensive test suite for event management UI components
   - `tests/unit/events/components/BasicInfoEditModal.test.tsx`: 10 tests covering rendering, validation, and modal state
   - `tests/unit/events/components/EventDetails.test.tsx`: 18 tests for dashboard/detail modes, status actions, and modal interactions

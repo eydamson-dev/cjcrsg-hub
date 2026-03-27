@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { Button } from '~/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, History, Archive } from 'lucide-react'
 import { requireAuth } from '~/lib/auth-guard'
 import { EmptyEventState } from '~/features/events/components/EmptyEventState'
 import { EventDetails } from '~/features/events/components/EventDetails'
@@ -128,17 +128,33 @@ function EventsContent() {
   if (unsavedEvent) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Events</h1>
             <p className="text-muted-foreground">
               Manage church events and services
             </p>
           </div>
-          <Button onClick={() => (window.location.href = '/events/new')}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Event
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/events/history')}
+            >
+              <History className="mr-2 h-4 w-4" />
+              Event History
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/events/archive')}
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              Archive
+            </Button>
+            <Button onClick={() => (window.location.href = '/events/new')}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Event
+            </Button>
+          </div>
         </div>
 
         <EventDetails
@@ -187,17 +203,33 @@ function EventsContent() {
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Events</h1>
             <p className="text-muted-foreground">
               Manage church events and services
             </p>
           </div>
-          <Button onClick={() => (window.location.href = '/events/new')}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Event
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/events/history')}
+            >
+              <History className="mr-2 h-4 w-4" />
+              Event History
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/events/archive')}
+            >
+              <Archive className="mr-2 h-4 w-4" />
+              Archive
+            </Button>
+            <Button onClick={() => (window.location.href = '/events/new')}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Event
+            </Button>
+          </div>
         </div>
 
         <EventDetails event={event} mode="dashboard" />
@@ -220,17 +252,33 @@ function EventsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Events</h1>
           <p className="text-muted-foreground">
             Manage church events and services
           </p>
         </div>
-        <Button onClick={() => (window.location.href = '/events/new')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Event
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = '/events/history')}
+          >
+            <History className="mr-2 h-4 w-4" />
+            Event History
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = '/events/archive')}
+          >
+            <Archive className="mr-2 h-4 w-4" />
+            Archive
+          </Button>
+          <Button onClick={() => (window.location.href = '/events/new')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Event
+          </Button>
+        </div>
       </div>
 
       <EmptyEventState

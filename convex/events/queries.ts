@@ -35,9 +35,9 @@ export const list = query({
       eventsQuery = ctx.db
         .query('events')
         .withIndex('by_date_status', (q) => {
-          let q2 = q
-          if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom) as typeof q
-          if (dateTo !== undefined) q2 = q2.lte('date', dateTo) as typeof q
+          let q2: any = q
+          if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+          if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
           return q2
         })
         .filter((q) =>
@@ -51,9 +51,9 @@ export const list = query({
       eventsQuery = ctx.db
         .query('events')
         .withIndex('by_date', (q) => {
-          let q2 = q
-          if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom) as typeof q
-          if (dateTo !== undefined) q2 = q2.lte('date', dateTo) as typeof q
+          let q2: any = q
+          if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+          if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
           return q2
         })
         .filter((q) => q.eq(q.field('isActive'), true))
@@ -151,47 +151,67 @@ export const getCurrentEvent = query({
 })
 
 /**
- * Get all events except active for the archive page.
- * - Excludes status='active' (shown on dashboard)
- * - Includes: upcoming, completed, cancelled
- * - Optional additional filters: eventTypeId, dateFrom, dateTo
- * - Order: date descending (most recent events first)
- * - Includes joined eventType: { name, color } and attendanceCount
+ * List active events (isActive=true) with optional filters and pagination.
+ * - For Event History page
+ * - Filters: eventTypeId, status, search, dateFrom, dateTo
+ * - Uses by_active_date index
+ * - Order: date descending (newest first)
+ * - Each result includes joined eventType data and attendanceCount
  */
-export const listArchive = query({
+export const listActive = query({
   args: {
     paginationOpts: paginationOptsValidator,
     eventTypeId: v.optional(v.id('eventTypes')),
+    status: v.optional(
+      v.union(
+        v.literal('upcoming'),
+        v.literal('active'),
+        v.literal('completed'),
+        v.literal('cancelled'),
+      ),
+    ),
+    search: v.optional(v.string()),
     dateFrom: v.optional(v.number()),
     dateTo: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, eventTypeId, dateFrom, dateTo } = args
+    const { paginationOpts, eventTypeId, status, search, dateFrom, dateTo } =
+      args
 
-    // Filter by isActive = false (archived events only)
-    const eventsQuery = ctx.db
+    // Use by_active_date index: ['isActive', 'date']
+    let eventsQuery = ctx.db
       .query('events')
-      .withIndex('by_date_status', (q) => {
-        let q2 = q
-        if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom) as typeof q
-        if (dateTo !== undefined) q2 = q2.lte('date', dateTo) as typeof q
+      .withIndex('by_active_date', (q) => {
+        let q2: any = q.eq('isActive', true)
+        if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+        if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
         return q2
       })
-      .filter((q) =>
-        q.and(
-          q.neq(q.field('status'), 'active'),
-          q.eq(q.field('isActive'), false),
-        ),
-      )
 
-    let filteredQuery = eventsQuery
+    // Apply status filter if provided
+    if (status !== undefined) {
+      eventsQuery = eventsQuery.filter((q) => q.eq(q.field('status'), status))
+    }
+
+    // Apply eventTypeId filter if provided
     if (eventTypeId !== undefined) {
-      filteredQuery = filteredQuery.filter((q) =>
+      eventsQuery = eventsQuery.filter((q) =>
         q.eq(q.field('eventTypeId'), eventTypeId),
       )
     }
 
-    const result = await filteredQuery.order('desc').paginate(paginationOpts)
+    // Apply search filter if provided (case-insensitive name search)
+    if (search && search.trim().length > 0) {
+      const searchLower = search.toLowerCase()
+      eventsQuery = eventsQuery.filter((q) =>
+        q.and(
+          q.gte(q.field('name'), searchLower),
+          q.lte(q.field('name'), searchLower + '\uffff'),
+        ),
+      )
+    }
+
+    const result = await eventsQuery.order('desc').paginate(paginationOpts)
 
     // Join eventType data and attendance count for each event
     const pageWithDetails = await Promise.all(
@@ -214,6 +234,209 @@ export const listArchive = query({
     )
 
     return { ...result, page: pageWithDetails }
+  },
+})
+
+/**
+ * List archived events (isActive=false) with optional filters and pagination.
+ * - Updated version with status filter and search support
+ * - Filters: eventTypeId, status, search, dateFrom, dateTo
+ * - Uses by_active_date index
+ * - Order: date descending (most recent events first)
+ * - Each result includes joined eventType data and attendanceCount
+ */
+export const listArchive = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    eventTypeId: v.optional(v.id('eventTypes')),
+    status: v.optional(
+      v.union(
+        v.literal('upcoming'),
+        v.literal('active'),
+        v.literal('completed'),
+        v.literal('cancelled'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    dateFrom: v.optional(v.number()),
+    dateTo: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, eventTypeId, status, search, dateFrom, dateTo } =
+      args
+
+    // Use by_active_date index: ['isActive', 'date']
+    let eventsQuery = ctx.db
+      .query('events')
+      .withIndex('by_active_date', (q) => {
+        let q2: any = q.eq('isActive', false)
+        if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+        if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
+        return q2
+      })
+
+    // Apply status filter if provided
+    if (status !== undefined) {
+      eventsQuery = eventsQuery.filter((q) => q.eq(q.field('status'), status))
+    }
+
+    // Apply eventTypeId filter if provided
+    if (eventTypeId !== undefined) {
+      eventsQuery = eventsQuery.filter((q) =>
+        q.eq(q.field('eventTypeId'), eventTypeId),
+      )
+    }
+
+    // Apply search filter if provided
+    if (search && search.trim().length > 0) {
+      const searchLower = search.toLowerCase()
+      eventsQuery = eventsQuery.filter((q) =>
+        q.and(
+          q.gte(q.field('name'), searchLower),
+          q.lte(q.field('name'), searchLower + '\uffff'),
+        ),
+      )
+    }
+
+    const result = await eventsQuery.order('desc').paginate(paginationOpts)
+
+    // Join eventType data and attendance count for each event
+    const pageWithDetails = await Promise.all(
+      result.page.map(async (event) => {
+        const eventType = await ctx.db.get(event.eventTypeId)
+
+        const attendanceRecords = await ctx.db
+          .query('attendanceRecords')
+          .withIndex('by_event', (q) => q.eq('eventId', event._id))
+          .collect()
+
+        return {
+          ...event,
+          eventType: eventType
+            ? { name: eventType.name, color: eventType.color }
+            : null,
+          attendanceCount: attendanceRecords.length,
+        }
+      }),
+    )
+
+    return { ...result, page: pageWithDetails }
+  },
+})
+
+/**
+ * Count active events (isActive=true) with optional filters.
+ * - Returns total count for pagination
+ * - Supports: eventTypeId, status, search, dateFrom, dateTo
+ */
+export const countActive = query({
+  args: {
+    eventTypeId: v.optional(v.id('eventTypes')),
+    status: v.optional(
+      v.union(
+        v.literal('upcoming'),
+        v.literal('active'),
+        v.literal('completed'),
+        v.literal('cancelled'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    dateFrom: v.optional(v.number()),
+    dateTo: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { eventTypeId, status, search, dateFrom, dateTo } = args
+
+    // Use by_active_date index
+    let eventsQuery = ctx.db
+      .query('events')
+      .withIndex('by_active_date', (q) => {
+        let q2: any = q.eq('isActive', true)
+        if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+        if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
+        return q2
+      })
+
+    if (status !== undefined) {
+      eventsQuery = eventsQuery.filter((q) => q.eq(q.field('status'), status))
+    }
+
+    if (eventTypeId !== undefined) {
+      eventsQuery = eventsQuery.filter((q) =>
+        q.eq(q.field('eventTypeId'), eventTypeId),
+      )
+    }
+
+    if (search && search.trim().length > 0) {
+      const searchLower = search.toLowerCase()
+      eventsQuery = eventsQuery.filter((q) =>
+        q.and(
+          q.gte(q.field('name'), searchLower),
+          q.lte(q.field('name'), searchLower + '\uffff'),
+        ),
+      )
+    }
+
+    const events = await eventsQuery.collect()
+    return events.length
+  },
+})
+
+/**
+ * Count archived events (isActive=false) with optional filters.
+ * - Returns total count for pagination
+ * - Supports: eventTypeId, status, search, dateFrom, dateTo
+ */
+export const countArchived = query({
+  args: {
+    eventTypeId: v.optional(v.id('eventTypes')),
+    status: v.optional(
+      v.union(
+        v.literal('upcoming'),
+        v.literal('active'),
+        v.literal('completed'),
+        v.literal('cancelled'),
+      ),
+    ),
+    search: v.optional(v.string()),
+    dateFrom: v.optional(v.number()),
+    dateTo: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { eventTypeId, status, search, dateFrom, dateTo } = args
+
+    // Use by_active_date index
+    let eventsQuery = ctx.db
+      .query('events')
+      .withIndex('by_active_date', (q) => {
+        let q2: any = q.eq('isActive', false)
+        if (dateFrom !== undefined) q2 = q2.gte('date', dateFrom)
+        if (dateTo !== undefined) q2 = q2.lte('date', dateTo)
+        return q2
+      })
+
+    if (status !== undefined) {
+      eventsQuery = eventsQuery.filter((q) => q.eq(q.field('status'), status))
+    }
+
+    if (eventTypeId !== undefined) {
+      eventsQuery = eventsQuery.filter((q) =>
+        q.eq(q.field('eventTypeId'), eventTypeId),
+      )
+    }
+
+    if (search && search.trim().length > 0) {
+      const searchLower = search.toLowerCase()
+      eventsQuery = eventsQuery.filter((q) =>
+        q.and(
+          q.gte(q.field('name'), searchLower),
+          q.lte(q.field('name'), searchLower + '\uffff'),
+        ),
+      )
+    }
+
+    const events = await eventsQuery.collect()
+    return events.length
   },
 })
 

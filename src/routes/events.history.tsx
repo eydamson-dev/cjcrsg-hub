@@ -2,10 +2,14 @@ import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
-import { EventArchive } from '~/features/events/components/EventArchive'
+import { EventList } from '~/features/events/components/EventList'
 import {
-  useArchivedEvents,
-  useArchivedEventCount,
+  EventsBreadcrumb,
+  BackLink,
+} from '~/features/events/components/EventsBreadcrumb'
+import {
+  useActiveEvents,
+  useActiveEventCount,
 } from '~/features/events/hooks/useEvents'
 import { useEventTypesList } from '~/features/events/hooks/useEventTypes'
 import { useDebounce } from '~/hooks/useDebounce'
@@ -24,31 +28,31 @@ const searchSchema = z.object({
 
 type SearchParams = z.infer<typeof searchSchema>
 
-export const Route = createFileRoute('/events/archive')({
-  component: EventsArchivePage,
+export const Route = createFileRoute('/events/history')({
+  component: EventsHistoryPage,
   validateSearch: searchSchema,
   beforeLoad: async ({ context }) => {
     requireAuth(context)
   },
 })
 
-function EventsArchivePage() {
+function EventsHistoryPage() {
   return (
     <ProtectedRoute>
       <Layout>
-        <EventsArchiveContent />
+        <EventsHistoryContent />
       </Layout>
     </ProtectedRoute>
   )
 }
 
-const PAGE_SIZE_KEY = 'cjcrsg-events-archive-page-size'
+const PAGE_SIZE_KEY = 'cjcrsg-events-history-page-size'
 const DEFAULT_PAGE_SIZE = 10
 const AVAILABLE_PAGE_SIZES = [10, 25, 50]
 
-function EventsArchiveContent() {
+function EventsHistoryContent() {
   const navigate = useNavigate()
-  const searchParams = useSearch({ from: '/events/archive' }) as SearchParams
+  const searchParams = useSearch({ from: '/events/history' }) as SearchParams
 
   // Local state for inputs (not debounced)
   const [localSearchQuery, setLocalSearchQuery] = useState(searchParams.q || '')
@@ -79,7 +83,7 @@ function EventsArchiveContent() {
   const debouncedSearchQuery = useDebounce(localSearchQuery, 300)
 
   // Fetch data
-  const listQuery = useArchivedEvents({
+  const listQuery = useActiveEvents({
     filters: {
       eventTypeId: localEventTypeFilter,
       status: localStatusFilter as any,
@@ -91,7 +95,7 @@ function EventsArchiveContent() {
     },
   })
 
-  const countQuery = useArchivedEventCount({
+  const countQuery = useActiveEventCount({
     eventTypeId: localEventTypeFilter,
     status: localStatusFilter as any,
     search: debouncedSearchQuery,
@@ -171,7 +175,7 @@ function EventsArchiveContent() {
 
     // Update URL without triggering navigation (replace: true)
     navigate({
-      to: '/events/archive',
+      to: '/events/history',
       search: params,
       replace: true,
     })
@@ -194,7 +198,7 @@ function EventsArchiveContent() {
   const handleNextPage = () => {
     if (paginationInfo.hasNext) {
       navigate({
-        to: '/events/archive',
+        to: '/events/history',
         search: {
           ...searchParams,
           page: currentPage + 1,
@@ -207,7 +211,7 @@ function EventsArchiveContent() {
   const handlePreviousPage = () => {
     if (paginationInfo.hasPrevious) {
       navigate({
-        to: '/events/archive',
+        to: '/events/history',
         search: {
           ...searchParams,
           page: currentPage - 1,
@@ -222,7 +226,7 @@ function EventsArchiveContent() {
     localStorage.setItem(PAGE_SIZE_KEY, newSize.toString())
     setCursorHistory([null])
     navigate({
-      to: '/events/archive',
+      to: '/events/history',
       search: {
         ...searchParams,
         page: 1,
@@ -253,24 +257,14 @@ function EventsArchiveContent() {
     setLocalStatusFilter(undefined)
   }
 
-  // Transform event types to ensure color is always a string
-  const transformedEventTypes = eventTypesQuery.data?.map((et) => ({
-    _id: et._id,
-    name: et.name,
-    description: et.description,
-    color: et.color || '#3b82f6',
-    isActive: et.isActive,
-    createdAt: et.createdAt,
-  }))
-
   // Show error state if any query failed
   const hasError = listQuery.error || countQuery.error || eventTypesQuery.error
   if (hasError) {
     return (
-      <div className="mx-auto max-w-7xl p-4 space-y-6">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Event Archive</h1>
-          <p className="text-muted-foreground">Browse archived events</p>
+          <h1 className="text-3xl font-bold tracking-tight">Event History</h1>
+          <p className="text-muted-foreground">Manage and view your events</p>
         </div>
         <ErrorState
           type="error"
@@ -285,27 +279,44 @@ function EventsArchiveContent() {
     )
   }
 
+  // Transform event types to ensure color is always a string
+  const transformedEventTypes = eventTypesQuery.data?.map((et) => ({
+    _id: et._id,
+    name: et.name,
+    description: et.description,
+    color: et.color || '#3b82f6',
+    isActive: et.isActive,
+    createdAt: et.createdAt,
+  }))
+
   return (
-    <EventArchive
-      events={events}
-      eventTypes={transformedEventTypes}
-      isLoading={isPending}
-      paginationInfo={paginationInfo}
-      searchQuery={localSearchQuery}
-      eventTypeFilter={localEventTypeFilter}
-      statusFilter={localStatusFilter}
-      viewMode={viewMode}
-      availablePageSizes={AVAILABLE_PAGE_SIZES}
-      onEventClick={handleEventClick}
-      onSearchChange={handleSearchChange}
-      onEventTypeFilterChange={handleEventTypeFilterChange}
-      onStatusFilterChange={handleStatusFilterChange}
-      onClearFilters={handleClearFilters}
-      onViewModeChange={setViewMode}
-      onNextPage={handleNextPage}
-      onPreviousPage={handlePreviousPage}
-      onPageSizeChange={handlePageSizeChange}
-      showBackLink={true}
-    />
+    <div className="mx-auto max-w-7xl p-4">
+      <EventsBreadcrumb items={[{ label: 'History' }]} />
+      <BackLink href="/events" label="Back to Events" />
+
+      <EventList
+        events={events}
+        eventTypes={transformedEventTypes}
+        isPending={isPending}
+        isArchived={false}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        searchQuery={localSearchQuery}
+        eventTypeFilter={localEventTypeFilter}
+        statusFilter={localStatusFilter}
+        onSearchChange={handleSearchChange}
+        onEventTypeFilterChange={handleEventTypeFilterChange}
+        onStatusFilterChange={handleStatusFilterChange}
+        onClearFilters={handleClearFilters}
+        onEventClick={handleEventClick}
+        paginationInfo={paginationInfo}
+        availablePageSizes={AVAILABLE_PAGE_SIZES}
+        onNextPage={handleNextPage}
+        onPreviousPage={handlePreviousPage}
+        onPageSizeChange={handlePageSizeChange}
+        title="Event History"
+        description="Manage and view your events"
+      />
+    </div>
   )
 }
