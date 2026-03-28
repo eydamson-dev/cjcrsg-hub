@@ -37,7 +37,7 @@ interface PageLoaderProps {
 
 export function PageLoader({ message = 'Loading...' }: PageLoaderProps) {
   return (
-    <div className="flex h-64 w-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <LoadingSpinner size="lg" message={message} />
     </div>
   )
