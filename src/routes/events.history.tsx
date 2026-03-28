@@ -289,10 +289,25 @@ function EventsHistoryContent() {
     createdAt: et.createdAt,
   }))
 
+  // Get parent event type info for breadcrumb context
+  const parentEventType = searchParams.type
+    ? eventTypesQuery.data?.find((et) => et._id === searchParams.type)
+    : undefined
+
+  // Generate back URL based on parent event type
+  const backUrl = parentEventType
+    ? `/events/${parentEventType.name.toLowerCase().replace(/\s+/g, '-')}`
+    : '/events'
+
   return (
     <div className="mx-auto max-w-7xl p-4">
-      <EventsBreadcrumb items={[{ label: 'History' }]} />
-      <BackLink href="/events" label="Back to Events" />
+      <EventsBreadcrumb
+        items={[{ label: 'History' }]}
+        parentEventTypeId={parentEventType?._id}
+        parentEventTypeName={parentEventType?.name}
+        showParentLink={!!parentEventType}
+      />
+      <BackLink href={backUrl} parentEventTypeName={parentEventType?.name} />
 
       <EventList
         events={events}

@@ -12,11 +12,14 @@ export const Route = createFileRoute('/events/sunday-service')({
   },
 })
 
+// Hardcoded event type name for Sunday Service page
+const SUNDAY_SERVICE_NAME = 'Sunday service'
+
 function SundayServicePage() {
   const { data: eventTypes } = useEventTypesList()
 
   const sundayServiceType = eventTypes?.find(
-    (et) => et.name.toLowerCase() === 'sunday service',
+    (et) => et.name === SUNDAY_SERVICE_NAME,
   )
 
   if (!sundayServiceType) {

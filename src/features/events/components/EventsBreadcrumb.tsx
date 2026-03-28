@@ -15,9 +15,31 @@ interface BreadcrumbItemData {
 
 interface EventsBreadcrumbProps {
   items: BreadcrumbItemData[]
+  parentEventTypeId?: string
+  parentEventTypeName?: string
+  showParentLink?: boolean
 }
 
-export function EventsBreadcrumb({ items }: EventsBreadcrumbProps) {
+function toSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-')
+}
+
+export function EventsBreadcrumb({
+  items,
+  parentEventTypeId,
+  parentEventTypeName,
+  showParentLink = true,
+}: EventsBreadcrumbProps) {
+  // Generate the correct Events URL based on parent event type
+  const getEventsUrl = () => {
+    if (parentEventTypeId && parentEventTypeName) {
+      return `/events/${toSlug(parentEventTypeName)}`
+    }
+    return '/events'
+  }
+
+  const eventsUrl = getEventsUrl()
+
   return (
     <Breadcrumb className="mb-4">
       <BreadcrumbList>
@@ -36,9 +58,21 @@ export function EventsBreadcrumb({ items }: EventsBreadcrumbProps) {
 
         <BreadcrumbItem>
           <BreadcrumbLink>
-            <a href="/events">Events</a>
+            <a href={eventsUrl}>Events</a>
           </BreadcrumbLink>
         </BreadcrumbItem>
+
+        {/* Show parent event type if provided */}
+        {parentEventTypeId && parentEventTypeName && showParentLink && (
+          <BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="size-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbLink>
+              <a href={eventsUrl}>{parentEventTypeName}</a>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        )}
 
         {items.map((item, index) => (
           <BreadcrumbItem key={index}>
@@ -65,9 +99,20 @@ interface BackLinkProps {
   href?: string
   label?: string
   onClick?: () => void
+  parentEventTypeName?: string
 }
 
-export function BackLink({ href, label = 'Back', onClick }: BackLinkProps) {
+export function BackLink({
+  href,
+  label,
+  onClick,
+  parentEventTypeName,
+}: BackLinkProps) {
+  // Generate dynamic back label
+  const backLabel = parentEventTypeName
+    ? `Back to ${parentEventTypeName}`
+    : label || 'Back to Events'
+
   return (
     <div className="mb-4">
       {href ? (
@@ -76,7 +121,7 @@ export function BackLink({ href, label = 'Back', onClick }: BackLinkProps) {
           className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ChevronRight className="size-4 rotate-180" />
-          {label}
+          {backLabel}
         </a>
       ) : (
         <button
@@ -85,7 +130,7 @@ export function BackLink({ href, label = 'Back', onClick }: BackLinkProps) {
           className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ChevronRight className="size-4 rotate-180" />
-          {label}
+          {backLabel}
         </button>
       )}
     </div>

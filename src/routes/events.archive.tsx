@@ -285,6 +285,11 @@ function EventsArchiveContent() {
     )
   }
 
+  // Get parent event type info for breadcrumb context
+  const parentEventType = searchParams.type
+    ? eventTypesQuery.data?.find((et) => et._id === searchParams.type)
+    : undefined
+
   return (
     <EventArchive
       events={events}
@@ -306,6 +311,8 @@ function EventsArchiveContent() {
       onPreviousPage={handlePreviousPage}
       onPageSizeChange={handlePageSizeChange}
       showBackLink={true}
+      parentEventTypeId={parentEventType?._id}
+      parentEventTypeName={parentEventType?.name}
     />
   )
 }

@@ -140,11 +140,21 @@ vi.mock('~/features/events/components/EventsBreadcrumb', () => ({
       {items.map((item) => item.label).join(' > ')}
     </nav>
   )),
-  BackLink: vi.fn(({ href, label }: { href: string; label: string }) => (
-    <a data-testid="back-link" href={href}>
-      {label}
-    </a>
-  )),
+  BackLink: vi.fn(
+    ({
+      href,
+      parentEventTypeName,
+    }: {
+      href: string
+      parentEventTypeName?: string
+    }) => (
+      <a data-testid="back-link" href={href}>
+        {parentEventTypeName
+          ? `Back to ${parentEventTypeName}`
+          : 'Back to Events'}
+      </a>
+    ),
+  ),
 }))
 
 // Mock ResizeObserver

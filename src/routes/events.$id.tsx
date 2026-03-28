@@ -4,7 +4,15 @@ import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { useEvent } from '~/features/events/hooks/useEvents'
 import { EventDetails } from '~/features/events/components/EventDetails'
+import {
+  EventsBreadcrumb,
+  BackLink,
+} from '~/features/events/components/EventsBreadcrumb'
 import type { Event, EventType } from '~/features/events/types'
+
+function toSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-')
+}
 
 export const Route = createFileRoute('/events/$id')({
   component: EventDetailPage,
@@ -62,10 +70,29 @@ function EventDetailPage() {
     eventType,
   }
 
+  // Generate parent URL based on event type
+  const parentEventTypeId = event.eventTypeId
+  const parentEventTypeName = event.eventType?.name
+  const parentUrl = parentEventTypeName
+    ? `/events/${toSlug(parentEventTypeName)}`
+    : '/events'
+
   return (
     <ProtectedRoute>
       <Layout>
-        <EventDetails event={eventData} mode="detail" />
+        <div className="mx-auto max-w-7xl p-4">
+          <EventsBreadcrumb
+            items={[{ label: event.name }]}
+            parentEventTypeId={parentEventTypeId}
+            parentEventTypeName={parentEventTypeName}
+            showParentLink={!!parentEventTypeName}
+          />
+          <BackLink
+            href={parentUrl}
+            parentEventTypeName={parentEventTypeName}
+          />
+          <EventDetails event={eventData} mode="detail" />
+        </div>
       </Layout>
     </ProtectedRoute>
   )

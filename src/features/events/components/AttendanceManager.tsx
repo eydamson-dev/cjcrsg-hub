@@ -52,12 +52,12 @@ import {
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
 
-import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '~/components/ui/collapsible'
+
 import {
   useAttendanceByEvent,
   useAttendanceStats,

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
@@ -27,9 +27,17 @@ import { EventsBreadcrumb } from '~/features/events/components/EventsBreadcrumb'
 import type { CreateEventInput } from '~/features/events/types'
 import { useCreateEvent } from '~/features/events/hooks/useEventMutations'
 import { useEventTypesList } from '~/features/events/hooks/useEventTypes'
+import { z } from 'zod'
+
+const searchSchema = z.object({
+  type: z.string().optional(),
+})
+
+type SearchParams = z.infer<typeof searchSchema>
 
 export const Route = createFileRoute('/events/new')({
   component: CreateEventPage,
+  validateSearch: searchSchema,
   beforeLoad: async ({ context }) => {
     requireAuth(context)
   },
@@ -39,10 +47,11 @@ function CreateEventPage() {
   const navigate = useNavigate()
   const createEvent = useCreateEvent()
   const { data: eventTypes } = useEventTypesList()
+  const searchParams = useSearch({ from: '/events/new' }) as SearchParams
 
-  // Form state
+  // Pre-select event type from query param if provided
   const [name, setName] = useState('')
-  const [eventTypeId, setEventTypeId] = useState('')
+  const [eventTypeId, setEventTypeId] = useState(searchParams.type || '')
   const [date, setDate] = useState<number | undefined>(Date.now())
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')

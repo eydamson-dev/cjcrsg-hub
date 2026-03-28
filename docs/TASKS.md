@@ -1047,8 +1047,38 @@ function SundayServiceStats(props: StatsProps) {
 
 ### Phase 10.10: Breadcrumb Navigation Enhancement
 
-**Status:** Ready for Implementation  
-**Goal:** Breadcrumbs should navigate to the correct event type parent page instead of the general Events page.
+**Status:** ✅ Complete 2026-03-28
+
+**Summary:**
+
+Enhanced breadcrumb navigation to respect event type context across the app:
+
+1. **Phase 10.10.1**: Updated `EventsBreadcrumb` component
+   - Added `parentEventTypeId`, `parentEventTypeName`, `showParentLink` props
+   - Generates correct Events URL based on parent event type
+   - Created `BackLink` component with dynamic back label
+
+2. **Phase 10.10.2**: Updated Sunday Service page
+   - Added hardcoded `SUNDAY_SERVICE_NAME` constant
+   - Passes parent context to breadcrumbs
+
+3. **Phase 10.10.3**: Created fallback route
+   - New file: `src/routes/events.$slug.tsx`
+   - Dynamic event type lookup by slug
+   - Redirects to `/events` if not found
+
+4. **Phase 10.10.4**: Updated History page
+   - Passes parent context to breadcrumbs
+
+5. **Phase 10.10.5**: Updated Archive page
+   - Passes parent context to EventArchive component
+   - Fixed test mock for BackLink component
+
+6. **Phase 10.10.6**: Updated Event Detail page
+   - Added breadcrumbs and back link based on event type
+   - Navigates to correct parent page (e.g., Sunday Service)
+
+**Test Results:** 553 tests passing
 
 **Problem:**
 

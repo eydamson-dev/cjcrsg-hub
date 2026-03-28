@@ -37,6 +37,8 @@ interface EventArchiveProps {
   onPreviousPage: () => void
   onPageSizeChange: (size: number) => void
   showBackLink?: boolean
+  parentEventTypeId?: string
+  parentEventTypeName?: string
 }
 
 export function EventArchive({
@@ -59,6 +61,8 @@ export function EventArchive({
   onPreviousPage,
   onPageSizeChange,
   showBackLink = false,
+  parentEventTypeId,
+  parentEventTypeName,
 }: EventArchiveProps) {
   const navigate = useNavigate()
 
@@ -70,11 +74,23 @@ export function EventArchive({
     }
   }
 
+  // Generate back URL based on parent event type
+  const backUrl = parentEventTypeName
+    ? `/events/${parentEventTypeName.toLowerCase().replace(/\s+/g, '-')}`
+    : '/events'
+
   return (
     <div className="mx-auto max-w-7xl p-4">
-      <EventsBreadcrumb items={[{ label: 'Archive' }]} />
+      <EventsBreadcrumb
+        items={[{ label: 'Archive' }]}
+        parentEventTypeId={parentEventTypeId}
+        parentEventTypeName={parentEventTypeName}
+        showParentLink={!!parentEventTypeId}
+      />
 
-      {showBackLink && <BackLink href="/events" label="Back to Events" />}
+      {showBackLink && (
+        <BackLink href={backUrl} parentEventTypeName={parentEventTypeName} />
+      )}
 
       <EventList
         events={events}
