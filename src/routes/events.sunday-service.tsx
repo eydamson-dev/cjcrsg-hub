@@ -17,13 +17,13 @@ export const Route = createFileRoute('/events/sunday-service')({
 const SUNDAY_SERVICE_NAME = 'Sunday service'
 
 function SundayServicePage() {
-  const { data: eventTypes } = useEventTypesList()
+  const { data: eventTypes, isPending } = useEventTypesList()
 
   const sundayServiceType = eventTypes?.find(
     (et) => et.name === SUNDAY_SERVICE_NAME,
   )
 
-  if (!sundayServiceType) {
+  if (!sundayServiceType && !isPending) {
     return (
       <ProtectedRoute>
         <Layout>
@@ -43,8 +43,8 @@ function SundayServicePage() {
         <EventsContent
           title="Sunday Service"
           subtitle="Manage Sunday worship services"
-          eventColor={sundayServiceType.color}
-          eventTypeId={sundayServiceType._id}
+          eventColor={sundayServiceType?.color}
+          eventTypeId={sundayServiceType?._id}
           defaultEventName={(date) =>
             `Sunday Service - ${date.toLocaleDateString('en-US', {
               month: 'long',

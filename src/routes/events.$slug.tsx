@@ -17,7 +17,17 @@ export const Route = createFileRoute('/events/$slug')({
 
 function EventTypeFallbackPage() {
   const { slug } = Route.useParams()
-  const { data: eventTypes } = useEventTypesList()
+  const { data: eventTypes, isPending } = useEventTypesList()
+
+  if (isPending) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <PageLoader />
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
 
   // Convert slug to name format (e.g., "prayer-meeting" → "prayer meeting")
   const searchName = slug.replace(/-/g, ' ')
@@ -27,7 +37,7 @@ function EventTypeFallbackPage() {
     (et) => et.name.toLowerCase() === searchName.toLowerCase(),
   )
 
-  // If event type not found, redirect to general events page
+  // If event type not found (after loading), redirect to general events page
   if (!eventType) {
     return <Navigate to="/events" />
   }
