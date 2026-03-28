@@ -70,8 +70,19 @@ export function useEvent(id?: string) {
  * Hook to get the currently active event for the dashboard.
  * - Returns null if no event is active
  * - Includes attendanceCount for display
+ * - When eventTypeId is provided, filters by that event type
  */
-export function useCurrentEvent() {
+export function useCurrentEvent(options?: { eventTypeId?: string }) {
+  const { eventTypeId } = options || {}
+
+  if (eventTypeId) {
+    return useQuery(
+      convexQuery(api.events.queries.getCurrentEventByType, {
+        eventTypeId: eventTypeId as Id<'eventTypes'>,
+      }),
+    )
+  }
+
   return useQuery(convexQuery(api.events.queries.getCurrentEvent, {}))
 }
 
@@ -196,7 +207,18 @@ export function useArchiveEvents(options?: {
 /**
  * Hook to get event statistics for the dashboard.
  * - Returns totalEvents, byStatus counts, thisMonth count, nextUpcoming event
+ * - When eventTypeId is provided, returns stats filtered by that event type
  */
-export function useEventStats() {
+export function useEventStats(options?: { eventTypeId?: string }) {
+  const { eventTypeId } = options || {}
+
+  if (eventTypeId) {
+    return useQuery(
+      convexQuery(api.events.queries.getStatsByEventType, {
+        eventTypeId: eventTypeId as Id<'eventTypes'>,
+      }),
+    )
+  }
+
   return useQuery(convexQuery(api.events.queries.getStats, {}))
 }

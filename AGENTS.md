@@ -100,11 +100,12 @@ The system is fully functional for core church operations:
 - ✅ CreateAttendeeModal with optional name pre-population
 - ✅ Phase 9: All test failures fixed (553 unit + 42 E2E = 595 total)
 - ✅ Phase 10.1: Backend queries getCurrentEventByType, getStatsByEventType
+- ✅ Phase 10.2: Frontend hooks with eventTypeId support
 
 **Next Up:**
 
-- ⏳ Phase 10.2: Frontend hooks (useCurrentEvent, useEventStats)
-- ⏳ Extract reusable EventsContent component
+- ⏳ Phase 10.3: Extract reusable EventsContent component
+- ⏳ Create /events/sunday-service route
 - ⏳ Create /events/sunday-service route
 - ⏳ Data export to CSV
 

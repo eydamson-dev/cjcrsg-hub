@@ -768,7 +768,7 @@ Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable confi
 | Phase | Task                                                         | Status      |
 | ----- | ------------------------------------------------------------ | ----------- |
 | 1     | Backend queries (getCurrentEventByType, getStatsByEventType) | ✅ Complete |
-| 2     | Frontend hooks (useCurrentEvent, useEventStats)              | ⏳ Pending  |
+| 2     | Frontend hooks (useCurrentEvent, useEventStats)              | ✅ Complete |
 | 3     | Extract EventsContent component                              | ⏳ Pending  |
 | 4     | Update EmptyEventState                                       | ⏳ Pending  |
 | 5     | Update QuickStats                                            | ⏳ Pending  |
