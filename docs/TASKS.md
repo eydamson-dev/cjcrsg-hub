@@ -753,6 +753,282 @@ Fixed all failing tests after Phase 8 refactoring:
 
 ---
 
+## Phase 10: Sunday Service Dedicated Page
+
+**Status:** 🚧 Ready for Implementation  
+**Route:** `/events/sunday-service`  
+**Goal:** Create a dedicated page for Sunday Service events with the same functionality as the general Events page, but specialized for Sunday Service type.
+
+### Overview
+
+Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable configurable component that supports any event type, then create a dedicated Sunday Service page using it.
+
+### Implementation Plan
+
+#### Phase 1: Backend (Convex)
+
+**File:** `convex/events/queries.ts`
+
+**Add 2 new queries:**
+
+1. **`getCurrentEventByType`** - Get the currently active event filtered by event type
+   - Returns null if no event of that type is active
+   - Includes attendance count
+
+2. **`getStatsByEventType`** - Get event statistics filtered by event type
+   - Returns stats for events of a specific type only
+   - Total events, byStatus counts, thisMonth count, nextUpcoming
+
+**Estimated:** ~80 lines added
+
+---
+
+#### Phase 2: Frontend Hooks
+
+**File:** `src/features/events/hooks/useEvents.ts`
+
+**Modify 2 hooks:**
+
+1. **`useCurrentEvent`** - Add optional `eventTypeId?: string` parameter
+   - Use `getCurrentEventByType` when `eventTypeId` provided
+   - Use `getCurrentEvent` when no `eventTypeId`
+
+2. **`useEventStats`** - Add optional `eventTypeId?: string` parameter
+   - Use `getStatsByEventType` when `eventTypeId` provided
+   - Use `getStats` when no `eventTypeId`
+
+**Estimated:** ~20 lines modified
+
+---
+
+#### Phase 3: Extract Reusable EventsContent Component
+
+**New File:** `src/features/events/components/EventsContent.tsx`
+
+**Props Interface:**
+
+```typescript
+interface EventsContentProps {
+  // Identity
+  title: string
+  subtitle?: string
+  eventColor?: string // For header color indicator
+
+  // Event Type Configuration
+  eventTypeId?: string
+  eventTypeName?: string // For default name generation
+
+  // Quick Start Configuration
+  defaultEventName: (date: Date) => string
+  defaultStartTime?: string // e.g., "09:00"
+  defaultEndTime?: string // e.g., "11:00"
+
+  // Empty State
+  emptyStateTitle: string
+  emptyStateDescription?: string
+  quickStartLabel: string
+
+  // Stats Configuration
+  statsComponent?: React.ComponentType<StatsProps> // Default: QuickStats
+}
+```
+
+**Features:**
+
+- Configurable header with optional event type color dot
+- Uses `useCurrentEvent({ eventTypeId })` for filtered current event
+- Uses `useEventStats({ eventTypeId })` for filtered stats
+- Supports custom stats component via `statsComponent` prop
+- Handles unsaved event workflow with configurable defaults
+- Navigation buttons for Event History and Archive
+
+**Estimated:** ~350 lines (new file)
+
+---
+
+#### Phase 4: Update EmptyEventState
+
+**File:** `src/features/events/components/EmptyEventState.tsx`
+
+**Changes:**
+
+- Add `statsComponent?: React.ComponentType<StatsProps>` prop
+- Add `quickStartLabel?: string` prop (for customizable button text)
+- Use custom stats component when provided, otherwise default QuickStats
+- Display quick start button with custom label
+
+**Estimated:** ~30 lines modified
+
+---
+
+#### Phase 5: Update QuickStats
+
+**File:** `src/features/events/components/QuickStats.tsx`
+
+**Changes:**
+
+- Add optional label props with defaults:
+  - `eventsThisMonthLabel?: string` (default: "Events This Month")
+  - `totalEventsLabel?: string` (default: "Total Events")
+  - `lastEventLabel?: string` (default: "Last Event")
+  - `nextScheduledLabel?: string` (default: "Next Scheduled")
+
+This allows custom stats components to pass different labels while reusing QuickStats logic.
+
+**Estimated:** ~20 lines modified
+
+---
+
+#### Phase 6: Update Events Index Page
+
+**File:** `src/routes/events.index.tsx`
+
+**Changes:**
+
+- Import `EventsContent` from components
+- Replace inline `EventsContent` function with imported component
+- Pass configuration for general Events:
+  ```typescript
+  <EventsContent
+    title="Events"
+    subtitle="Manage church events and services"
+    defaultEventName={(date) =>
+      `New Event - ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+    }
+    emptyStateTitle="No Active Event"
+    quickStartLabel="Start Event"
+  />
+  ```
+
+**Estimated:** ~250 lines removed, ~20 lines added
+
+---
+
+#### Phase 7: Create Sunday Service Route
+
+**New File:** `src/routes/events.sunday-service.tsx`
+
+**Implementation:**
+
+- Route: `/events/sunday-service`
+- Find "Sunday Service" event type by name
+- Use `EventsContent` with Sunday Service configuration:
+  - Title: "Sunday Service" with color dot
+  - Default name: "Sunday Service - March 30, 2026"
+  - Default times: 09:00 - 11:00
+  - Event type ID filter
+  - Custom stats labels via wrapper component
+
+**Sample Configuration:**
+
+```typescript
+<EventsContent
+  title="Sunday Service"
+  subtitle="Manage Sunday worship services"
+  eventColor={sundayServiceType.color}
+  eventTypeId={sundayServiceType._id}
+  eventTypeName="Sunday Service"
+  defaultEventName={(date) =>
+    `Sunday Service - ${date.toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric'
+    })}`
+  }
+  defaultStartTime="09:00"
+  defaultEndTime="11:00"
+  emptyStateTitle="No Sunday Service Today"
+  emptyStateDescription="Start a new Sunday Service to begin tracking attendance."
+  quickStartLabel="Start Sunday Service"
+  statsComponent={SundayServiceStats}  // Custom wrapper with custom labels
+/>
+```
+
+**Custom Stats Component Example:**
+
+```typescript
+function SundayServiceStats(props: StatsProps) {
+  return (
+    <QuickStats
+      {...props}
+      eventsThisMonthLabel="Sunday Services This Month"
+      totalEventsLabel="Total Sunday Services"
+      lastEventLabel="Last Service"
+      nextScheduledLabel="Next Service"
+    />
+  )
+}
+```
+
+**Estimated:** ~80 lines (new file)
+
+---
+
+#### Phase 8: Update Navigation
+
+**File:** `src/lib/navigation.ts`
+
+**Changes:**
+
+- Add `children` array to Events nav item
+- Add sub-items:
+  - "All Events" (`/events`) with List icon
+  - "Sunday Service" (`/events/sunday-service`) with Church icon
+
+**Estimated:** ~15 lines modified
+
+---
+
+#### Phase 9: Update Sidebar with Accordion
+
+**File:** `src/components/layout/Sidebar.tsx`
+
+**Changes:**
+
+- Make Events menu item expandable using shadcn Accordion
+- Show sub-items (All Events, Sunday Service) when expanded
+- Highlight active sub-item
+- Use Church icon for Sunday Service
+
+**Estimated:** ~40 lines modified
+
+---
+
+### Summary of Changes
+
+| Phase     | File(s)                                              | Lines Changed        | Description                                  |
+| --------- | ---------------------------------------------------- | -------------------- | -------------------------------------------- |
+| 1         | `convex/events/queries.ts`                           | +80                  | 2 new backend queries                        |
+| 2         | `src/features/events/hooks/useEvents.ts`             | +20                  | Modify 2 hooks with optional eventTypeId     |
+| 3         | `src/features/events/components/EventsContent.tsx`   | +350                 | New reusable component                       |
+| 4         | `src/features/events/components/EmptyEventState.tsx` | +30                  | Add statsComponent and quickStartLabel props |
+| 5         | `src/features/events/components/QuickStats.tsx`      | +20                  | Add optional label props                     |
+| 6         | `src/routes/events.index.tsx`                        | -250, +20            | Use EventsContent component                  |
+| 7         | `src/routes/events.sunday-service.tsx`               | +80                  | New Sunday Service route                     |
+| 8         | `src/lib/navigation.ts`                              | +15                  | Add sub-nav for Events                       |
+| 9         | `src/components/layout/Sidebar.tsx`                  | +40                  | Accordion for Events menu                    |
+| **Total** | **9 files**                                          | **~405 lines added** |                                              |
+
+### Acceptance Criteria
+
+- [ ] `/events/sunday-service` route accessible from sidebar
+- [ ] Shows "Sunday Service" header with event type color dot
+- [ ] If active Sunday Service exists, shows EventDetails in dashboard mode
+- [ ] If no active Sunday Service, shows empty state with "Start Sunday Service" button
+- [ ] Quick start creates event named "Sunday Service - [Date]" with 9AM-11AM default time
+- [ ] Stats show "Sunday Services This Month" and "Total Sunday Services"
+- [ ] Events sidebar menu has accordion with "All Events" and "Sunday Service" sub-items
+- [ ] Sunday Service uses Church icon from lucide-react
+- [ ] Navigation between sub-items works correctly
+- [ ] All existing functionality on general Events page still works
+
+### Dependencies
+
+- Requires "Sunday Service" event type to exist in database
+- Uses existing hooks: useCurrentEvent, useEventStats, useCreateEvent, useStartEvent
+- Uses existing components: EventDetails, EmptyEventState, QuickStats
+- Uses shadcn Accordion component for sidebar
+
+---
+
 ## Development Workflow
 
 1. **IMPLEMENT** - Build the feature first
