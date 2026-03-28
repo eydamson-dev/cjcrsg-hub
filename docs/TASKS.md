@@ -1080,6 +1080,41 @@ Enhanced breadcrumb navigation to respect event type context across the app:
 
 **Test Results:** 553 tests passing
 
+---
+
+### Phase 10.11: Loading State Improvements
+
+**Status:** ✅ Complete 2026-03-28
+
+**Summary:**
+
+Improved loading state handling to prevent flash of error messages:
+
+1. **Create reusable LoadingSpinner and PageLoader components**
+   - New file: `src/components/ui/loading-spinner.tsx`
+   - `LoadingSpinner` with configurable size (sm/md/lg) and optional message
+   - `PageLoader` for common page loading states
+
+2. **Add loader prop to EventsContent**
+   - Accepts custom ReactNode to show while loading
+   - Backward compatible - uses default spinner if not provided
+   - Parent components pass PageLoader via loader prop
+
+3. **Fix isPending checks in event type pages**
+   - Add `isPending` check to Sunday Service page
+   - Add `isPending` check to fallback slug route
+   - Prevents "not found" message from flashing during page load
+
+**Files Modified:**
+
+- `src/components/ui/loading-spinner.tsx` (new)
+- `src/features/events/components/EventsContent.tsx` - added loader prop
+- `src/routes/events.index.tsx` - added loader prop
+- `src/routes/events.sunday-service.tsx` - added loader prop and isPending check
+- `src/routes/events.$slug.tsx` - added loader prop and isPending check
+
+**Test Results:** 553 tests passing
+
 **Problem:**
 
 - On Sunday Service History/Archive page, clicking "Events" breadcrumb goes to `/events` (general page)
