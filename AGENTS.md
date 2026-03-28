@@ -2,7 +2,7 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 10 - Sunday Service Page (In Progress)  
+**Status:** Phase 10 - Complete (Sunday Service Page)  
 **Last Updated:** 2026-03-28
 
 ---
@@ -105,10 +105,11 @@ The system is fully functional for core church operations:
 - ✅ Phase 10.5: Update QuickStats with optional label props
 - ✅ Phase 10.6: Update events.index.tsx to use EventsContent
 - ✅ Phase 10.7: Create /events/sunday-service route
+- ✅ Phase 10.8-10.9: Update navigation & sidebar with accordion
 
 **Next Up:**
 
-- ⏳ Phase 10.8-10.9: Update navigation & sidebar
+- ⏳ Phase 11: Add more dedicated event type pages
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 

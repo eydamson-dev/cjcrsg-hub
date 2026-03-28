@@ -5,6 +5,8 @@ import {
   CheckSquare,
   Settings,
   Palette,
+  Church,
+  List,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -13,6 +15,7 @@ export type NavItem = {
   href: string
   icon: LucideIcon
   description?: string
+  children?: NavItem[]
 }
 
 export const navItems: NavItem[] = [
@@ -33,6 +36,20 @@ export const navItems: NavItem[] = [
     href: '/events',
     icon: CalendarDays,
     description: 'Schedule and manage events',
+    children: [
+      {
+        title: 'All Events',
+        href: '/events',
+        icon: List,
+        description: 'View all events',
+      },
+      {
+        title: 'Sunday Service',
+        href: '/events/sunday-service',
+        icon: Church,
+        description: 'Manage Sunday worship services',
+      },
+    ],
   },
   {
     title: 'Attendance',

@@ -12,6 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion'
 import { LogOut, User } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
@@ -61,6 +67,57 @@ export function Sidebar() {
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
             const isActive = location.href === item.href
+            const hasChildren = item.children && item.children.length > 0
+
+            if (hasChildren) {
+              const childHrefs = item.children!.map((c) => c.href)
+              const isChildActive = childHrefs.includes(location.href)
+
+              return (
+                <Accordion
+                  key={item.href}
+                  defaultValue={[isChildActive ? item.href : '']}
+                  className="w-full"
+                >
+                  <AccordionItem value={item.href} className="border-none">
+                    <AccordionTrigger
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:no-underline',
+                        isChildActive || isActive
+                          ? 'text-foreground'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                      )}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col gap-1 pl-4">
+                        {item.children!.map((child) => {
+                          const isChildItemActive = location.href === child.href
+                          return (
+                            <Link
+                              key={child.href}
+                              to={child.href}
+                              className={cn(
+                                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                isChildItemActive
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                              )}
+                            >
+                              <child.icon className="h-4 w-4" />
+                              <span>{child.title}</span>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )
+            }
+
             return (
               <Link
                 key={item.href}
