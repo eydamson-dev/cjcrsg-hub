@@ -755,7 +755,7 @@ Fixed all failing tests after Phase 8 refactoring:
 
 ## Phase 10: Sunday Service Dedicated Page
 
-**Status:** 🚧 Ready for Implementation  
+**Status:** 🚧 In Progress  
 **Route:** `/events/sunday-service`  
 **Goal:** Create a dedicated page for Sunday Service events with the same functionality as the general Events page, but specialized for Sunday Service type.
 
@@ -763,13 +763,27 @@ Fixed all failing tests after Phase 8 refactoring:
 
 Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable configurable component that supports any event type, then create a dedicated Sunday Service page using it.
 
-### Implementation Plan
+### Implementation Phases
 
-#### Phase 1: Backend (Convex)
+| Phase | Task                                                         | Status      |
+| ----- | ------------------------------------------------------------ | ----------- |
+| 1     | Backend queries (getCurrentEventByType, getStatsByEventType) | ✅ Complete |
+| 2     | Frontend hooks (useCurrentEvent, useEventStats)              | ⏳ Pending  |
+| 3     | Extract EventsContent component                              | ⏳ Pending  |
+| 4     | Update EmptyEventState                                       | ⏳ Pending  |
+| 5     | Update QuickStats                                            | ⏳ Pending  |
+| 6     | Update events.index.tsx                                      | ⏳ Pending  |
+| 7     | Create sunday-service route                                  | ⏳ Pending  |
+| 8     | Update navigation                                            | ⏳ Pending  |
+| 9     | Update sidebar with accordion                                | ⏳ Pending  |
+
+---
+
+#### Phase 1: Backend (Convex) ✅ Complete
 
 **File:** `convex/events/queries.ts`
 
-**Add 2 new queries:**
+**Added 2 new queries:**
 
 1. **`getCurrentEventByType`** - Get the currently active event filtered by event type
    - Returns null if no event of that type is active
@@ -779,7 +793,9 @@ Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable confi
    - Returns stats for events of a specific type only
    - Total events, byStatus counts, thisMonth count, nextUpcoming
 
-**Estimated:** ~80 lines added
+**Lines added:** ~114
+
+**Verified:** Both queries tested successfully via Convex CLI
 
 ---
 

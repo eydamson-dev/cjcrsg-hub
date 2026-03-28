@@ -2,7 +2,7 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 9 - Complete (Testing & Documentation Updates)  
+**Status:** Phase 10 - Sunday Service Page (In Progress)  
 **Last Updated:** 2026-03-28
 
 ---
@@ -99,12 +99,13 @@ The system is fully functional for core church operations:
 - ✅ Inviter selection with full Attendee object return
 - ✅ CreateAttendeeModal with optional name pre-population
 - ✅ Phase 9: All test failures fixed (553 unit + 42 E2E = 595 total)
-- ✅ Test documentation updated with current status
+- ✅ Phase 10.1: Backend queries getCurrentEventByType, getStatsByEventType
 
 **Next Up:**
 
-- ⏳ Attendance reporting & analytics
-- ⏳ Dashboard statistics widgets
+- ⏳ Phase 10.2: Frontend hooks (useCurrentEvent, useEventStats)
+- ⏳ Extract reusable EventsContent component
+- ⏳ Create /events/sunday-service route
 - ⏳ Data export to CSV
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**

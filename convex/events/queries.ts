@@ -500,3 +500,117 @@ export const getStats = query({
     }
   },
 })
+
+/**
+ * Get the single currently active event filtered by event type.
+ * - Uses by_status index with status='active'
+ * - Filters by eventTypeId if provided
+ * - Returns event with joined eventType and attendanceCount
+ * - Returns null if no event of that type is currently active
+ * - Used by Sunday Service page to get current event of type "Sunday Service"
+ */
+export const getCurrentEventByType = query({
+  args: {
+    eventTypeId: v.id('eventTypes'),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db
+      .query('events')
+      .withIndex('by_status', (q) => q.eq('status', 'active'))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('isActive'), true),
+          q.eq(q.field('eventTypeId'), args.eventTypeId),
+        ),
+      )
+      .first()
+
+    if (!event) return null
+
+    const eventType = await ctx.db.get(event.eventTypeId)
+
+    // Get attendance count for display on dashboard
+    const attendanceRecords = await ctx.db
+      .query('attendanceRecords')
+      .withIndex('by_event', (q) => q.eq('eventId', event._id))
+      .collect()
+
+    return {
+      ...event,
+      eventType: eventType
+        ? { name: eventType.name, color: eventType.color }
+        : null,
+      attendanceCount: attendanceRecords.length,
+    }
+  },
+})
+
+/**
+ * Get event statistics filtered by event type for the dashboard.
+ * - totalEvents: count of all non-archived events of this type
+ * - byStatus: { upcoming, active, completed, cancelled } counts for this type
+ * - thisMonth: count of events of this type in current calendar month
+ * - nextUpcoming: nearest upcoming event of this type after today (name + date)
+ * - Used by Sunday Service page to show stats for "Sunday Service" type only
+ */
+export const getStatsByEventType = query({
+  args: {
+    eventTypeId: v.id('eventTypes'),
+  },
+  handler: async (ctx, args) => {
+    const allEvents = await ctx.db
+      .query('events')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('isActive'), true),
+          q.eq(q.field('eventTypeId'), args.eventTypeId),
+        ),
+      )
+      .collect()
+
+    const byStatus = {
+      upcoming: 0,
+      active: 0,
+      completed: 0,
+      cancelled: 0,
+    }
+
+    const now = Date.now()
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+    const startOfMonthTs = startOfMonth.getTime()
+
+    let thisMonth = 0
+
+    for (const event of allEvents) {
+      byStatus[event.status]++
+      if (event.date >= startOfMonthTs && event.date <= now) {
+        thisMonth++
+      }
+    }
+
+    // Get the next upcoming event of this type after today
+    const nextUpcoming = await ctx.db
+      .query('events')
+      .withIndex('by_date_status', (q) => q.gte('date', now))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('status'), 'upcoming'),
+          q.eq(q.field('isActive'), true),
+          q.eq(q.field('eventTypeId'), args.eventTypeId),
+        ),
+      )
+      .order('asc')
+      .first()
+
+    return {
+      totalEvents: allEvents.length,
+      byStatus,
+      thisMonth,
+      nextUpcoming: nextUpcoming
+        ? { name: nextUpcoming.name, date: nextUpcoming.date }
+        : null,
+    }
+  },
+})
