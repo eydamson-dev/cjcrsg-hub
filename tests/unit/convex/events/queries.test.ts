@@ -361,15 +361,15 @@ describe('events queries', () => {
   })
 
   describe('listArchive', () => {
-    it('returns completed events', async () => {
+    it('returns completed and archived events', async () => {
       const t = convexTest(schema, modules)
       const eventTypeId = await createTestEventType(t)
 
       const eventId = await createTestEvent(t, eventTypeId)
 
-      // Make event completed
+      // Make event completed AND archived (isActive: false)
       await t.run(async (ctx) => {
-        await ctx.db.patch(eventId, { status: 'completed' })
+        await ctx.db.patch(eventId, { status: 'completed', isActive: false })
       })
 
       const result = await t.query(listArchive, {
@@ -380,20 +380,23 @@ describe('events queries', () => {
       expect(result.page[0].status).toBe('completed')
     })
 
-    it('excludes active events', async () => {
+    it('excludes active (non-archived) events', async () => {
       const t = convexTest(schema, modules)
       const eventTypeId = await createTestEventType(t)
 
-      // Create active event
+      // Create active event (not archived - isActive: true by default)
       const activeEventId = await createTestEvent(t, eventTypeId)
       await t.run(async (ctx) => {
         await ctx.db.patch(activeEventId, { status: 'active' })
       })
 
-      // Create completed event
-      const completedEventId = await createTestEvent(t, eventTypeId)
+      // Create completed AND archived event
+      const archivedEventId = await createTestEvent(t, eventTypeId)
       await t.run(async (ctx) => {
-        await ctx.db.patch(completedEventId, { status: 'completed' })
+        await ctx.db.patch(archivedEventId, {
+          status: 'completed',
+          isActive: false,
+        })
       })
 
       const result = await t.query(listArchive, {
@@ -411,12 +414,12 @@ describe('events queries', () => {
 
       const event1Id = await createTestEvent(t, eventTypeId1)
       await t.run(async (ctx) => {
-        await ctx.db.patch(event1Id, { status: 'completed' })
+        await ctx.db.patch(event1Id, { status: 'completed', isActive: false })
       })
 
       const event2Id = await createTestEvent(t, eventTypeId2)
       await t.run(async (ctx) => {
-        await ctx.db.patch(event2Id, { status: 'completed' })
+        await ctx.db.patch(event2Id, { status: 'completed', isActive: false })
       })
 
       const result = await t.query(listArchive, {
@@ -434,9 +437,9 @@ describe('events queries', () => {
 
       const eventId = await createTestEvent(t, eventTypeId)
 
-      // Make event completed
+      // Make event completed AND archived
       await t.run(async (ctx) => {
-        await ctx.db.patch(eventId, { status: 'completed' })
+        await ctx.db.patch(eventId, { status: 'completed', isActive: false })
 
         const attendee = await ctx.db.insert('attendees', {
           firstName: 'John',
@@ -462,13 +465,13 @@ describe('events queries', () => {
       expect(result.page[0].attendanceCount).toBe(1)
     })
 
-    it('excludes archived events', async () => {
+    it('includes archived events with isActive: false', async () => {
       const t = convexTest(schema, modules)
       const eventTypeId = await createTestEventType(t)
 
       const eventId = await createTestEvent(t, eventTypeId)
 
-      // Make event completed but archived
+      // Make event completed and archived (isActive: false)
       await t.run(async (ctx) => {
         await ctx.db.patch(eventId, { status: 'completed', isActive: false })
       })
@@ -477,7 +480,9 @@ describe('events queries', () => {
         paginationOpts: { numItems: 10, cursor: null },
       })
 
-      expect(result.page).toHaveLength(0)
+      expect(result.page).toHaveLength(1)
+      expect(result.page[0].status).toBe('completed')
+      expect(result.page[0].isActive).toBe(false)
     })
   })
 

@@ -89,12 +89,12 @@ test.describe('Events CRUD', () => {
       timeout: 5000,
     })
 
-    // Step 2: Navigate to events archive to find the event
-    await page.goto('/events/archive')
+    // Step 2: Navigate to events history to find the event (archive only shows archived events)
+    await page.goto('/events/history')
     await page.waitForLoadState('networkidle')
 
     // Wait for the events list to load
-    await expect(page.getByText(/event archive/i)).toBeVisible()
+    await expect(page.getByText(/event history/i)).toBeVisible()
 
     // Step 3: Find and click on the event row (click on the event name link)
     await expect(page.getByText(uniqueEventName)).toBeVisible({ timeout: 5000 })
@@ -174,12 +174,12 @@ test.describe('Events CRUD', () => {
       timeout: 5000,
     })
 
-    // Step 2: Navigate to events archive to find the event
-    await page.goto('/events/archive')
+    // Step 2: Navigate to events history to find the event (archive only shows archived events)
+    await page.goto('/events/history')
     await page.waitForLoadState('networkidle')
 
     // Wait for the events list to load
-    await expect(page.getByText(/event archive/i)).toBeVisible()
+    await expect(page.getByText(/event history/i)).toBeVisible()
 
     // Step 3: Find and click on the event to view details
     await expect(page.getByText(uniqueEventName)).toBeVisible({ timeout: 5000 })
@@ -245,12 +245,12 @@ test.describe('Events CRUD', () => {
       timeout: 5000,
     })
 
-    // Step 2: Navigate to events archive to find the event
-    await page.goto('/events/archive')
+    // Step 2: Navigate to events history to find the event (active events are in history)
+    await page.goto('/events/history')
     await page.waitForLoadState('networkidle')
 
     // Wait for the events list to load
-    await expect(page.getByText(/event archive/i)).toBeVisible()
+    await expect(page.getByText(/event history/i)).toBeVisible()
 
     // Step 3: Find and click on the event to view details
     await expect(page.getByText(uniqueEventName)).toBeVisible({ timeout: 5000 })
@@ -277,15 +277,16 @@ test.describe('Events CRUD', () => {
       timeout: 5000,
     })
 
-    // Step 7: Navigate back to archive and verify event is not in the list
+    // Step 7: Navigate to archive and verify event IS now in the archive list
+    // (archived events have isActive=false and appear in archive)
     await page.goto('/events/archive')
     await page.waitForLoadState('networkidle')
 
     // Wait for the events list to load
     await expect(page.getByText(/event archive/i)).toBeVisible()
 
-    // The archived event should no longer appear in the archive list
-    await expect(page.getByText(uniqueEventName)).not.toBeVisible()
+    // The archived event should now appear in the archive list (isActive=false)
+    await expect(page.getByText(uniqueEventName)).toBeVisible()
   })
 
   test.skip('event lifecycle - create, start, complete, verify in archive', async ({
@@ -339,10 +340,9 @@ test.describe('Events CRUD', () => {
     // await expect(page.locator('tr', { hasText: uniqueEventName }).getByText(/Completed/i)).toBeVisible()
   })
 
-  test.skip('cancel event - create, start, cancel, verify shows cancelled', async ({
-    page,
-  }) => {
+  test.skip('cancel event - create, start, cancel, verify shows cancelled', async () => {
     // NOTE: Same issue as above - skipped due to test infrastructure problem
     // This test would verify: Create → Start → Cancel → Verify "Cancelled" in archive
+    // Test implementation skipped - see notes in previous skipped test
   })
 })

@@ -2,8 +2,8 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 6 - Event History & EventList Component (Complete)  
-**Last Updated:** 2026-03-27
+**Status:** Phase 9 - Complete (Testing & Documentation Updates)  
+**Last Updated:** 2026-03-28
 
 ---
 
@@ -71,6 +71,9 @@ The system is fully functional for core church operations:
 
 - Create and manage unlimited events
 - Track attendance with check-in/check-out
+- **Dedicated "Add Attendance" button with modal interface**
+- **Unified attendee selection with inviter assignment**
+- **Quick attendee creation from attendance modal**
 - View event history and analytics
 - Manage event media and documentation
 
@@ -91,6 +94,12 @@ The system is fully functional for core church operations:
 - ✅ Reusable EventList component with table/cards views
 - ✅ New Convex queries: listActive, countActive, countArchived
 - ✅ Server-side filtering and pagination for archive page
+- ✅ Phase 8: AttendanceManager refactor with "Add Attendance" button
+- ✅ Unified AttendeeSearchModal with search + selected attendees
+- ✅ Inviter selection with full Attendee object return
+- ✅ CreateAttendeeModal with optional name pre-population
+- ✅ Phase 9: All test failures fixed (553 unit + 42 E2E = 595 total)
+- ✅ Test documentation updated with current status
 
 **Next Up:**
 

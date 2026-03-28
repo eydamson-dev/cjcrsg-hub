@@ -119,7 +119,7 @@ export function EventList({
   description = 'Manage and view your events',
 }: EventListProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
-  const isSearching = isPending && searchQuery.length >= 3
+  const isSearching = isPending && (searchQuery?.length ?? 0) >= 3
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -502,7 +502,8 @@ export function EventList({
           <p
             className={cn(
               'text-xs text-muted-foreground mt-1 h-4 transition-opacity duration-200',
-              localSearchQuery.length > 0 && localSearchQuery.length < 3
+              (localSearchQuery?.length ?? 0) > 0 &&
+                (localSearchQuery?.length ?? 0) < 3
                 ? 'opacity-100'
                 : 'opacity-0',
             )}

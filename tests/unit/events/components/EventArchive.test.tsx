@@ -3,93 +3,131 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { EventArchive } from '~/features/events/components/EventArchive'
 import type { Event, EventType } from '~/features/events/types'
 
-// Mock child components
-vi.mock('~/features/events/components/EventArchiveTable', () => ({
-  EventArchiveTable: vi.fn(
+// Mock child components - EventArchive now uses EventList
+vi.mock('~/features/events/components/EventList', () => ({
+  EventList: vi.fn(
     ({
       events,
-      onEventClick,
-    }: {
-      events: Event[]
-      onEventClick: (id: string) => void
-    }) => (
-      <div data-testid="event-archive-table">
-        {events.map((event) => (
-          <div
-            key={event._id}
-            data-testid={`table-row-${event._id}`}
-            onClick={() => onEventClick(event._id)}
-          >
-            {event.name}
-          </div>
-        ))}
-      </div>
-    ),
-  ),
-}))
-
-vi.mock('~/features/events/components/EventArchiveCards', () => ({
-  EventArchiveCards: vi.fn(
-    ({
-      events,
-      onEventClick,
-    }: {
-      events: Event[]
-      onEventClick: (id: string) => void
-    }) => (
-      <div data-testid="event-archive-cards">
-        {events.map((event) => (
-          <div
-            key={event._id}
-            data-testid={`card-${event._id}`}
-            onClick={() => onEventClick(event._id)}
-          >
-            {event.name}
-          </div>
-        ))}
-      </div>
-    ),
-  ),
-}))
-
-vi.mock('~/features/events/components/EventFilters', () => ({
-  EventFilters: vi.fn(
-    ({
       eventTypes,
-      selectedEventType,
-      onEventTypeChange,
+      isPending,
+      viewMode,
       searchQuery,
+      eventTypeFilter,
+      statusFilter,
       onSearchChange,
+      onEventTypeFilterChange,
       onClearFilters,
+      onViewModeChange,
+      onEventClick,
+      paginationInfo,
+      onNextPage,
+      onPreviousPage,
+      title,
+      description,
     }: any) => (
-      <div data-testid="event-filters">
+      <div data-testid="event-list">
+        <div data-testid="event-list-title">{title}</div>
+        <div data-testid="event-list-description">{description}</div>
+        <div data-testid="event-count">{events.length} events found</div>
+        <div data-testid="view-mode">{viewMode}</div>
+        <div data-testid="search-query">{searchQuery}</div>
+        <div data-testid="event-type-filter">{eventTypeFilter || 'all'}</div>
+        <div data-testid="status-filter">{statusFilter || 'all'}</div>
+        <div data-testid="loading-state">
+          {isPending ? 'loading' : 'not-loading'}
+        </div>
+
+        {/* Filter controls simulation */}
         <select
           data-testid="event-type-select"
-          value={selectedEventType || 'all'}
+          value={eventTypeFilter || 'all'}
           onChange={(e) =>
-            onEventTypeChange(
+            onEventTypeFilterChange?.(
               e.target.value === 'all' ? undefined : e.target.value,
             )
           }
         >
           <option value="all">All Types</option>
-          {eventTypes.map((type: EventType) => (
+          {eventTypes?.map((type: EventType) => (
             <option key={type._id} value={type._id}>
               {type.name}
             </option>
           ))}
         </select>
+
         <input
           data-testid="search-input"
           type="text"
           value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={(e) => onSearchChange?.(e.target.value)}
           placeholder="Search events..."
         />
-        {(selectedEventType || searchQuery) && (
+
+        {(eventTypeFilter || searchQuery) && (
           <button data-testid="clear-filters-btn" onClick={onClearFilters}>
             Clear Filters
           </button>
+        )}
+
+        {/* View mode toggle */}
+        <button
+          data-testid="table-view-btn"
+          onClick={() => onViewModeChange?.('table')}
+        >
+          Table
+        </button>
+        <button
+          data-testid="cards-view-btn"
+          onClick={() => onViewModeChange?.('cards')}
+        >
+          Cards
+        </button>
+
+        {/* Event items */}
+        <div data-testid="events-container">
+          {events.map((event: Event) => (
+            <div
+              key={event._id}
+              data-testid={`event-item-${event._id}`}
+              onClick={() => onEventClick?.(event._id)}
+            >
+              {event.name}
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination simulation */}
+        {paginationInfo && (
+          <div data-testid="pagination">
+            <button
+              data-testid="prev-page-btn"
+              onClick={onPreviousPage}
+              disabled={!paginationInfo.hasPrevious}
+              aria-label="Go to previous page"
+            >
+              Previous
+            </button>
+            <span data-testid="pagination-info">
+              {paginationInfo.startItem}-{paginationInfo.endItem} of{' '}
+              {paginationInfo.totalCount}
+            </span>
+            <button
+              data-testid="next-page-btn"
+              onClick={onNextPage}
+              disabled={!paginationInfo.hasNext}
+              aria-label="Go to next page"
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {events.length === 0 && (
+          <div data-testid="empty-state">
+            <div>No events found</div>
+            <div>Try adjusting your filters or search query</div>
+          </div>
         )}
       </div>
     ),
@@ -200,24 +238,42 @@ describe('EventArchive', () => {
     },
   ]
 
+  const defaultProps = {
+    events: mockEvents,
+    eventTypes: mockEventTypes,
+    isLoading: false,
+    searchQuery: '',
+    viewMode: 'table' as const,
+    onEventClick: vi.fn(),
+    onSearchChange: vi.fn(),
+    onEventTypeFilterChange: vi.fn(),
+    onStatusFilterChange: vi.fn(),
+    onClearFilters: vi.fn(),
+    onViewModeChange: vi.fn(),
+    onNextPage: vi.fn(),
+    onPreviousPage: vi.fn(),
+    onPageSizeChange: vi.fn(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   describe('Rendering', () => {
     it('renders with events in table view by default', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      render(<EventArchive {...defaultProps} />)
 
       expect(screen.getByTestId('events-breadcrumb')).toBeInTheDocument()
-      expect(screen.getByText('Event Archive')).toBeInTheDocument()
+      expect(screen.getByTestId('event-list-title')).toHaveTextContent(
+        'Event Archive',
+      )
       expect(screen.getByText('3 events found')).toBeInTheDocument()
-      expect(screen.getByTestId('event-archive-table')).toBeInTheDocument()
-      expect(screen.getByText('Table')).toBeInTheDocument()
-      expect(screen.getByText('Cards')).toBeInTheDocument()
+      expect(screen.getByTestId('event-list')).toBeInTheDocument()
+      expect(screen.getByTestId('view-mode')).toHaveTextContent('table')
     })
 
     it('renders with empty events array', () => {
-      render(<EventArchive events={[]} eventTypes={mockEventTypes} />)
+      render(<EventArchive {...defaultProps} events={[]} />)
 
       expect(screen.getByText('0 events found')).toBeInTheDocument()
       expect(screen.getByText('No events found')).toBeInTheDocument()
@@ -227,128 +283,109 @@ describe('EventArchive', () => {
     })
 
     it('renders with showBackLink', () => {
-      render(
-        <EventArchive
-          events={mockEvents}
-          eventTypes={mockEventTypes}
-          showBackLink={true}
-        />,
-      )
+      render(<EventArchive {...defaultProps} showBackLink={true} />)
 
       expect(screen.getByTestId('back-link')).toBeInTheDocument()
       expect(screen.getByText('Back to Events')).toBeInTheDocument()
     })
 
-    it('renders loading state with skeletons', () => {
-      render(
-        <EventArchive
-          events={[]}
-          eventTypes={mockEventTypes}
-          isLoading={true}
-        />,
-      )
+    it('renders loading state', () => {
+      render(<EventArchive {...defaultProps} isLoading={true} />)
 
-      // Check for loading state by looking for the loading container
-      const loadingContainer = document.querySelector('.space-y-4')
-      expect(loadingContainer).toBeInTheDocument()
+      expect(screen.getByTestId('loading-state')).toHaveTextContent('loading')
     })
   })
 
   describe('View Mode Toggle', () => {
     it('switches from table to cards view when Cards button clicked', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      const onViewModeChange = vi.fn()
+      render(
+        <EventArchive {...defaultProps} onViewModeChange={onViewModeChange} />,
+      )
 
-      const cardsButton = screen.getByText('Cards')
+      const cardsButton = screen.getByTestId('cards-view-btn')
       fireEvent.click(cardsButton)
 
-      expect(screen.getByTestId('event-archive-cards')).toBeInTheDocument()
-      expect(
-        screen.queryByTestId('event-archive-table'),
-      ).not.toBeInTheDocument()
+      expect(onViewModeChange).toHaveBeenCalledWith('cards')
     })
 
     it('switches back to table view when Table button clicked', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      const onViewModeChange = vi.fn()
+      render(
+        <EventArchive
+          {...defaultProps}
+          viewMode="cards"
+          onViewModeChange={onViewModeChange}
+        />,
+      )
 
-      // First switch to cards
-      fireEvent.click(screen.getByText('Cards'))
-      expect(screen.getByTestId('event-archive-cards')).toBeInTheDocument()
+      const tableButton = screen.getByTestId('table-view-btn')
+      fireEvent.click(tableButton)
 
-      // Then switch back to table
-      fireEvent.click(screen.getByText('Table'))
-      expect(screen.getByTestId('event-archive-table')).toBeInTheDocument()
-      expect(
-        screen.queryByTestId('event-archive-cards'),
-      ).not.toBeInTheDocument()
+      expect(onViewModeChange).toHaveBeenCalledWith('table')
     })
   })
 
   describe('Filtering', () => {
     it('filters events by event type', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      const onEventTypeFilterChange = vi.fn()
+      render(
+        <EventArchive
+          {...defaultProps}
+          onEventTypeFilterChange={onEventTypeFilterChange}
+        />,
+      )
 
       const typeSelect = screen.getByTestId('event-type-select')
       fireEvent.change(typeSelect, { target: { value: 'type-1' } })
 
-      // Check for "1 event found" - use a flexible text matcher
-      expect(
-        screen.getByText(
-          (content) => content.includes('1') && content.includes('found'),
-        ),
-      ).toBeInTheDocument()
-      expect(screen.getByTestId('table-row-event-1')).toBeInTheDocument()
+      expect(onEventTypeFilterChange).toHaveBeenCalledWith('type-1')
     })
 
     it('filters events by search query', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      const onSearchChange = vi.fn()
+      render(<EventArchive {...defaultProps} onSearchChange={onSearchChange} />)
 
       const searchInput = screen.getByTestId('search-input')
       fireEvent.change(searchInput, { target: { value: 'Youth' } })
 
-      // Use flexible text matcher
-      expect(
-        screen.getByText(
-          (content) => content.includes('1') && content.includes('found'),
-        ),
-      ).toBeInTheDocument()
+      expect(onSearchChange).toHaveBeenCalledWith('Youth')
     })
 
     it('clears filters when Clear Filters clicked', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      const onClearFilters = vi.fn()
+      render(
+        <EventArchive
+          {...defaultProps}
+          searchQuery="test"
+          eventTypeFilter="type-1"
+          onClearFilters={onClearFilters}
+        />,
+      )
 
-      // Apply filter first
-      const typeSelect = screen.getByTestId('event-type-select')
-      fireEvent.change(typeSelect, { target: { value: 'type-1' } })
-
-      // Use flexible text matcher
-      expect(
-        screen.getByText(
-          (content) => content.includes('1') && content.includes('found'),
-        ),
-      ).toBeInTheDocument()
-
-      // Clear filters
       const clearButton = screen.getByTestId('clear-filters-btn')
       fireEvent.click(clearButton)
 
-      expect(screen.getByText('3 events found')).toBeInTheDocument()
+      expect(onClearFilters).toHaveBeenCalled()
     })
   })
 
   describe('Empty States', () => {
     it('shows Clear Filters button when filters are active', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
-
-      // Apply search filter
-      const searchInput = screen.getByTestId('search-input')
-      fireEvent.change(searchInput, { target: { value: 'nonexistent' } })
+      render(
+        <EventArchive
+          {...defaultProps}
+          searchQuery="nonexistent"
+          events={[]}
+        />,
+      )
 
       expect(screen.getByText('No events found')).toBeInTheDocument()
       expect(screen.getByTestId('clear-filters-btn')).toBeInTheDocument()
     })
 
-    it('shows CalendarX icon when no events and no filters active', () => {
-      render(<EventArchive events={[]} eventTypes={mockEventTypes} />)
+    it('does not show clear filters when no filters active', () => {
+      render(<EventArchive {...defaultProps} events={[]} />)
 
       expect(screen.getByText('No events found')).toBeInTheDocument()
       expect(screen.queryByTestId('clear-filters-btn')).not.toBeInTheDocument()
@@ -356,106 +393,90 @@ describe('EventArchive', () => {
   })
 
   describe('Pagination', () => {
-    it('renders pagination when events exceed ITEMS_PER_PAGE', () => {
-      const manyEvents: Event[] = Array.from({ length: 15 }, (_, i) => ({
-        ...mockEvents[0],
-        _id: `event-${i}`,
-        name: `Event ${i + 1}`,
-      }))
+    const mockPaginationInfo = {
+      currentPage: 1,
+      totalCount: 15,
+      pageSize: 10,
+      totalPages: 2,
+      startItem: 1,
+      endItem: 10,
+      hasNext: true,
+      hasPrevious: false,
+      isDone: false,
+    }
 
-      render(<EventArchive events={manyEvents} eventTypes={mockEventTypes} />)
+    it('renders pagination when events exceed page size', () => {
+      render(
+        <EventArchive {...defaultProps} paginationInfo={mockPaginationInfo} />,
+      )
 
-      // Use flexible text matcher for pagination info
-      expect(
-        screen.getByText(
-          (content) =>
-            content.includes('1') &&
-            content.includes('10') &&
-            content.includes('15'),
-        ),
-      ).toBeInTheDocument()
-      // Pagination navigation exists
-      expect(
-        document.querySelector('[aria-label="pagination"]'),
-      ).toBeInTheDocument()
+      expect(screen.getByTestId('pagination')).toBeInTheDocument()
+      expect(screen.getByTestId('pagination-info')).toHaveTextContent(
+        '1-10 of 15',
+      )
     })
 
     it('navigates to next page when Next clicked', () => {
-      const manyEvents: Event[] = Array.from({ length: 15 }, (_, i) => ({
-        ...mockEvents[0],
-        _id: `event-${i}`,
-        name: `Event ${i + 1}`,
-      }))
+      const onNextPage = vi.fn()
+      render(
+        <EventArchive
+          {...defaultProps}
+          paginationInfo={mockPaginationInfo}
+          onNextPage={onNextPage}
+        />,
+      )
 
-      render(<EventArchive events={manyEvents} eventTypes={mockEventTypes} />)
-
-      // Find the next button by aria-label
-      const nextButton = screen.getByLabelText('Go to next page')
+      const nextButton = screen.getByTestId('next-page-btn')
       fireEvent.click(nextButton)
 
-      // Check for page 2 content
-      expect(
-        screen.getByText(
-          (content) => content.includes('11') && content.includes('15'),
-        ),
-      ).toBeInTheDocument()
+      expect(onNextPage).toHaveBeenCalled()
     })
 
     it('disables Previous button on first page', () => {
-      const manyEvents: Event[] = Array.from({ length: 15 }, (_, i) => ({
-        ...mockEvents[0],
-        _id: `event-${i}`,
-        name: `Event ${i + 1}`,
-      }))
+      render(
+        <EventArchive {...defaultProps} paginationInfo={mockPaginationInfo} />,
+      )
 
-      render(<EventArchive events={manyEvents} eventTypes={mockEventTypes} />)
-
-      // Find Previous button by aria-label
-      const prevButton = screen.getByLabelText('Go to previous page')
-      expect(prevButton?.className).toContain('pointer-events-none')
+      const prevButton = screen.getByTestId('prev-page-btn')
+      expect(prevButton).toBeDisabled()
     })
 
     it('disables Next button on last page', () => {
-      const manyEvents: Event[] = Array.from({ length: 15 }, (_, i) => ({
-        ...mockEvents[0],
-        _id: `event-${i}`,
-        name: `Event ${i + 1}`,
-      }))
+      render(
+        <EventArchive
+          {...defaultProps}
+          paginationInfo={{
+            ...mockPaginationInfo,
+            currentPage: 2,
+            hasNext: false,
+            hasPrevious: true,
+            startItem: 11,
+            endItem: 15,
+          }}
+        />,
+      )
 
-      render(<EventArchive events={manyEvents} eventTypes={mockEventTypes} />)
-
-      // Navigate to last page
-      const nextButton = screen.getByLabelText('Go to next page')
-      fireEvent.click(nextButton)
-
-      // After navigation, check if the Next button is now disabled
-      const updatedNextButton = screen.getByLabelText('Go to next page')
-      expect(updatedNextButton?.className).toContain('pointer-events-none')
+      const nextButton = screen.getByTestId('next-page-btn')
+      expect(nextButton).toBeDisabled()
     })
   })
 
   describe('Event Click', () => {
     it('calls onEventClick when provided', () => {
       const onEventClick = vi.fn()
-      render(
-        <EventArchive
-          events={mockEvents}
-          eventTypes={mockEventTypes}
-          onEventClick={onEventClick}
-        />,
-      )
+      render(<EventArchive {...defaultProps} onEventClick={onEventClick} />)
 
-      const row = screen.getByTestId('table-row-event-1')
-      fireEvent.click(row)
+      const eventItem = screen.getByTestId('event-item-event-1')
+      fireEvent.click(eventItem)
 
       expect(onEventClick).toHaveBeenCalledWith('event-1')
     })
 
     it('navigates when onEventClick not provided', () => {
-      render(<EventArchive events={mockEvents} eventTypes={mockEventTypes} />)
+      render(<EventArchive {...defaultProps} onEventClick={undefined as any} />)
 
-      const row = screen.getByTestId('table-row-event-1')
-      fireEvent.click(row)
+      const eventItem = screen.getByTestId('event-item-event-1')
+      fireEvent.click(eventItem)
 
       expect(mockNavigate).toHaveBeenCalledWith({
         to: '/events/$id',

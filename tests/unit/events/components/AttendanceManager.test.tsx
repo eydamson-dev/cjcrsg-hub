@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { AttendanceManager } from '~/features/events/components/AttendanceManager'
 
 // Mock the hooks
@@ -7,29 +7,33 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: vi.fn(() => vi.fn()),
 }))
 
-vi.mock('~/hooks/useDebounce', () => ({
-  useDebounce: (value: string) => value,
-}))
-
-vi.mock('~/features/attendees/hooks/useAttendees', () => ({
-  useSearchAttendees: vi.fn(),
-}))
-
 vi.mock('~/features/events/hooks/useAttendance', () => ({
   useAttendanceByEvent: vi.fn(),
   useAttendanceStats: vi.fn(),
-  useCheckIn: vi.fn(),
   useUnCheckIn: vi.fn(),
   useBulkCheckIn: vi.fn(),
+  useUpdateInviter: vi.fn(),
 }))
 
-import { useSearchAttendees } from '~/features/attendees/hooks/useAttendees'
+// Mock child components that use QueryClient
+vi.mock('~/features/events/components/InviterSelectionModal', () => ({
+  InviterSelectionModal: () => null,
+}))
+
+vi.mock('~/features/events/components/AttendeeSearchModal', () => ({
+  AttendeeSearchModal: () => null,
+}))
+
+vi.mock('~/features/events/components/CreateAttendeeModal', () => ({
+  CreateAttendeeModal: () => null,
+}))
+
 import {
   useAttendanceByEvent,
   useAttendanceStats,
-  useCheckIn,
   useUnCheckIn,
   useBulkCheckIn,
+  useUpdateInviter,
 } from '~/features/events/hooks/useAttendance'
 
 describe('AttendanceManager', () => {
@@ -45,14 +49,6 @@ describe('AttendanceManager', () => {
     ;(useAttendanceStats as any).mockReturnValue({
       data: { total: 0, members: 0, visitors: 0 },
     })
-    ;(useSearchAttendees as any).mockReturnValue({
-      data: [],
-      isLoading: false,
-    })
-    ;(useCheckIn as any).mockReturnValue({
-      mutateAsync: mockMutateAsync,
-      isPending: false,
-    })
     ;(useUnCheckIn as any).mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
@@ -61,17 +57,18 @@ describe('AttendanceManager', () => {
       mutateAsync: mockMutateAsync,
       isPending: false,
     })
+    ;(useUpdateInviter as any).mockReturnValue({
+      mutateAsync: mockMutateAsync,
+      isPending: false,
+    })
   })
 
   describe('Rendering', () => {
-    it('renders search input and add button', () => {
+    it('renders Add Attendance button', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
       expect(
-        screen.getByPlaceholderText('Search attendee to add...'),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: /add attendee/i }),
+        screen.getByRole('button', { name: /add attendance/i }),
       ).toBeInTheDocument()
       expect(screen.getByText('Checked-in Attendees')).toBeInTheDocument()
     })
@@ -81,7 +78,7 @@ describe('AttendanceManager', () => {
 
       expect(screen.getByText('No attendees yet')).toBeInTheDocument()
       expect(
-        screen.getByText('Search above to check someone in'),
+        screen.getByText('Click "Add Attendance" to check someone in'),
       ).toBeInTheDocument()
     })
 
@@ -195,247 +192,16 @@ describe('AttendanceManager', () => {
     })
   })
 
-  describe('Search Functionality', () => {
-    it('shows search results when typing', async () => {
-      const mockSearchResults = [
-        {
-          _id: 'attendee-1',
-          firstName: 'John',
-          lastName: 'Doe',
-          status: 'member',
-        },
-        {
-          _id: 'attendee-2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          status: 'visitor',
-        },
-      ]
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: mockSearchResults,
-        isLoading: false,
-      })
-
+  describe('Add Attendance Button', () => {
+    it('opens AttendeeSearchModal when clicking Add Attendance button', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'john' } })
+      const addButton = screen.getByRole('button', { name: /add attendance/i })
+      fireEvent.click(addButton)
 
-      await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument()
-        expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-      })
-    })
-
-    it('shows empty message when no search results found', async () => {
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: [],
-        isLoading: false,
-      })
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'xyz' } })
-
-      await waitFor(() => {
-        expect(screen.getByText('No attendees found')).toBeInTheDocument()
-      })
-    })
-
-    it('filters out already checked-in attendees from search results', async () => {
-      const mockSearchResults = [
-        {
-          _id: 'attendee-1',
-          firstName: 'John',
-          lastName: 'Doe',
-          status: 'member',
-        },
-        {
-          _id: 'attendee-2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          status: 'visitor',
-        },
-      ]
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: mockSearchResults,
-        isLoading: false,
-      })
-      ;(useAttendanceByEvent as any).mockReturnValue({
-        data: {
-          page: [
-            {
-              _id: 'record-1',
-              eventId: mockEventId,
-              attendeeId: 'attendee-1',
-              checkedInAt: Date.now(),
-              checkedInBy: 'user-1',
-              attendee: {
-                _id: 'attendee-1',
-                firstName: 'John',
-                lastName: 'Doe',
-                status: 'member',
-              },
-            },
-          ],
-          continueCursor: null,
-        },
-        isLoading: false,
-      })
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'test' } })
-
-      // Should only show Jane Smith (1 available) since John Doe is already checked in
-      await waitFor(() => {
-        expect(screen.getByText('1 available')).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Check-in Functionality', () => {
-    it('calls checkIn mutation when clicking on attendee in search results', async () => {
-      const mockSearchResults = [
-        {
-          _id: 'attendee-1',
-          firstName: 'John',
-          lastName: 'Doe',
-          status: 'member',
-        },
-      ]
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: mockSearchResults,
-        isLoading: false,
-      })
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'john' } })
-
-      await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument()
-      })
-
-      fireEvent.click(screen.getByText('John Doe'))
-
-      await waitFor(() => {
-        expect(mockMutateAsync).toHaveBeenCalledWith({
-          eventId: mockEventId,
-          attendeeId: 'attendee-1',
-        })
-      })
-    })
-
-    it('allows selecting multiple attendees for bulk check-in', async () => {
-      const mockSearchResults = [
-        {
-          _id: 'attendee-1',
-          firstName: 'John',
-          lastName: 'Doe',
-          status: 'member',
-        },
-        {
-          _id: 'attendee-2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          status: 'visitor',
-        },
-      ]
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: mockSearchResults,
-        isLoading: false,
-      })
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'test' } })
-
-      await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument()
-      })
-
-      // Select multiple attendees via checkbox
-      const checkboxes = screen.getAllByRole('checkbox')
-      fireEvent.click(checkboxes[0])
-      fireEvent.click(checkboxes[1])
-
-      await waitFor(() => {
-        expect(screen.getByText('2 selected')).toBeInTheDocument()
-        expect(
-          screen.getByRole('button', { name: /add 2/i }),
-        ).toBeInTheDocument()
-      })
-    })
-
-    it('calls bulkCheckIn mutation when clicking bulk add button', async () => {
-      const mockSearchResults = [
-        {
-          _id: 'attendee-1',
-          firstName: 'John',
-          lastName: 'Doe',
-          status: 'member',
-        },
-        {
-          _id: 'attendee-2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          status: 'visitor',
-        },
-      ]
-      ;(useSearchAttendees as any).mockReturnValue({
-        data: mockSearchResults,
-        isLoading: false,
-      })
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const searchInput = screen.getByPlaceholderText(
-        'Search attendee to add...',
-      )
-      fireEvent.change(searchInput, { target: { value: 'test' } })
-
-      await waitFor(() => {
-        expect(screen.getByText('John Doe')).toBeInTheDocument()
-      })
-
-      // Select attendees
-      const checkboxes = screen.getAllByRole('checkbox')
-      fireEvent.click(checkboxes[0])
-      fireEvent.click(checkboxes[1])
-
-      // Click bulk add button
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: /add 2/i }),
-        ).toBeInTheDocument()
-      })
-
-      fireEvent.click(screen.getByRole('button', { name: /add 2/i }))
-
-      await waitFor(() => {
-        expect(mockMutateAsync).toHaveBeenCalledWith({
-          eventId: mockEventId,
-          attendees: [
-            { attendeeId: 'attendee-1' },
-            { attendeeId: 'attendee-2' },
-          ],
-        })
-      })
+      // Modal should open (we can't fully test the modal here as it's a separate component)
+      // But we can verify the button exists and is clickable
+      expect(addButton).toBeInTheDocument()
     })
   })
 

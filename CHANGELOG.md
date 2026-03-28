@@ -58,6 +58,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/unit/components/events/CurrentEventDashboard.test.tsx`: 25 tests covering event rendering with child components (EventBanner, EventInfo, AttendanceManager), LIVE badge with animation, action button visibility and callbacks, component integration with props, edge cases (minimal data, zero attendance), debug logging, button variants, icon rendering, and responsive layout
   - Total 25 new tests, bringing component test count to 410 and overall test count to 560
 
+- **Phase 9: Testing & Documentation Updates** - Fixed all test failures after Phase 8 refactoring
+  - Fixed `AttendanceManager.test.tsx` (unit/events): Updated for new "Add Attendance" button UI, removed obsolete search bar tests, added proper mocks for QueryClient-wrapped modals
+  - Fixed `AttendanceManager.test.tsx` (components/events): Updated test expectations for new modal-based workflow
+  - Fixed `EventArchive.test.tsx`: Updated mocks to match new EventList-based architecture (changed from mocking EventArchiveTable/EventArchiveCards to mocking EventList)
+  - Fixed `convex/events/queries.test.ts`: Fixed `listArchive` tests to set `isActive: false` when archiving events (query filters by `isActive: false`)
+  - Fixed `tests/unit/setup.ts`: Added console warning suppression for hydration errors and convex-test warnings
+  - Fixed `EventFilters.test.tsx`: Changed Select mock from `span` to React fragment to prevent HTML validation errors
+  - Fixed E2E tests: Changed navigation from `/events/archive` to `/events/history` in 3 tests (active events are in history, archived events are in archive)
+  - Fixed E2E archive test: Corrected expectation - archived event should appear in archive (isActive=false), not disappear
+  - **Final Results**: 553 unit tests + 42 E2E tests = 595 tests passing
+
 - **Phase 10.1: Event CRUD E2E Tests** - E2E tests for event creation, editing, viewing, and archiving workflows
   - `tests/e2e/specs/events-crud.spec.ts`: Comprehensive event creation test
     - Test covers: User signup/login, navigation to create event page, filling required fields (name, event type, date), form submission, redirect to events dashboard, success toast verification

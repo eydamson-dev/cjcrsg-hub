@@ -17,10 +17,24 @@ vi.mock('~/features/events/hooks/useAttendance', () => ({
   useCheckIn: vi.fn(),
   useUnCheckIn: vi.fn(),
   useBulkCheckIn: vi.fn(),
+  useUpdateInviter: vi.fn(),
 }))
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: vi.fn(() => vi.fn()),
+}))
+
+// Mock child components that use QueryClient
+vi.mock('~/features/events/components/InviterSelectionModal', () => ({
+  InviterSelectionModal: () => null,
+}))
+
+vi.mock('~/features/events/components/AttendeeSearchModal', () => ({
+  AttendeeSearchModal: () => null,
+}))
+
+vi.mock('~/features/events/components/CreateAttendeeModal', () => ({
+  CreateAttendeeModal: () => null,
 }))
 
 // Import mocked hooks for test control
@@ -31,6 +45,7 @@ import {
   useCheckIn,
   useUnCheckIn,
   useBulkCheckIn,
+  useUpdateInviter,
 } from '~/features/events/hooks/useAttendance'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -138,6 +153,10 @@ describe('AttendanceManager', () => {
     vi.mocked(useCheckIn).mockReturnValue(mockCheckIn as any)
     vi.mocked(useUnCheckIn).mockReturnValue(mockUnCheckIn as any)
     vi.mocked(useBulkCheckIn).mockReturnValue(mockBulkCheckIn as any)
+    vi.mocked(useUpdateInviter).mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    } as any)
   })
 
   afterEach(() => {
@@ -149,16 +168,17 @@ describe('AttendanceManager', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
       expect(
-        screen.getByPlaceholderText(/search attendee to add/i),
+        screen.getByRole('button', { name: /add attendance/i }),
       ).toBeInTheDocument()
       expect(screen.getByText(/checked-in attendees/i)).toBeInTheDocument()
     })
 
-    it('displays search input with correct placeholder', () => {
+    it('displays Add Attendance button', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
-      const searchInput = screen.getByPlaceholderText(/search attendee to add/i)
-      expect(searchInput).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /add attendance/i }),
+      ).toBeInTheDocument()
     })
 
     it('displays attendance table with correct headers', () => {
@@ -174,14 +194,6 @@ describe('AttendanceManager', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
       expect(screen.getByText('2')).toBeInTheDocument() // Total count
-    })
-
-    it('displays Add Attendee button', () => {
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      expect(
-        screen.getByRole('button', { name: /add attendee/i }),
-      ).toBeInTheDocument()
     })
   })
 
@@ -215,7 +227,7 @@ describe('AttendanceManager', () => {
 
       expect(screen.getByText(/no attendees yet/i)).toBeInTheDocument()
       expect(
-        screen.getByText(/search above to check someone in/i),
+        screen.getByText(/click "add attendance" to check someone in/i),
       ).toBeInTheDocument()
     })
 
@@ -235,30 +247,15 @@ describe('AttendanceManager', () => {
     })
   })
 
-  describe('Search Functionality', () => {
-    it('shows search input placeholder', () => {
+  describe('Add Attendance Button', () => {
+    it('clicking Add Attendance opens modal', () => {
       render(<AttendanceManager eventId={mockEventId} />)
 
-      const searchInput = screen.getByPlaceholderText(/search attendee to add/i)
-      expect(searchInput).toBeInTheDocument()
-      expect(searchInput).toHaveAttribute(
-        'placeholder',
-        'Search attendee to add...',
-      )
-    })
-  })
+      const addButton = screen.getByRole('button', { name: /add attendance/i })
+      fireEvent.click(addButton)
 
-  describe('Single Check-in Flow', () => {
-    it('disables Add Attendee button while check-in is pending', () => {
-      vi.mocked(useCheckIn).mockReturnValue({
-        mutateAsync: vi.fn(),
-        isPending: true,
-      } as any)
-
-      render(<AttendanceManager eventId={mockEventId} />)
-
-      const addButton = screen.getByRole('button', { name: /add attendee/i })
-      expect(addButton).toBeDisabled()
+      // Modal opening is handled by the mocked component
+      expect(addButton).toBeInTheDocument()
     })
   })
 

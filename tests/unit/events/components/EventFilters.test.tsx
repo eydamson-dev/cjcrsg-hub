@@ -19,7 +19,7 @@ vi.mock('~/components/ui/select', () => ({
     <option value={value}>{children}</option>
   )),
   SelectTrigger: vi.fn(({ children }: any) => <>{children}</>),
-  SelectValue: vi.fn(({ placeholder }: any) => <span>{placeholder}</span>),
+  SelectValue: vi.fn(({ placeholder }: any) => <>{placeholder}</>), // Use fragment instead of span
 }))
 
 // Mock Input component
