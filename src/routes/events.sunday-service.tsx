@@ -17,17 +17,7 @@ export const Route = createFileRoute('/events/sunday-service')({
 const SUNDAY_SERVICE_NAME = 'Sunday service'
 
 function SundayServicePage() {
-  const { data: eventTypes, isLoading } = useEventTypesList()
-
-  if (isLoading) {
-    return (
-      <ProtectedRoute>
-        <Layout>
-          <PageLoader message="Loading Sunday Service..." />
-        </Layout>
-      </ProtectedRoute>
-    )
-  }
+  const { data: eventTypes } = useEventTypesList()
 
   const sundayServiceType = eventTypes?.find(
     (et) => et.name === SUNDAY_SERVICE_NAME,
@@ -67,6 +57,7 @@ function SundayServicePage() {
           emptyStateTitle="No Sunday Service Today"
           emptyStateDescription="Start a new Sunday Service to begin tracking attendance."
           quickStartLabel="Start Sunday Service"
+          loader={<PageLoader message="Loading Sunday Service..." />}
         />
       </Layout>
     </ProtectedRoute>

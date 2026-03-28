@@ -25,6 +25,7 @@ export interface EventsContentProps {
   emptyStateTitle?: string
   emptyStateDescription?: string
   quickStartLabel?: string
+  loader?: React.ReactNode
 }
 
 export function EventsContent({
@@ -38,6 +39,7 @@ export function EventsContent({
   emptyStateTitle = 'No Active Event',
   emptyStateDescription,
   quickStartLabel = 'Start Event',
+  loader,
 }: EventsContentProps) {
   const [unsavedEvent, setUnsavedEvent] = useState<Event | null>(null)
   const { data: currentEvent, isLoading: isLoadingCurrent } = useCurrentEvent({
@@ -120,11 +122,13 @@ export function EventsContent({
 
   if (isLoadingCurrent || isLoadingStats) {
     return (
-      <div className="space-y-6">
-        <div className="flex h-64 items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      loader || (
+        <div className="space-y-6">
+          <div className="flex h-64 items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
         </div>
-      </div>
+      )
     )
   }
 

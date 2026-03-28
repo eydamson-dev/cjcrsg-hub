@@ -17,17 +17,7 @@ export const Route = createFileRoute('/events/$slug')({
 
 function EventTypeFallbackPage() {
   const { slug } = Route.useParams()
-  const { data: eventTypes, isLoading } = useEventTypesList()
-
-  if (isLoading) {
-    return (
-      <ProtectedRoute>
-        <Layout>
-          <PageLoader />
-        </Layout>
-      </ProtectedRoute>
-    )
-  }
+  const { data: eventTypes } = useEventTypesList()
 
   // Convert slug to name format (e.g., "prayer-meeting" → "prayer meeting")
   const searchName = slug.replace(/-/g, ' ')
@@ -64,6 +54,7 @@ function EventTypeFallbackPage() {
           emptyStateTitle={`No ${eventType.name} Today`}
           emptyStateDescription={`Start a new ${eventType.name} to begin tracking attendance.`}
           quickStartLabel={`Start ${eventType.name}`}
+          loader={<PageLoader />}
         />
       </Layout>
     </ProtectedRoute>

@@ -3,6 +3,7 @@ import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { EventsContent } from '~/features/events/components/EventsContent'
+import { PageLoader } from '~/components/ui/loading-spinner'
 
 export const Route = createFileRoute('/events/')({
   component: EventsPage,
@@ -27,6 +28,7 @@ function EventsPage() {
           }}
           emptyStateTitle="No Active Event"
           quickStartLabel="Start Event"
+          loader={<PageLoader />}
         />
       </Layout>
     </ProtectedRoute>
