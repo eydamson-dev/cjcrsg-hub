@@ -769,10 +769,10 @@ Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable confi
 | ----- | ------------------------------------------------------------ | ----------- |
 | 1     | Backend queries (getCurrentEventByType, getStatsByEventType) | ✅ Complete |
 | 2     | Frontend hooks (useCurrentEvent, useEventStats)              | ✅ Complete |
-| 3     | Extract EventsContent component                              | ⏳ Pending  |
-| 4     | Update EmptyEventState                                       | ⏳ Pending  |
+| 3     | Extract EventsContent component                              | ✅ Complete |
+| 4     | Update EmptyEventState                                       | ✅ Complete |
 | 5     | Update QuickStats                                            | ⏳ Pending  |
-| 6     | Update events.index.tsx                                      | ⏳ Pending  |
+| 6     | Update events.index.tsx                                      | ✅ Complete |
 | 7     | Create sunday-service route                                  | ⏳ Pending  |
 | 8     | Update navigation                                            | ⏳ Pending  |
 | 9     | Update sidebar with accordion                                | ⏳ Pending  |

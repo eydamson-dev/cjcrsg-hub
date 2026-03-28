@@ -14,11 +14,17 @@ interface EmptyEventStateProps {
     lastEvent: string
     nextScheduled: string
   }
+  title?: string
+  description?: string
+  quickStartLabel?: string
 }
 
 export function EmptyEventState({
   onStartEvent,
   stats = mockEventStats,
+  title = 'Start New Event',
+  description = 'Create an event to begin tracking attendance',
+  quickStartLabel = 'Click to start',
 }: EmptyEventStateProps) {
   const navigate = useNavigate()
   const [isHovered, setIsHovered] = useState(false)
@@ -50,24 +56,22 @@ export function EmptyEventState({
                   ${isHovered ? 'scale-105 shadow-lg' : ''}
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 `}
-                aria-label="Start New Event"
+                aria-label={title}
               >
                 <Plus className="size-10" />
               </button>
               {isHovered && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 animate-in fade-in-0 zoom-in-95 duration-200">
                   <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                    Click to start
+                    {quickStartLabel}
                   </span>
                 </span>
               )}
             </div>
 
             <div className="flex flex-col gap-1">
-              <h2 className="text-xl font-semibold">Start New Event</h2>
-              <p className="text-sm text-muted-foreground">
-                Create an event to begin tracking attendance
-              </p>
+              <h2 className="text-xl font-semibold">{title}</h2>
+              <p className="text-sm text-muted-foreground">{description}</p>
             </div>
           </div>
 
