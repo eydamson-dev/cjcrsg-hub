@@ -773,7 +773,7 @@ Extract `EventsContent` from `src/routes/events.index.tsx` into a reusable confi
 | 4     | Update EmptyEventState                                       | ✅ Complete |
 | 5     | Update QuickStats                                            | ✅ Complete |
 | 6     | Update events.index.tsx                                      | ✅ Complete |
-| 7     | Create sunday-service route                                  | ⏳ Pending  |
+| 7     | Create sunday-service route                                  | ✅ Complete |
 | 8     | Update navigation                                            | ⏳ Pending  |
 | 9     | Update sidebar with accordion                                | ⏳ Pending  |
 

@@ -104,10 +104,10 @@ The system is fully functional for core church operations:
 - ✅ Phase 10.3-10.4: Extract EventsContent, update EmptyEventState
 - ✅ Phase 10.5: Update QuickStats with optional label props
 - ✅ Phase 10.6: Update events.index.tsx to use EventsContent
+- ✅ Phase 10.7: Create /events/sunday-service route
 
 **Next Up:**
 
-- ⏳ Phase 10.7: Create /events/sunday-service route
 - ⏳ Phase 10.8-10.9: Update navigation & sidebar
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**

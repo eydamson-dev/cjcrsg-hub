@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
 import { Route as EventsTestRouteImport } from './routes/events.test'
+import { Route as EventsSundayServiceRouteImport } from './routes/events.sunday-service'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsHistoryRouteImport } from './routes/events.history'
 import { Route as EventsArchiveRouteImport } from './routes/events.archive'
@@ -52,6 +53,11 @@ const AttendeesIndexRoute = AttendeesIndexRouteImport.update({
 const EventsTestRoute = EventsTestRouteImport.update({
   id: '/events/test',
   path: '/events/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsSundayServiceRoute = EventsSundayServiceRouteImport.update({
+  id: '/events/sunday-service',
+  path: '/events/sunday-service',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/sunday-service'
     | '/events/test'
     | '/attendees/'
     | '/events/'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/sunday-service'
     | '/events/test'
     | '/attendees'
     | '/events'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/sunday-service'
     | '/events/test'
     | '/attendees/'
     | '/events/'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   EventsArchiveRoute: typeof EventsArchiveRoute
   EventsHistoryRoute: typeof EventsHistoryRoute
   EventsNewRoute: typeof EventsNewRoute
+  EventsSundayServiceRoute: typeof EventsSundayServiceRoute
   EventsTestRoute: typeof EventsTestRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/events/test'
       fullPath: '/events/test'
       preLoaderRoute: typeof EventsTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/sunday-service': {
+      id: '/events/sunday-service'
+      path: '/events/sunday-service'
+      fullPath: '/events/sunday-service'
+      preLoaderRoute: typeof EventsSundayServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/new': {
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsArchiveRoute: EventsArchiveRoute,
   EventsHistoryRoute: EventsHistoryRoute,
   EventsNewRoute: EventsNewRoute,
+  EventsSundayServiceRoute: EventsSundayServiceRoute,
   EventsTestRoute: EventsTestRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
