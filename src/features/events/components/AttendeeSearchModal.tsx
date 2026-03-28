@@ -24,17 +24,29 @@ import { useDebounce } from '~/hooks/useDebounce'
 import { CreateAttendeeModal } from './CreateAttendeeModal'
 import type { Attendee } from '~/features/attendees/types'
 
+// Phase 2: Will import InviterSelectionModal
+// import { InviterSelectionModal } from './InviterSelectionModal'
+
+// Phase 3: Will import Trash2
+// import { Trash2 } from 'lucide-react'
+
+type AttendeeSearchModalMode = 'groupAdd' | 'generalAdd'
+
 interface AttendeeSearchModalProps {
   open?: boolean
-  inviterName: string
-  onSelect: (attendeeIds: string[]) => void
+  mode?: AttendeeSearchModalMode
+  inviterName?: string
+  title?: string
+  onSelect: (attendeeIds: string[], inviterId: string | null) => void
   onClose: () => void
   excludeAttendeeIds?: string[]
 }
 
 export function AttendeeSearchModal({
   open,
+  mode = 'generalAdd',
   inviterName,
+  title,
   onSelect,
   onClose,
   excludeAttendeeIds = [],
@@ -45,6 +57,10 @@ export function AttendeeSearchModal({
     new Set(),
   )
   const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
+
+  // Phase 2: Will add inviter selection state
+  // const [showInviterModal, setShowInviterModal] = useState(false)
+  // const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const { data: searchResults, isLoading: isSearching } =
@@ -61,6 +77,8 @@ export function AttendeeSearchModal({
     if (isOpen) {
       setSearchQuery('')
       setSelectedAttendees(new Set())
+      // Phase 2: Will reset inviter
+      // setCurrentInviterId(null)
     }
   }, [isOpen])
 
@@ -91,8 +109,19 @@ export function AttendeeSearchModal({
 
   const handleSave = () => {
     if (selectedAttendees.size === 0) return
-    onSelect(Array.from(selectedAttendees))
+    // Phase 2: Will pass inviterId
+    // onSelect(Array.from(selectedAttendees), currentInviterId)
+    onSelect(Array.from(selectedAttendees), null)
     handleOpenChange(false)
+  }
+
+  // Dynamic title based on mode
+  const getModalTitle = () => {
+    if (title) return title
+    if (mode === 'groupAdd' && inviterName) {
+      return `Add Attendees to ${inviterName}'s Invites`
+    }
+    return 'Add Attendance'
   }
 
   const handleCreateAttendee = () => {
@@ -110,12 +139,25 @@ export function AttendeeSearchModal({
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>
-              Add Attendees to {inviterName}&apos;s Invites
-            </DialogTitle>
+            <DialogTitle>{getModalTitle()}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Phase 2: Inviter Selection Button - will be implemented in Phase 2 */}
+            {mode === 'generalAdd' && (
+              <div className="text-sm text-muted-foreground p-2 border rounded-md bg-muted/30">
+                Phase 2 placeholder: Inviter button will appear here
+              </div>
+            )}
+
+            {/* Phase 3: Selected Attendees Section - will be implemented in Phase 3 */}
+            {selectedAttendees.size > 0 && (
+              <div className="text-sm text-muted-foreground p-2 border rounded-md bg-muted/30">
+                Phase 3 placeholder: Selected attendees list will appear here (
+                {selectedAttendees.size} selected)
+              </div>
+            )}
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -238,6 +280,19 @@ export function AttendeeSearchModal({
         onSave={handleAttendeeCreated}
         onClose={() => setShowCreateAttendeeModal(false)}
       />
+
+      {/* Phase 2: Inviter Selection Modal - will be implemented in Phase 2 */}
+      {/* 
+      <InviterSelectionModal
+        open={showInviterModal}
+        onSelect={(inviterId) => {
+          setCurrentInviterId(inviterId)
+          setShowInviterModal(false)
+        }}
+        onClose={() => setShowInviterModal(false)}
+        excludeAttendeeIds={excludeAttendeeIds}
+      /> 
+      */}
     </>
   )
 }

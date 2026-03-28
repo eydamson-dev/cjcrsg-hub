@@ -3,8 +3,12 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-27  
-**Current Phase:** Phase 7 Refined - Attendance Workflow Redesign  
-**Status:** ✅ Complete | All Tasks 7.5-7.12 Finished
+**Current Phase:** Phase 8 - Refactor AttendanceManager  
+**Status:** 🚧 In Progress | Task 8.1 - Phase 1
+
+**Next Up:**
+
+- 🚧 Phase 1: AttendeeSearchModal - Core Structure (In Progress)
 
 ---
 
@@ -427,6 +431,254 @@ interface AttendeeSearchModalProps {
 - ✅ ESLint passes without errors
 - ✅ All imports resolved correctly
 - ✅ Backend mutations tested and working
+
+---
+
+## Next Tasks
+
+### Task 8.1: Refactor AttendanceManager with Add Attendance Button
+
+**Status:** 🚧 Ready for Implementation  
+**Priority:** HIGH  
+**Goal:** Replace search bar with dedicated "Add Attendance" button and enhance AttendeeSearchModal for general attendance addition
+
+**Implementation Approach:** Manual testing each phase, no commits until you approve
+
+---
+
+#### Implementation Phases
+
+| Phase     | Component           | Focus                          | Est. Time      | Files Modified          |
+| --------- | ------------------- | ------------------------------ | -------------- | ----------------------- |
+| 1         | AttendeeSearchModal | Interface & structure updates  | 30 min         | AttendeeSearchModal.tsx |
+| 2         | AttendeeSearchModal | Inviter selection button       | 45 min         | AttendeeSearchModal.tsx |
+| 3         | AttendeeSearchModal | Selected attendees section     | 45 min         | AttendeeSearchModal.tsx |
+| 4         | AttendeeSearchModal | Final integration & polish     | 30 min         | AttendeeSearchModal.tsx |
+| 5         | AttendanceManager   | Remove search bar              | 30 min         | AttendanceManager.tsx   |
+| 6         | AttendanceManager   | Add button & modal integration | 45 min         | AttendanceManager.tsx   |
+| 7         | Both                | Manual testing                 | 30 min         | Manual testing          |
+| **Total** |                     |                                | **~4.5 hours** |                         |
+
+**Phase Details:**
+
+**Phase 1:** Update interface with new props (`mode`, `inviterName`, `title`), add internal state, implement dynamic title logic, add placeholder for selected attendees section
+
+**Phase 2:** Add inviter selection button (only in generalAdd mode), integrate InviterSelectionModal as sub-modal, handle inviter selection state
+
+**Phase 3:** Build "Selected Attendees (X)" section below search results with Name + Status badge + Trash icon for each attendee, plus "Clear All" button
+
+**Phase 4:** Wire everything together, update `handleSave` to pass `inviterId`, ensure proper state reset, handle edge cases
+
+**Phase 5:** Remove search input and dropdown (~150 lines), remove related states and handlers, remove searchRef and useDebounce, clean up all search-related JSX
+
+**Phase 6:** Add "Add Attendance" button in CardHeader, add modal state, implement modal with `mode="generalAdd"`, handle onSelect callback with bulkCheckIn mutation
+
+**Phase 7:** Manual testing - open modal, test inviter selection, test attendee search/selection, test selected attendees section, test bulk check-in, verify no console errors
+
+---
+
+#### Part A: Modify AttendeeSearchModal Component
+
+**File:** `src/features/events/components/AttendeeSearchModal.tsx`
+
+**Interface Changes:**
+
+```typescript
+interface AttendeeSearchModalProps {
+  open?: boolean
+  mode?: 'groupAdd' | 'generalAdd' // 'groupAdd' = with inviter, 'generalAdd' = standalone
+  inviterName?: string // For groupAdd mode title
+  title?: string // Optional custom title override
+  onSelect: (attendeeIds: string[], inviterId: string | null) => void
+  onClose: () => void
+  excludeAttendeeIds?: string[]
+}
+```
+
+**Key Features:**
+
+1. **Dynamic Title:**
+   - `groupAdd` mode: "Add Attendees to {inviterName}'s Invites"
+   - `generalAdd` mode: "Add Attendance"
+
+2. **Inviter Selection Button** (generalAdd mode only):
+   - Button displays: "Inviter: Walk-in" (default) or "Inviter: [Name]"
+   - Clicking opens `InviterSelectionModal`
+   - Selected inviter ID stored in component state
+   - `null` = Walk-in (default)
+
+3. **Selected Attendees Section:**
+   - Shows below search results: "Selected Attendees (X)"
+   - Lists marked attendees with:
+     - Name
+     - Status badge (Member/Visitor)
+     - Trash icon to unmark individual attendees
+   - "Clear All" button to remove all selections
+   - Scrollable with max-height if many selected
+
+4. **UI Layout for generalAdd Mode:**
+
+   ```
+   ┌─────────────────────────────────────────────────────────┐
+   │ Add Attendance                                   [X]   │
+   ├─────────────────────────────────────────────────────────┤
+   │ ┌──────────────────────────────────────────────┐      │
+   │ │ Inviter: Walk-in                   [Change]    │      │
+   │ └──────────────────────────────────────────────┘      │
+   ├─────────────────────────────────────────────────────────┤
+   │ Search for attendees...                                 │
+   │                                                         │
+   │ ☐ John Smith        [Member]                            │
+   │ ☐ Sarah Lee         [Visitor]                           │
+   │                                                         │
+   │ [Create new attendee: "SearchQuery"]                    │
+   ├─────────────────────────────────────────────────────────┤
+   │ Selected Attendees (3)                         [Clear]  │
+   │ ┌─────────────────────────────────────────────────────┐ │
+   │ │ John Smith    [Member]                    [🗑️]      │ │
+   │ │ Sarah Lee     [Visitor]                   [🗑️]      │ │
+   │ └─────────────────────────────────────────────────────┘ │
+   ├─────────────────────────────────────────────────────────┤
+   │ [Cancel]                                [Add 3]       │
+   └─────────────────────────────────────────────────────────┘
+   ```
+
+5. **Workflow:**
+   - Modal opens with "Inviter: Walk-in" button
+   - User clicks [Change] → opens `InviterSelectionModal`
+   - After selecting inviter, return to this modal with updated button text
+   - User searches and selects attendees via checkboxes
+   - Selected attendees appear in bottom section with trash icons
+   - Clicking trash unmarks that attendee
+   - Clicking [Add X] calls `onSelect(attendeeIds, inviterId)`
+
+#### Part B: Modify AttendanceManager Component
+
+**File:** `src/features/events/components/AttendanceManager.tsx`
+
+**Changes:**
+
+1. **Remove Search Bar:**
+   - Delete search input and dropdown (~150 lines)
+   - Remove states: `searchQuery`, `showSearchResults`, `selectedAttendees`, `pendingAttendees`
+   - Remove handlers: `handleBulkCheckIn`, `handleCreateAttendee`, `handleInviterSelect`, `handleAttendeeCreated`
+   - Remove `searchRef`, `useDebounce` for search
+
+2. **Add "Add Attendance" Button:**
+   - **Placement:** In CardHeader next to attendee count (Option A)
+   - **UI:**
+     ```tsx
+     <Button
+       onClick={() => setShowAddAttendanceModal(true)}
+       variant="outline"
+       size="sm"
+     >
+       <Plus className="mr-2 h-4 w-4" />
+       Add Attendance
+     </Button>
+     ```
+
+3. **New State:**
+
+   ```typescript
+   const [showAddAttendanceModal, setShowAddAttendanceModal] = useState(false)
+   ```
+
+4. **Modal Implementation:**
+
+   ```tsx
+   <AttendeeSearchModal
+     open={showAddAttendanceModal}
+     mode="generalAdd"
+     onSelect={async (attendeeIds, inviterId) => {
+       const attendeesToCheckIn = attendeeIds.map((id) => ({
+         attendeeId: id,
+         invitedBy: inviterId || undefined,
+       }))
+       await bulkCheckIn.mutateAsync({ eventId, attendees: attendeesToCheckIn })
+       setShowAddAttendanceModal(false)
+     }}
+     onClose={() => setShowAddAttendanceModal(false)}
+     excludeAttendeeIds={attendance.map((r) => r.attendeeId)}
+   />
+   ```
+
+5. **CardHeader Update:**
+   ```tsx
+   <CardHeader>
+     <div className="flex items-center justify-between">
+       <CardTitle>Checked-in Attendees</CardTitle>
+       <div className="flex items-center gap-3">
+         <Button
+           onClick={() => setShowAddAttendanceModal(true)}
+           variant="outline"
+           size="sm"
+         >
+           <Plus className="mr-2 h-4 w-4" />
+           Add Attendance
+         </Button>
+         <div className="flex items-center gap-2">
+           <Users className="size-4 text-muted-foreground" />
+           <span className="text-2xl font-bold">{totalCount}</span>
+         </div>
+       </div>
+     </div>
+   </CardHeader>
+   ```
+
+#### Part C: Reuse InviterSelectionModal
+
+**Integration in AttendeeSearchModal:**
+
+```tsx
+const [showInviterModal, setShowInviterModal] = useState(false)
+const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
+
+// Helper to get inviter name from ID
+const getInviterName = (id: string | null) => {
+  if (!id) return 'Walk-in'
+  // Could fetch from attendees list or pass inviter list as prop
+  return 'Selected Inviter' // Simplified
+}
+
+// In render:
+<Button
+  variant="outline"
+  onClick={() => setShowInviterModal(true)}
+  className="w-full justify-between"
+>
+  <span>Inviter: {getInviterName(currentInviterId)}</span>
+  <span className="text-muted-foreground text-sm">Change</span>
+</Button>
+
+// ... later in JSX:
+<InviterSelectionModal
+  open={showInviterModal}
+  onSelect={(inviterId) => {
+    setCurrentInviterId(inviterId)
+    setShowInviterModal(false)
+  }}
+  onClose={() => setShowInviterModal(false)}
+  excludeAttendeeIds={[]} // All attendees can be inviters
+/>
+```
+
+**Acceptance Criteria:**
+
+- [ ] Search bar removed from AttendanceManager
+- [ ] "Add Attendance" button visible in CardHeader
+- [ ] Clicking button opens AttendeeSearchModal in generalAdd mode
+- [ ] Modal shows "Add Attendance" title
+- [ ] Inviter button shows "Inviter: Walk-in" by default
+- [ ] Clicking inviter button opens InviterSelectionModal
+- [ ] After selecting inviter, modal returns with updated inviter name
+- [ ] Search for attendees works with checkboxes
+- [ ] Selected attendees appear in separate section
+- [ ] Trash icon unmarks individual attendees
+- [ ] Clear All button removes all selections
+- [ ] Add button shows count and is disabled when 0 selected
+- [ ] Clicking Add checks in all selected with chosen inviter
+- [ ] Default inviter is Walk-in (null)
 
 ---
 
