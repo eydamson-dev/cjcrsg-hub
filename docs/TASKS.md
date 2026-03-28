@@ -1045,6 +1045,166 @@ function SundayServiceStats(props: StatsProps) {
 
 ---
 
+### Phase 10.10: Breadcrumb Navigation Enhancement
+
+**Status:** Ready for Implementation  
+**Goal:** Breadcrumbs should navigate to the correct event type parent page instead of the general Events page.
+
+**Problem:**
+
+- On Sunday Service History/Archive page, clicking "Events" breadcrumb goes to `/events` (general page)
+- Should go to `/events/sunday-service` (specific page)
+- "Back" button should say "Back to Sunday Service" and navigate correctly
+
+**Approach:** Hardcoded Names with Fallback
+
+#### Implementation Details
+
+**Q1: Event Type Lookup:** Hardcode by NAME instead of ID
+
+```typescript
+const SUNDAY_SERVICE_NAME = 'Sunday service' // Hardcoded in each page
+const sundayServiceType = eventTypes?.find(
+  (et) => et.name === SUNDAY_SERVICE_NAME,
+)
+```
+
+**Q2: Fallback Route Behavior:**
+
+- Try to find event type by slug (dynamic lookup)
+- If found: render generic EventsContent
+- If NOT found: redirect to `/events`
+
+**Q3: Skip slug generation for hardcoded pages** - each page has its own hardcoded name
+
+#### Phase 10.10.1: Update EventsBreadcrumb Component
+
+**File:** `src/features/events/components/EventsBreadcrumb.tsx`
+
+**Add props:**
+
+```typescript
+interface EventsBreadcrumbProps {
+  items: BreadcrumbItemData[]
+  parentEventTypeId?: string
+  parentEventTypeName?: string
+  showParentLink?: boolean
+}
+```
+
+**Logic:**
+
+```typescript
+const getEventsUrl = () => {
+  if (parentEventTypeId && parentEventTypeName) {
+    const slug = parentEventTypeName.toLowerCase().replace(/\s+/g, '-')
+    return `/events/${slug}`
+  }
+  return '/events'
+}
+
+const backText = parentEventTypeName
+  ? `Back to ${parentEventTypeName}`
+  : 'Back to Events'
+```
+
+#### Phase 10.10.2: Update Sunday Service Page
+
+**File:** `src/routes/events.sunday-service.tsx`
+
+**Add hardcoded constant:**
+
+```typescript
+const SUNDAY_SERVICE_NAME = 'Sunday service'
+const sundayServiceType = eventTypes?.find(
+  (et) => et.name === SUNDAY_SERVICE_NAME,
+)
+```
+
+#### Phase 10.10.3: Create Fallback Route
+
+**File:** `src/routes/events.$slug.tsx` (NEW)
+
+**Logic:**
+
+1. Get slug from URL params (e.g., "prayer-meeting")
+2. Convert to name format: "prayer meeting"
+3. Find event type by name (case-insensitive)
+4. **If found:** Render EventsContent with that event type
+5. **If not found:** Redirect to `/events`
+
+**Implementation:**
+
+```typescript
+const searchName = slug.replace(/-/g, ' ')
+const eventType = eventTypes?.find(
+  (et) => et.name.toLowerCase() === searchName.toLowerCase()
+)
+
+if (!eventType) {
+  return <Navigate to="/events" />
+}
+
+return <EventsContent
+  title={eventType.name}
+  subtitle={`Manage ${eventType.name} events`}
+  eventTypeId={eventType._id}
+  // ... other props
+/>
+```
+
+#### Phase 10.10.4: Update History Page
+
+**File:** `src/routes/events.history.tsx`
+
+**Add parent context:**
+
+```typescript
+const searchParams = useSearch({ from: '/events/history' })
+const parentEventType = searchParams.type
+  ? eventTypes?.find(et => et._id === searchParams.type)
+  : undefined
+
+<EventsBreadcrumb
+  items={[{ label: 'History' }]}
+  parentEventTypeId={parentEventType?._id}
+  parentEventTypeName={parentEventType?.name}
+/>
+```
+
+#### Phase 10.10.5: Update Archive Page
+
+**File:** `src/routes/events.archive.tsx`
+
+Same as Phase 10.10.4.
+
+#### Phase 10.10.6: Update Event Detail Page
+
+**File:** `src/routes/events.$id.tsx`
+
+```typescript
+const eventType = eventTypes?.find(et => et._id === event?.eventTypeId)
+
+<EventsBreadcrumb
+  items={[{ label: event?.name }]}
+  parentEventTypeId={event?.eventTypeId}
+  parentEventTypeName={eventType?.name}
+/>
+```
+
+#### Testing Checklist
+
+- [ ] Sunday Service page: "Events" breadcrumb goes to `/events/sunday-service`
+- [ ] Sunday Service History: Breadcrumb shows "Home > Events > Sunday Service > History"
+- [ ] History "Events" link → goes to `/events/sunday-service`
+- [ ] History "Back" button → says "Back to Sunday Service", goes to `/events/sunday-service`
+- [ ] Sunday Service Archive: Same breadcrumb behavior
+- [ ] Event Detail page: Back button respects parent event type
+- [ ] Fallback route works for unhandled event types
+- [ ] Fallback redirects to `/events` if event type not found
+
+---
+
 ## Development Workflow
 
 1. **IMPLEMENT** - Build the feature first
