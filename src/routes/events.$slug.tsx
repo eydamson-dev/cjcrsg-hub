@@ -4,6 +4,7 @@ import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { EventsContent } from '~/features/events/components/EventsContent'
 import { useEventTypesList } from '~/features/events/hooks/useEventTypes'
+import { PageLoader } from '~/components/ui/loading-spinner'
 
 // Fallback route for event types without a hardcoded custom page
 // Matches /events/{any-slug} and tries to find the event type by slug
@@ -22,9 +23,7 @@ function EventTypeFallbackPage() {
     return (
       <ProtectedRoute>
         <Layout>
-          <div className="flex h-64 items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          <PageLoader />
         </Layout>
       </ProtectedRoute>
     )
