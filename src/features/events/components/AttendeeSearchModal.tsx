@@ -22,10 +22,8 @@ import {
 import { useSearchAttendees } from '~/features/attendees/hooks/useAttendees'
 import { useDebounce } from '~/hooks/useDebounce'
 import { CreateAttendeeModal } from './CreateAttendeeModal'
+import { InviterSelectionModal } from './InviterSelectionModal'
 import type { Attendee } from '~/features/attendees/types'
-
-// Phase 2: Will import InviterSelectionModal
-// import { InviterSelectionModal } from './InviterSelectionModal'
 
 // Phase 3: Will import Trash2
 // import { Trash2 } from 'lucide-react'
@@ -57,10 +55,8 @@ export function AttendeeSearchModal({
     new Set(),
   )
   const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
-
-  // Phase 2: Will add inviter selection state
-  // const [showInviterModal, setShowInviterModal] = useState(false)
-  // const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
+  const [showInviterModal, setShowInviterModal] = useState(false)
+  const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const { data: searchResults, isLoading: isSearching } =
@@ -77,8 +73,7 @@ export function AttendeeSearchModal({
     if (isOpen) {
       setSearchQuery('')
       setSelectedAttendees(new Set())
-      // Phase 2: Will reset inviter
-      // setCurrentInviterId(null)
+      setCurrentInviterId(null)
     }
   }, [isOpen])
 
@@ -109,9 +104,7 @@ export function AttendeeSearchModal({
 
   const handleSave = () => {
     if (selectedAttendees.size === 0) return
-    // Phase 2: Will pass inviterId
-    // onSelect(Array.from(selectedAttendees), currentInviterId)
-    onSelect(Array.from(selectedAttendees), null)
+    onSelect(Array.from(selectedAttendees), currentInviterId)
     handleOpenChange(false)
   }
 
@@ -143,11 +136,18 @@ export function AttendeeSearchModal({
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Phase 2: Inviter Selection Button - will be implemented in Phase 2 */}
+            {/* Phase 2: Inviter Selection Button */}
             {mode === 'generalAdd' && (
-              <div className="text-sm text-muted-foreground p-2 border rounded-md bg-muted/30">
-                Phase 2 placeholder: Inviter button will appear here
-              </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowInviterModal(true)}
+                className="w-full justify-between"
+              >
+                <span>
+                  Inviter: {currentInviterId ? 'Selected' : 'Walk-in'}
+                </span>
+                <span className="text-muted-foreground text-sm">Change</span>
+              </Button>
             )}
 
             {/* Phase 3: Selected Attendees Section - will be implemented in Phase 3 */}
@@ -281,8 +281,7 @@ export function AttendeeSearchModal({
         onClose={() => setShowCreateAttendeeModal(false)}
       />
 
-      {/* Phase 2: Inviter Selection Modal - will be implemented in Phase 2 */}
-      {/* 
+      {/* Phase 2: Inviter Selection Modal */}
       <InviterSelectionModal
         open={showInviterModal}
         onSelect={(inviterId) => {
@@ -291,8 +290,7 @@ export function AttendeeSearchModal({
         }}
         onClose={() => setShowInviterModal(false)}
         excludeAttendeeIds={excludeAttendeeIds}
-      /> 
-      */}
+      />
     </>
   )
 }
