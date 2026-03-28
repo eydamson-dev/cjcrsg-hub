@@ -20,10 +20,11 @@ import {
 } from '~/components/ui/command'
 import { useSearchAttendees } from '~/features/attendees/hooks/useAttendees'
 import { useDebounce } from '~/hooks/useDebounce'
+import type { Attendee } from '~/features/attendees/types'
 
 interface InviterSelectionModalProps {
   open?: boolean
-  onSelect: (inviterId: string | null) => void
+  onSelect: (inviter: Attendee | null) => void
   onClose?: () => void
   excludeAttendeeIds?: string[]
   title?: string
@@ -63,8 +64,8 @@ export function InviterSelectionModal({
     }
   }
 
-  const handleSelectInviter = (inviterId: string | null) => {
-    onSelect(inviterId)
+  const handleSelectInviter = (inviter: Attendee | null) => {
+    onSelect(inviter)
     handleOpenChange(false)
   }
 
@@ -140,7 +141,9 @@ export function InviterSelectionModal({
                       <CommandItem
                         key={attendee._id}
                         className="flex items-center justify-between py-3 cursor-pointer"
-                        onSelect={() => handleSelectInviter(attendee._id)}
+                        onSelect={() =>
+                          handleSelectInviter(attendee as Attendee)
+                        }
                       >
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">

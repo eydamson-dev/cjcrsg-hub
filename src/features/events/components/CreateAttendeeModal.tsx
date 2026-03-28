@@ -13,12 +13,14 @@ import type { CreateAttendeeInput, Attendee } from '~/features/attendees/types'
 
 interface CreateAttendeeModalProps {
   open?: boolean
+  name?: string
   onSave: (attendee: Attendee) => void
   onClose?: () => void
 }
 
 export function CreateAttendeeModal({
   open,
+  name,
   onSave,
   onClose,
 }: CreateAttendeeModalProps) {
@@ -67,6 +69,7 @@ export function CreateAttendeeModal({
 
         <div className="py-4">
           <AttendeeForm
+            initialData={{ firstName: name }}
             onSubmit={handleSubmit}
             onCancel={() => handleOpenChange(false)}
             isSubmitting={createAttendee.isPending}

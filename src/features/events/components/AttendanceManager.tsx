@@ -1,25 +1,23 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { cn } from '~/lib/utils'
 import {
-  Search,
   Trash2,
-  X,
   Users,
-  Check,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
   Loader2,
   ChevronDown,
   ChevronUp,
-  UserPlus,
   Plus,
+  List,
+  LayoutGrid,
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
+
 import { Badge } from '~/components/ui/badge'
 import { Checkbox } from '~/components/ui/checkbox'
 import {
@@ -53,44 +51,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from '~/components/ui/command'
+
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '~/components/ui/collapsible'
-import { useDebounce } from '~/hooks/useDebounce'
-import { useSearchAttendees } from '~/features/attendees/hooks/useAttendees'
 import {
   useAttendanceByEvent,
   useAttendanceStats,
-  useCheckIn,
   useUnCheckIn,
   useBulkCheckIn,
   useUpdateInviter,
 } from '../hooks/useAttendance'
 import { useNavigate } from '@tanstack/react-router'
-import { CreateAttendeeModal } from './CreateAttendeeModal'
 import { InviterSelectionModal } from './InviterSelectionModal'
 import { AttendeeSearchModal } from './AttendeeSearchModal'
-import type { Attendee } from '~/features/attendees/types'
 
 interface AttendanceManagerProps {
   eventId: string
-}
-
-interface AttendeeToCheckIn {
-  attendeeId: string
-  firstName: string
-  lastName: string
-  status: 'member' | 'visitor' | 'inactive'
 }
 
 // Type for attendance record from Convex query
@@ -119,27 +99,16 @@ interface AttendanceRecordItem {
 
 export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showSearchResults, setShowSearchResults] = useState(false)
-  const [selectedAttendees, setSelectedAttendees] = useState<Set<string>>(
-    new Set(),
-  )
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null)
   const [cursor, setCursor] = useState<string | null>(null)
   const [pageSize, setPageSize] = useState(10)
-  const searchRef = useRef<HTMLDivElement>(null)
 
   // View mode state
   const [viewMode, setViewMode] = useState<'list' | 'byInviter'>('list')
 
   // Modal states
   const [showInviterModal, setShowInviterModal] = useState(false)
-  const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
-
-  // Pending attendees for check-in (waiting for inviter selection)
-  const [pendingAttendees, setPendingAttendees] = useState<AttendeeToCheckIn[]>(
-    [],
-  )
+  const [showAddAttendanceModal, setShowAddAttendanceModal] = useState(false)
 
   // Track expanded groups in "by inviter" view
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
@@ -150,17 +119,13 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   )
 
   const pageSizeOptions = [10, 25, 50]
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   // Queries
   const { data: attendanceData, isLoading: isLoadingAttendance } =
     useAttendanceByEvent(eventId, { numItems: pageSize, cursor })
   const { data: stats } = useAttendanceStats(eventId)
-  const { data: searchResults, isLoading: isSearching } =
-    useSearchAttendees(debouncedSearchQuery)
 
   // Mutations
-  const checkIn = useCheckIn()
   const unCheckIn = useUnCheckIn()
   const bulkCheckIn = useBulkCheckIn()
   const updateInviter = useUpdateInviter()
@@ -177,36 +142,6 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     id: string | null
     name: string
   } | null>(null)
-
-  // Get already checked-in attendee IDs
-  const checkedInAttendeeIds = useMemo(() => {
-    const attendance = attendanceData?.page || []
-    return new Set(
-      attendance.map((record: AttendanceRecordItem) => record.attendeeId),
-    )
-  }, [attendanceData])
-
-  // Filter search results to exclude already checked-in attendees
-  const availableAttendees = useMemo(() => {
-    if (!searchResults) return []
-    return searchResults.filter(
-      (attendee) => !checkedInAttendeeIds.has(attendee._id),
-    )
-  }, [searchResults, checkedInAttendeeIds])
-
-  // Handle click outside to close search results
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setShowSearchResults(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   // Format time
   const formatTime = (timestamp: number) => {
@@ -230,64 +165,6 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     ),
     hasNext: !!attendanceData?.continueCursor,
     hasPrevious: !!cursor,
-  }
-
-  // Handle check-in (defaults to Walk-in)
-  const handleBulkCheckIn = async () => {
-    if (selectedAttendees.size === 0) return
-
-    const attendeesToCheckIn = availableAttendees
-      .filter((attendee) => selectedAttendees.has(attendee._id))
-      .map((attendee) => ({
-        attendeeId: attendee._id,
-        // invitedBy is undefined = Walk-in
-      }))
-
-    try {
-      await bulkCheckIn.mutateAsync({
-        eventId,
-        attendees: attendeesToCheckIn,
-      })
-      setSearchQuery('')
-      setShowSearchResults(false)
-      setSelectedAttendees(new Set())
-    } catch (error) {
-      // Error is handled by the hook
-    }
-  }
-
-  // Handle inviter selection from modal
-  const handleInviterSelect = async (inviterId: string | null) => {
-    if (pendingAttendees.length === 0) return
-
-    try {
-      if (pendingAttendees.length === 1) {
-        // Single check-in
-        await checkIn.mutateAsync({
-          eventId,
-          attendeeId: pendingAttendees[0].attendeeId,
-          invitedBy: inviterId || undefined,
-        })
-      } else {
-        // Bulk check-in
-        await bulkCheckIn.mutateAsync({
-          eventId,
-          attendees: pendingAttendees.map((attendee) => ({
-            attendeeId: attendee.attendeeId,
-            invitedBy: inviterId || undefined,
-          })),
-        })
-      }
-
-      // Reset state
-      setSearchQuery('')
-      setShowSearchResults(false)
-      setSelectedAttendees(new Set())
-      setPendingAttendees([])
-      setShowInviterModal(false)
-    } catch (error) {
-      // Error is handled by the hook
-    }
   }
 
   // Handle uncheck-in (remove)
@@ -336,15 +213,18 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     setShowAttendeeSearchModal(true)
   }
 
-  // Handle attendees selected from AttendeeSearchModal
-  const handleAttendeesSelectedForGroup = async (attendeeIds: string[]) => {
+  // Handle attendees selected from AttendeeSearchModal (groupAdd mode)
+  const handleAttendeesSelectedForGroup = async (
+    attendeeIds: string[],
+    inviterId: string | null,
+  ) => {
     if (!selectedInviterForGroupAdd || attendeeIds.length === 0) return
 
     try {
       // Check in all selected attendees with the pre-selected inviter
       const attendeesToCheckIn = attendeeIds.map((id) => ({
         attendeeId: id,
-        invitedBy: selectedInviterForGroupAdd.id || undefined,
+        invitedBy: inviterId || undefined,
       }))
 
       await bulkCheckIn.mutateAsync({
@@ -360,13 +240,15 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
   }
 
   // Handle inviter selection from modal (for single record assignment)
-  const handleInviterSelectedForRecord = async (inviterId: string | null) => {
+  const handleInviterSelectedForRecord = async (
+    inviter: { _id: string } | null,
+  ) => {
     if (!recordToAssignInviter) return
 
     try {
       await updateInviter.mutateAsync({
         attendanceRecordId: recordToAssignInviter,
-        invitedBy: inviterId || undefined,
+        invitedBy: inviter?._id ?? undefined,
       })
       setRecordToAssignInviter(null)
       setAttendeeNameForModal('')
@@ -376,40 +258,28 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
     }
   }
 
-  // Handle create new attendee from search
-  const handleCreateAttendee = () => {
-    setShowCreateAttendeeModal(true)
-  }
+  // Handle attendees selected from Add Attendance modal (generalAdd mode)
+  const handleAttendeesSelectedForGeneralAdd = async (
+    attendeeIds: string[],
+    inviterId: string | null,
+  ) => {
+    if (attendeeIds.length === 0) return
 
-  // Handle after attendee is created
-  const handleAttendeeCreated = (attendee: Attendee) => {
-    // Add the new attendee to selected attendees
-    setSelectedAttendees(new Set([attendee._id]))
-    // Set them as pending for check-in
-    setPendingAttendees([
-      {
-        attendeeId: attendee._id,
-        firstName: attendee.firstName,
-        lastName: attendee.lastName,
-        status: attendee.status,
-      },
-    ])
-    // Clear search
-    setSearchQuery('')
-    setShowSearchResults(false)
-    // Open inviter modal
-    setShowInviterModal(true)
-  }
+    try {
+      const attendeesToCheckIn = attendeeIds.map((id) => ({
+        attendeeId: id,
+        invitedBy: inviterId || undefined,
+      }))
 
-  // Toggle attendee selection for bulk check-in
-  const toggleAttendeeSelection = (attendeeId: string) => {
-    const newSelected = new Set(selectedAttendees)
-    if (newSelected.has(attendeeId)) {
-      newSelected.delete(attendeeId)
-    } else {
-      newSelected.add(attendeeId)
+      await bulkCheckIn.mutateAsync({
+        eventId,
+        attendees: attendeesToCheckIn,
+      })
+
+      setShowAddAttendanceModal(false)
+    } catch (error) {
+      // Error is handled by the hook
     }
-    setSelectedAttendees(newSelected)
   }
 
   // Toggle group expansion
@@ -513,164 +383,17 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Search Bar with Add Button */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex-1 w-full sm:min-w-[200px] sm:max-w-md">
-          <div ref={searchRef} className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search attendee to add..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setShowSearchResults(true)
-                if (e.target.value === '') {
-                  setSelectedAttendees(new Set())
-                }
-              }}
-              onFocus={() => setShowSearchResults(true)}
-              className="pl-9"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              {isSearching && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              )}
-              {searchQuery && !isSearching && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('')
-                    setShowSearchResults(false)
-                    setSelectedAttendees(new Set())
-                  }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Search Results Dropdown */}
-            {showSearchResults && (
-              <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
-                <Command>
-                  <CommandList>
-                    {debouncedSearchQuery.length === 0 ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Start typing to search for attendees
-                      </div>
-                    ) : isSearching ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Searching...
-                      </div>
-                    ) : availableAttendees.length === 0 ? (
-                      <CommandEmpty>
-                        {searchResults?.length === 0 ? (
-                          <div className="p-4 text-center space-y-2">
-                            <p className="text-muted-foreground">
-                              No attendees found
-                            </p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleCreateAttendee}
-                              className="w-full"
-                            >
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              Create new attendee: &quot;{debouncedSearchQuery}
-                              &quot;
-                            </Button>
-                          </div>
-                        ) : (
-                          'All matching attendees are already checked in'
-                        )}
-                      </CommandEmpty>
-                    ) : (
-                      <>
-                        <CommandGroup
-                          heading={`${availableAttendees.length} available`}
-                        >
-                          {availableAttendees.map((attendee) => (
-                            <CommandItem
-                              key={attendee._id}
-                              className="flex items-center justify-between py-2 cursor-pointer"
-                              onSelect={() => {
-                                toggleAttendeeSelection(attendee._id)
-                              }}
-                            >
-                              <div className="flex items-center gap-3">
-                                <Checkbox
-                                  checked={selectedAttendees.has(attendee._id)}
-                                  onCheckedChange={() =>
-                                    toggleAttendeeSelection(attendee._id)
-                                  }
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <span className="font-medium">
-                                  {attendee.firstName} {attendee.lastName}
-                                </span>
-                                <Badge
-                                  variant={
-                                    attendee.status === 'member'
-                                      ? 'default'
-                                      : 'secondary'
-                                  }
-                                  className="text-xs"
-                                >
-                                  {attendee.status === 'member'
-                                    ? 'Member'
-                                    : 'Visitor'}
-                                </Badge>
-                              </div>
-                              {selectedAttendees.has(attendee._id) && (
-                                <Check className="size-4 text-primary" />
-                              )}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                        {selectedAttendees.size > 0 && (
-                          <div className="border-t p-2 flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">
-                              {selectedAttendees.size} selected
-                            </span>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedAttendees(new Set())}
-                              >
-                                Clear
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={handleBulkCheckIn}
-                                disabled={bulkCheckIn.isPending}
-                              >
-                                Add {selectedAttendees.size}
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </CommandList>
-                </Command>
-              </div>
-            )}
-          </div>
-          <p
-            className={cn(
-              'text-xs text-muted-foreground mt-1 h-4 transition-opacity duration-200',
-              searchQuery.length > 0 && searchQuery.length < 3
-                ? 'opacity-100'
-                : 'opacity-0',
-            )}
-          >
-            Type at least 3 characters to search
-          </p>
-        </div>
+      <div className="flex w-full justify-end tems-center">
+        <Button
+          onClick={() => setShowAddAttendanceModal(true)}
+          variant="default"
+          size="lg"
+          className="w-max"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add Attendance
+        </Button>
       </div>
-
-      {/* Results Info */}
       {attendance.length > 0 && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground">
@@ -678,7 +401,7 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
               ? `Showing ${paginationInfo.startItem} to ${paginationInfo.endItem} of ${paginationInfo.totalCount} attendees`
               : `${attendance.length} attendees`}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             <span className="text-sm text-muted-foreground">
               Items per page:
             </span>
@@ -703,28 +426,43 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           </div>
         </div>
       )}
-
-      {/* View Toggle Tabs */}
-      {attendance.length > 0 && (
-        <Tabs
-          value={viewMode}
-          onValueChange={(value) => setViewMode(value as 'list' | 'byInviter')}
-        >
-          <TabsList className="grid w-full sm:w-auto grid-cols-2">
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="byInviter">By Inviter</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      )}
-
-      {/* Attendance Table Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <CardTitle>Checked-in Attendees</CardTitle>
-            <div className="flex items-center gap-2">
-              <Users className="size-4 text-muted-foreground" />
-              <span className="text-2xl font-bold">{totalCount}</span>
+            <div className="flex items-center gap-3 mr-auto">
+              <div className="flex items-center gap-2">
+                <Users className="size-4 text-muted-foreground" />
+                <span className="text-lg font-bold">{totalCount}</span>
+              </div>
+            </div>
+            <div className="flex rounded-lg justify-end">
+              <Button
+                variant={viewMode === 'list' ? 'outline' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  viewMode === 'list'
+                    ? ''
+                    : 'text-muted-foreground hover:text-foreground',
+                  'rounded-r-none',
+                )}
+              >
+                <List className="h-4 w-4 mr-2" />
+              </Button>
+              <Button
+                variant={viewMode === 'byInviter' ? 'outline' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('byInviter')}
+                className={cn(
+                  viewMode === 'byInviter'
+                    ? ''
+                    : 'text-muted-foreground hover:text-foreground',
+                  'rounded-l-none',
+                )}
+              >
+                <LayoutGrid className="h-4 w-4 mr-2" />
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -738,7 +476,7 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold">No attendees yet</h3>
               <p className="text-sm text-muted-foreground mt-2">
-                Search above to check someone in
+                Click "Add Attendance" to check someone in
               </p>
             </div>
           ) : viewMode === 'list' ? (
@@ -763,24 +501,6 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
                         <Button size="sm">Bulk Actions</Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            // TODO: Open inviter selection modal for bulk assign
-                            setPendingAttendees(
-                              attendance
-                                .filter((r) => selectedTableRows.has(r._id))
-                                .map((r) => ({
-                                  attendeeId: r.attendeeId,
-                                  firstName: r.attendee?.firstName || '',
-                                  lastName: r.attendee?.lastName || '',
-                                  status: r.attendee?.status || 'visitor',
-                                })),
-                            )
-                            setShowInviterModal(true)
-                          }}
-                        >
-                          Assign Inviter
-                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={async () => {
@@ -1141,28 +861,16 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Create Attendee Modal */}
-      <CreateAttendeeModal
-        open={showCreateAttendeeModal}
-        onSave={handleAttendeeCreated}
-        onClose={() => setShowCreateAttendeeModal(false)}
-      />
-
       {/* Inviter Selection Modal */}
       <InviterSelectionModal
         open={showInviterModal}
-        onSelect={
-          recordToAssignInviter
-            ? handleInviterSelectedForRecord
-            : handleInviterSelect
-        }
+        onSelect={handleInviterSelectedForRecord}
         onClose={() => {
           setShowInviterModal(false)
-          setPendingAttendees([])
           setRecordToAssignInviter(null)
           setAttendeeNameForModal('')
         }}
-        excludeAttendeeIds={pendingAttendees.map((a) => a.attendeeId)}
+        excludeAttendeeIds={[]}
         title={
           recordToAssignInviter
             ? `Assign Inviter to ${attendeeNameForModal}`
@@ -1174,6 +882,7 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
       {selectedInviterForGroupAdd && (
         <AttendeeSearchModal
           open={showAttendeeSearchModal}
+          mode="groupAdd"
           inviterName={selectedInviterForGroupAdd.name}
           onSelect={handleAttendeesSelectedForGroup}
           onClose={() => {
@@ -1183,6 +892,15 @@ export function AttendanceManager({ eventId }: AttendanceManagerProps) {
           excludeAttendeeIds={attendance.map((r) => r.attendeeId)}
         />
       )}
+
+      {/* Attendee Search Modal for General Add Attendance */}
+      <AttendeeSearchModal
+        open={showAddAttendanceModal}
+        mode="generalAdd"
+        onSelect={handleAttendeesSelectedForGeneralAdd}
+        onClose={() => setShowAddAttendanceModal(false)}
+        excludeAttendeeIds={attendance.map((r) => r.attendeeId)}
+      />
     </div>
   )
 }

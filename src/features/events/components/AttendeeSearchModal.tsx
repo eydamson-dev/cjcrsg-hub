@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, User, Users, Plus, Trash2 } from 'lucide-react'
+import { Search, User, Users, Trash2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -14,7 +14,6 @@ import { Badge } from '~/components/ui/badge'
 import { Checkbox } from '~/components/ui/checkbox'
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -60,7 +59,10 @@ export function AttendeeSearchModal({
   >([])
   const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
   const [showInviterModal, setShowInviterModal] = useState(false)
-  const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
+  const [currentInviter, setCurrentInviter] = useState<Attendee | null>(null)
+  const [newAttendeeName, setNewAttendeeName] = useState<string | undefined>(
+    undefined,
+  )
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const { data: searchResults, isLoading: isSearching } =
@@ -77,7 +79,7 @@ export function AttendeeSearchModal({
     if (isOpen) {
       setSearchQuery('')
       setSelectedAttendees([])
-      setCurrentInviterId(null)
+      setCurrentInviter(null)
     }
   }, [isOpen])
 
@@ -88,13 +90,25 @@ export function AttendeeSearchModal({
     }
   }
 
-  // Filter search results to exclude already-checked-in attendees
+  // Filter search results to exclude already-checked-in attendees AND selected attendees
   const availableAttendees = useMemo(() => {
     if (!searchResults) return []
     return searchResults.filter(
-      (attendee) => !excludeAttendeeIds.includes(attendee._id),
+      (attendee) =>
+        !excludeAttendeeIds.includes(attendee._id) &&
+        !selectedAttendees.some((selected) => selected._id === attendee._id),
     )
-  }, [searchResults, excludeAttendeeIds])
+  }, [searchResults, excludeAttendeeIds, selectedAttendees])
+
+  // Unified display list: search results + selected attendees (most recent first)
+  const displayAttendees = useMemo(() => {
+    // Selected attendees first (most recent = last in array = at top)
+    const selectedReversed = [...selectedAttendees].reverse()
+    return [...availableAttendees, ...selectedReversed]
+  }, [availableAttendees, selectedAttendees])
+
+  // Index where selected section starts (for divider logic)
+  const selectedSectionStartIndex = availableAttendees.length
 
   const toggleAttendeeSelection = (attendee: SelectedAttendee) => {
     const exists = selectedAttendees.find((a) => a._id === attendee._id)
@@ -115,7 +129,7 @@ export function AttendeeSearchModal({
     if (selectedAttendees.length === 0) return
     onSelect(
       selectedAttendees.map((a) => a._id),
-      currentInviterId,
+      currentInviter?._id ?? null,
     )
     handleOpenChange(false)
   }
@@ -146,6 +160,20 @@ export function AttendeeSearchModal({
     setShowCreateAttendeeModal(false)
   }
 
+  const createNewAttendeeLink = (text: string = 'New attendee?') => {
+    return (
+      <button
+        onClick={() => {
+          setNewAttendeeName(searchQuery || undefined)
+          handleCreateAttendee()
+        }}
+        className="text-xs text-primary hover:underline transition-colors"
+      >
+        {text}
+      </button>
+    )
+  }
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -163,77 +191,35 @@ export function AttendeeSearchModal({
                 className="w-full justify-between"
               >
                 <span>
-                  Inviter: {currentInviterId ? 'Selected' : 'Walk-in'}
+                  Inviter:{' '}
+                  {currentInviter
+                    ? `${currentInviter.firstName} ${currentInviter.lastName}`
+                    : 'Walk-in'}
                 </span>
                 <span className="text-muted-foreground text-sm">Change</span>
               </Button>
             )}
 
-            {/* Phase 3: Selected Attendees Section */}
-            {selectedAttendees.length > 0 && (
-              <div className="border rounded-md">
-                <div className="flex items-center justify-between p-3 bg-muted/50">
-                  <span className="text-sm font-medium">
-                    Selected Attendees ({selectedAttendees.length})
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedAttendees([])}
-                  >
-                    Clear All
-                  </Button>
-                </div>
-                <div className="max-h-[200px] overflow-auto p-2 space-y-2">
-                  {selectedAttendees.map((attendee) => (
-                    <div
-                      key={attendee._id}
-                      className="flex items-center justify-between p-2 bg-background rounded-md"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {attendee.firstName} {attendee.lastName}
-                        </span>
-                        <Badge
-                          variant={
-                            attendee.status === 'member'
-                              ? 'default'
-                              : 'secondary'
-                          }
-                          className="text-xs"
-                        >
-                          {attendee.status === 'member' ? 'Member' : 'Visitor'}
-                        </Badge>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeAttendee(attendee._id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search for attendees..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                  autoFocus
+                />
               </div>
-            )}
-
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search for attendees..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-                autoFocus
-              />
+              {/* New attendee link */}
+              <div className="flex justify-end">{createNewAttendeeLink()}</div>
             </div>
 
             <div className="border rounded-md">
               <Command>
                 <CommandList className="max-h-[300px] overflow-auto">
-                  {debouncedSearchQuery.length === 0 ? (
+                  {debouncedSearchQuery.length === 0 &&
+                  selectedAttendees.length === 0 ? (
                     <div className="p-8 text-center text-sm text-muted-foreground">
                       <Users className="size-8 mx-auto mb-2 text-muted-foreground" />
                       Type a name to search for attendees
@@ -242,50 +228,18 @@ export function AttendeeSearchModal({
                     <div className="p-8 text-center text-sm text-muted-foreground">
                       Searching...
                     </div>
-                  ) : availableAttendees.length === 0 ? (
-                    <CommandEmpty>
-                      <div className="p-4 text-center space-y-3">
-                        <p className="text-muted-foreground">
-                          No attendees found matching &quot;
-                          {debouncedSearchQuery}&quot;
-                        </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleCreateAttendee}
-                          className="w-full"
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Create new attendee: &quot;{debouncedSearchQuery}
-                          &quot;
-                        </Button>
-                      </div>
-                    </CommandEmpty>
                   ) : (
-                    <CommandGroup
-                      heading={`${availableAttendees.length} available`}
-                    >
-                      {availableAttendees.map((attendee) => {
-                        const isSelected = selectedAttendees.some(
-                          (a) => a._id === attendee._id,
-                        )
-                        return (
-                          <CommandItem
-                            key={attendee._id}
-                            className="flex items-center justify-between py-3 cursor-pointer"
-                            onSelect={() =>
-                              toggleAttendeeSelection({
-                                _id: attendee._id,
-                                firstName: attendee.firstName,
-                                lastName: attendee.lastName,
-                                status: attendee.status,
-                              })
-                            }
-                          >
-                            <div className="flex items-center gap-3">
-                              <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() =>
+                    <CommandGroup>
+                      {/* Search Results Section - only show if there are available attendees */}
+                      {availableAttendees.length > 0 ? (
+                        <>
+                          {displayAttendees
+                            .slice(0, selectedSectionStartIndex)
+                            .map((attendee) => (
+                              <CommandItem
+                                key={attendee._id}
+                                className="flex items-center justify-between py-3 cursor-pointer"
+                                onSelect={() =>
                                   toggleAttendeeSelection({
                                     _id: attendee._id,
                                     firstName: attendee.firstName,
@@ -293,62 +247,149 @@ export function AttendeeSearchModal({
                                     status: attendee.status,
                                   })
                                 }
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                                <User className="size-4 text-primary" />
-                              </div>
-                              <span className="font-medium">
-                                {attendee.firstName} {attendee.lastName}
-                              </span>
-                              <Badge
-                                variant={
-                                  attendee.status === 'member'
-                                    ? 'default'
-                                    : 'secondary'
-                                }
-                                className="text-xs"
                               >
-                                {attendee.status === 'member'
-                                  ? 'Member'
-                                  : 'Visitor'}
-                              </Badge>
-                            </div>
-                          </CommandItem>
-                        )
-                      })}
+                                <div className="flex items-center gap-3">
+                                  <Checkbox
+                                    checked={false}
+                                    onCheckedChange={() =>
+                                      toggleAttendeeSelection({
+                                        _id: attendee._id,
+                                        firstName: attendee.firstName,
+                                        lastName: attendee.lastName,
+                                        status: attendee.status,
+                                      })
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                                    <User className="size-4 text-primary" />
+                                  </div>
+                                  <span className="font-medium">
+                                    {attendee.firstName} {attendee.lastName}
+                                  </span>
+                                  <Badge
+                                    variant={
+                                      attendee.status === 'member'
+                                        ? 'default'
+                                        : 'secondary'
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {attendee.status === 'member'
+                                      ? 'Member'
+                                      : 'Visitor'}
+                                  </Badge>
+                                </div>
+                              </CommandItem>
+                            ))}
+                        </>
+                      ) : (
+                        <>
+                          {`Attendee not found.`}
+                          {' Create new attendee for '}
+                          <strong>{createNewAttendeeLink(searchQuery)}</strong>
+                          {'?'}
+                        </>
+                      )}
+
+                      {/* Divider between sections */}
+                      {availableAttendees.length > 0 &&
+                        selectedAttendees.length > 0 && (
+                          <div className="border-t my-2" />
+                        )}
+
+                      {/* Selected Attendees Section (most recent first) */}
+                      {selectedAttendees.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-xs text-muted-foreground font-medium">
+                            Selected
+                          </div>
+                          {[...selectedAttendees].reverse().map((attendee) => (
+                            <CommandItem
+                              key={attendee._id}
+                              className="flex items-center justify-between py-3 cursor-pointer bg-primary/5"
+                              onSelect={() => removeAttendee(attendee._id)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={true}
+                                  onCheckedChange={() =>
+                                    removeAttendee(attendee._id)
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                                  <User className="size-4 text-primary" />
+                                </div>
+                                <span className="font-medium">
+                                  {attendee.firstName} {attendee.lastName}
+                                </span>
+                                <Badge
+                                  variant={
+                                    attendee.status === 'member'
+                                      ? 'default'
+                                      : 'secondary'
+                                  }
+                                  className="text-xs"
+                                >
+                                  {attendee.status === 'member'
+                                    ? 'Member'
+                                    : 'Visitor'}
+                                </Badge>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  removeAttendee(attendee._id)
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </CommandItem>
+                          ))}
+                        </>
+                      )}
                     </CommandGroup>
-                  )}
-                  {selectedAttendees.length > 0 && (
-                    <div className="border-t p-3 flex items-center justify-between bg-muted/50">
-                      <span className="text-sm font-medium">
-                        {selectedAttendees.length} selected
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedAttendees([])}
-                      >
-                        Clear
-                      </Button>
-                    </div>
                   )}
                 </CommandList>
               </Command>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => handleOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={selectedAttendees.length === 0}
-            >
-              Add{' '}
-              {selectedAttendees.length > 0 && `(${selectedAttendees.length})`}
-            </Button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {selectedAttendees.length > 0 && (
+                <>
+                  <span className="text-sm text-muted-foreground">
+                    {selectedAttendees.length} selected
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedAttendees([])}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    Clear
+                  </Button>
+                </>
+              )}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => handleOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={selectedAttendees.length === 0}
+              >
+                Add{' '}
+                {selectedAttendees.length > 0 &&
+                  `(${selectedAttendees.length})`}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -356,15 +397,19 @@ export function AttendeeSearchModal({
       {/* Create Attendee Modal */}
       <CreateAttendeeModal
         open={showCreateAttendeeModal}
+        name={newAttendeeName}
         onSave={handleAttendeeCreated}
-        onClose={() => setShowCreateAttendeeModal(false)}
+        onClose={() => {
+          setShowCreateAttendeeModal(false)
+          setNewAttendeeName(undefined)
+        }}
       />
 
       {/* Phase 2: Inviter Selection Modal */}
       <InviterSelectionModal
         open={showInviterModal}
-        onSelect={(inviterId) => {
-          setCurrentInviterId(inviterId)
+        onSelect={(inviter) => {
+          setCurrentInviter(inviter)
           setShowInviterModal(false)
         }}
         onClose={() => setShowInviterModal(false)}
