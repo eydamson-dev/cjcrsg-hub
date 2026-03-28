@@ -16,7 +16,19 @@ export const Route = createFileRoute('/events/$slug')({
 
 function EventTypeFallbackPage() {
   const { slug } = Route.useParams()
-  const { data: eventTypes } = useEventTypesList()
+  const { data: eventTypes, isLoading } = useEventTypesList()
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <div className="flex h-64 items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
 
   // Convert slug to name format (e.g., "prayer-meeting" → "prayer meeting")
   const searchName = slug.replace(/-/g, ' ')

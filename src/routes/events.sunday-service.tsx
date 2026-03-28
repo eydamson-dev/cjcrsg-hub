@@ -16,7 +16,19 @@ export const Route = createFileRoute('/events/sunday-service')({
 const SUNDAY_SERVICE_NAME = 'Sunday service'
 
 function SundayServicePage() {
-  const { data: eventTypes } = useEventTypesList()
+  const { data: eventTypes, isLoading } = useEventTypesList()
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <div className="flex h-64 items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
 
   const sundayServiceType = eventTypes?.find(
     (et) => et.name === SUNDAY_SERVICE_NAME,
