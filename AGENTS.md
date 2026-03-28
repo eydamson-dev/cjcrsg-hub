@@ -102,11 +102,11 @@ The system is fully functional for core church operations:
 - ✅ Phase 10.1: Backend queries getCurrentEventByType, getStatsByEventType
 - ✅ Phase 10.2: Frontend hooks with eventTypeId support
 - ✅ Phase 10.3-10.4: Extract EventsContent, update EmptyEventState
+- ✅ Phase 10.5: Update QuickStats with optional label props
 - ✅ Phase 10.6: Update events.index.tsx to use EventsContent
 
 **Next Up:**
 
-- ⏳ Phase 10.5: Update QuickStats with optional label props
 - ⏳ Phase 10.7: Create /events/sunday-service route
 - ⏳ Phase 10.8-10.9: Update navigation & sidebar
 

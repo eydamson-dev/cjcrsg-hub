@@ -7,6 +7,10 @@ interface QuickStatsProps {
   lastEvent: string
   nextScheduled: string
   className?: string
+  eventsThisMonthLabel?: string
+  totalEventsLabel?: string
+  lastEventLabel?: string
+  nextScheduledLabel?: string
 }
 
 export function QuickStats({
@@ -15,6 +19,10 @@ export function QuickStats({
   lastEvent,
   nextScheduled,
   className,
+  eventsThisMonthLabel = 'Events This Month',
+  totalEventsLabel = 'Total Events',
+  lastEventLabel = 'Last Event',
+  nextScheduledLabel = 'Next Scheduled',
 }: QuickStatsProps) {
   return (
     <div
@@ -25,18 +33,18 @@ export function QuickStats({
     >
       <StatItem
         icon={Calendar}
-        label="Events This Month"
+        label={eventsThisMonthLabel}
         value={eventsThisMonth.toString()}
       />
       <StatItem
         icon={Users}
-        label="Total Events"
+        label={totalEventsLabel}
         value={totalEvents.toString()}
       />
-      <StatItem icon={Clock} label="Last Event" value={lastEvent} />
+      <StatItem icon={Clock} label={lastEventLabel} value={lastEvent} />
       <StatItem
         icon={CalendarCheck}
-        label="Next Scheduled"
+        label={nextScheduledLabel}
         value={nextScheduled}
       />
     </div>
