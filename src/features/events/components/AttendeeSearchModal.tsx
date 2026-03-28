@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search, User, Users, Plus } from 'lucide-react'
+import { Search, User, Users, Plus, Trash2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -25,8 +25,12 @@ import { CreateAttendeeModal } from './CreateAttendeeModal'
 import { InviterSelectionModal } from './InviterSelectionModal'
 import type { Attendee } from '~/features/attendees/types'
 
-// Phase 3: Will import Trash2
-// import { Trash2 } from 'lucide-react'
+interface SelectedAttendee {
+  _id: string
+  firstName: string
+  lastName: string
+  status: 'member' | 'visitor' | 'inactive'
+}
 
 type AttendeeSearchModalMode = 'groupAdd' | 'generalAdd'
 
@@ -51,9 +55,9 @@ export function AttendeeSearchModal({
 }: AttendeeSearchModalProps) {
   const [isOpen, setIsOpen] = useState(open ?? false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedAttendees, setSelectedAttendees] = useState<Set<string>>(
-    new Set(),
-  )
+  const [selectedAttendees, setSelectedAttendees] = useState<
+    SelectedAttendee[]
+  >([])
   const [showCreateAttendeeModal, setShowCreateAttendeeModal] = useState(false)
   const [showInviterModal, setShowInviterModal] = useState(false)
   const [currentInviterId, setCurrentInviterId] = useState<string | null>(null)
@@ -72,7 +76,7 @@ export function AttendeeSearchModal({
   useEffect(() => {
     if (isOpen) {
       setSearchQuery('')
-      setSelectedAttendees(new Set())
+      setSelectedAttendees([])
       setCurrentInviterId(null)
     }
   }, [isOpen])
@@ -92,19 +96,27 @@ export function AttendeeSearchModal({
     )
   }, [searchResults, excludeAttendeeIds])
 
-  const toggleAttendeeSelection = (attendeeId: string) => {
-    const newSelected = new Set(selectedAttendees)
-    if (newSelected.has(attendeeId)) {
-      newSelected.delete(attendeeId)
+  const toggleAttendeeSelection = (attendee: SelectedAttendee) => {
+    const exists = selectedAttendees.find((a) => a._id === attendee._id)
+    if (exists) {
+      setSelectedAttendees(
+        selectedAttendees.filter((a) => a._id !== attendee._id),
+      )
     } else {
-      newSelected.add(attendeeId)
+      setSelectedAttendees([...selectedAttendees, attendee])
     }
-    setSelectedAttendees(newSelected)
+  }
+
+  const removeAttendee = (attendeeId: string) => {
+    setSelectedAttendees(selectedAttendees.filter((a) => a._id !== attendeeId))
   }
 
   const handleSave = () => {
-    if (selectedAttendees.size === 0) return
-    onSelect(Array.from(selectedAttendees), currentInviterId)
+    if (selectedAttendees.length === 0) return
+    onSelect(
+      selectedAttendees.map((a) => a._id),
+      currentInviterId,
+    )
     handleOpenChange(false)
   }
 
@@ -123,7 +135,14 @@ export function AttendeeSearchModal({
 
   const handleAttendeeCreated = (attendee: Attendee) => {
     // Auto-add the newly created attendee
-    setSelectedAttendees(new Set([attendee._id]))
+    setSelectedAttendees([
+      {
+        _id: attendee._id,
+        firstName: attendee.firstName,
+        lastName: attendee.lastName,
+        status: attendee.status,
+      },
+    ])
     setShowCreateAttendeeModal(false)
   }
 
@@ -150,11 +169,53 @@ export function AttendeeSearchModal({
               </Button>
             )}
 
-            {/* Phase 3: Selected Attendees Section - will be implemented in Phase 3 */}
-            {selectedAttendees.size > 0 && (
-              <div className="text-sm text-muted-foreground p-2 border rounded-md bg-muted/30">
-                Phase 3 placeholder: Selected attendees list will appear here (
-                {selectedAttendees.size} selected)
+            {/* Phase 3: Selected Attendees Section */}
+            {selectedAttendees.length > 0 && (
+              <div className="border rounded-md">
+                <div className="flex items-center justify-between p-3 bg-muted/50">
+                  <span className="text-sm font-medium">
+                    Selected Attendees ({selectedAttendees.length})
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedAttendees([])}
+                  >
+                    Clear All
+                  </Button>
+                </div>
+                <div className="max-h-[200px] overflow-auto p-2 space-y-2">
+                  {selectedAttendees.map((attendee) => (
+                    <div
+                      key={attendee._id}
+                      className="flex items-center justify-between p-2 bg-background rounded-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">
+                          {attendee.firstName} {attendee.lastName}
+                        </span>
+                        <Badge
+                          variant={
+                            attendee.status === 'member'
+                              ? 'default'
+                              : 'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {attendee.status === 'member' ? 'Member' : 'Visitor'}
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeAttendee(attendee._id)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -204,52 +265,69 @@ export function AttendeeSearchModal({
                     <CommandGroup
                       heading={`${availableAttendees.length} available`}
                     >
-                      {availableAttendees.map((attendee) => (
-                        <CommandItem
-                          key={attendee._id}
-                          className="flex items-center justify-between py-3 cursor-pointer"
-                          onSelect={() => toggleAttendeeSelection(attendee._id)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Checkbox
-                              checked={selectedAttendees.has(attendee._id)}
-                              onCheckedChange={() =>
-                                toggleAttendeeSelection(attendee._id)
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                              <User className="size-4 text-primary" />
+                      {availableAttendees.map((attendee) => {
+                        const isSelected = selectedAttendees.some(
+                          (a) => a._id === attendee._id,
+                        )
+                        return (
+                          <CommandItem
+                            key={attendee._id}
+                            className="flex items-center justify-between py-3 cursor-pointer"
+                            onSelect={() =>
+                              toggleAttendeeSelection({
+                                _id: attendee._id,
+                                firstName: attendee.firstName,
+                                lastName: attendee.lastName,
+                                status: attendee.status,
+                              })
+                            }
+                          >
+                            <div className="flex items-center gap-3">
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={() =>
+                                  toggleAttendeeSelection({
+                                    _id: attendee._id,
+                                    firstName: attendee.firstName,
+                                    lastName: attendee.lastName,
+                                    status: attendee.status,
+                                  })
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                                <User className="size-4 text-primary" />
+                              </div>
+                              <span className="font-medium">
+                                {attendee.firstName} {attendee.lastName}
+                              </span>
+                              <Badge
+                                variant={
+                                  attendee.status === 'member'
+                                    ? 'default'
+                                    : 'secondary'
+                                }
+                                className="text-xs"
+                              >
+                                {attendee.status === 'member'
+                                  ? 'Member'
+                                  : 'Visitor'}
+                              </Badge>
                             </div>
-                            <span className="font-medium">
-                              {attendee.firstName} {attendee.lastName}
-                            </span>
-                            <Badge
-                              variant={
-                                attendee.status === 'member'
-                                  ? 'default'
-                                  : 'secondary'
-                              }
-                              className="text-xs"
-                            >
-                              {attendee.status === 'member'
-                                ? 'Member'
-                                : 'Visitor'}
-                            </Badge>
-                          </div>
-                        </CommandItem>
-                      ))}
+                          </CommandItem>
+                        )
+                      })}
                     </CommandGroup>
                   )}
-                  {selectedAttendees.size > 0 && (
+                  {selectedAttendees.length > 0 && (
                     <div className="border-t p-3 flex items-center justify-between bg-muted/50">
                       <span className="text-sm font-medium">
-                        {selectedAttendees.size} selected
+                        {selectedAttendees.length} selected
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setSelectedAttendees(new Set())}
+                        onClick={() => setSelectedAttendees([])}
                       >
                         Clear
                       </Button>
@@ -266,9 +344,10 @@ export function AttendeeSearchModal({
             </Button>
             <Button
               onClick={handleSave}
-              disabled={selectedAttendees.size === 0}
+              disabled={selectedAttendees.length === 0}
             >
-              Add {selectedAttendees.size > 0 && `(${selectedAttendees.size})`}
+              Add{' '}
+              {selectedAttendees.length > 0 && `(${selectedAttendees.length})`}
             </Button>
           </div>
         </DialogContent>
