@@ -1350,6 +1350,79 @@ Tests to add after core features are stable:
 
 ---
 
-**Last Updated:** 2026-03-26
-**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (4/6 tests)
+## Phase 13: Retreat Enhancement Tests
+
+**Status:** ⏳ Planned
+**Location:** `tests/unit/convex/retreat/`, `tests/unit/components/events/`
+**Estimated Time:** 2 hours
+**Total Tests:** 30 (18 Convex + 12 Component)
+
+### Phase 13.1: Convex Tests (18 tests)
+
+**File:** `tests/unit/convex/retreat/mutations.test.ts`
+
+#### Teacher Validation (6 tests)
+- ✅ Accepts Pastor as teacher
+- ✅ Accepts Leader as teacher
+- ✅ Accepts Elder as teacher
+- ✅ Accepts Deacon as teacher
+- ❌ Rejects Member as teacher
+- ❌ Rejects Visitor as teacher
+
+#### Overlap Detection (6 tests)
+- ✅ Allows non-overlapping lessons on same day
+- ❌ Rejects overlapping lessons on same day
+- ✅ Allows same time on different days
+- ✅ Handles edge cases (back-to-back sessions)
+- ✅ Detects partial overlaps
+- ✅ Allows updating lesson without conflict
+
+#### Teacher Removal Warnings (3 tests)
+- ✅ Allows removal when no lessons assigned
+- ⚠️ Returns warning when lessons assigned
+- ✅ Force removal unassigns lessons
+
+#### Staff CRUD (3 tests)
+- ✅ Allows any attendee as staff
+- ✅ Updates role/responsibilities
+- ✅ Removes staff member
+
+### Phase 13.2: Component Tests (12 tests)
+
+| File | Tests |
+|------|-------|
+| `RetreatTeachers.test.tsx` | Renders teacher list, Shows warning dialog on remove, Filters search to qualified attendees only, Handles empty state |
+| `RetreatSchedule.test.tsx` | Renders timeline with day tabs, Shows overlap warning, Disables save on conflict, Handles empty state |
+| `RetreatStaff.test.tsx` | Renders staff grid, Allows any attendee in search, Handles role text input, Handles empty state |
+
+**Acceptance Criteria:**
+- [ ] 18 Convex tests passing
+- [ ] 12 Component tests passing
+- [ ] All teacher validation scenarios covered
+- [ ] All overlap detection scenarios covered
+- [ ] Warning dialog behavior tested
+
+---
+
+## Updated Test Summary
+
+| Phase | Tasks | Est. Time | Tests | Status |
+|-------|-------|-----------|-------|--------|
+| **Phase 1** | Infrastructure | 2 hours | 1 | ✅ Complete |
+| **Phase 2** | Attendee Convex | 2.5 hours | 37 | ✅ Complete |
+| **Phase 3** | Component Tests | 2 hours | 44 | ✅ Complete |
+| **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
+| **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
+| **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
+| **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
+| **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
+| **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **4** | ⏳ In Progress |
+| **Phase 13** | Retreat Enhancement | 2 hours | **30** | ⏳ Planned |
+| **Total** | | **13 + 14-19 hrs** | **618** | |
+
+---
+
+**Last Updated:** 2026-03-30
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (4/6 tests) | Phase 13 Planned
 ````

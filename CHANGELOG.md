@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Requirements: Teachers (Pastor/Leader/Elder/Deacon), 1-3 day schedule, free-form staff roles
   - Features: Tabbed layout with swappable accordion mode, overlap detection, warning dialogs
 
+### Changed
+
+- **Documentation Cleanup** - Major cleanup of `docs/TASKS.md` for better maintainability
+  - Removed 1,010 lines (47% reduction: 2,128 → 1,118 lines)
+  - Reduced file size by 44% (77KB → 43KB)
+  - Removed outdated original Phase 7 (superseded by Phase 7 Refined)
+  - Condensed completed phase descriptions to essential summaries
+  - Removed redundant "Parts A-C" code examples from Task 8.1
+  - Removed duplicate Testing Summary table (now only in TDD_TASKS.md)
+  - Moved Phase 13.6 testing specs to `docs/TDD_TASKS.md`
+  - Consolidated Phase 10 detailed implementation phases to summary only
+  - Condensed Phase 11 problem/solution sections to tables only
+  - Updated header status to reflect current Phase 12 complete, Phase 13 planned
+
 - **Spiritual Retreat Page** - Dedicated event page for Spiritual Retreat events
   - New route: `/events/spiritual-retreat`
   - Looks for "Retreat" event type in database
