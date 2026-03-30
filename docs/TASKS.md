@@ -3,14 +3,17 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-30  
-**Current Phase:** Phase 12 - Spiritual Retreat Page  
-**Status:** ✅ Completed | Added /events/spiritual-retreat route
+**Current Phase:** Phase 13 - Spiritual Retreat Enhancement  
+**Status:** ⏳ Planned | Teachers, Lessons, and Staff Management
 
 **Next Up:**
 
-- ⏳ Future: Attendance reporting & analytics
-- ⏳ Future: Dashboard statistics widgets
-- ⏳ Future: Data export to CSV
+- ⏳ Phase 13.1: Database Schema & Validators (Waiting for approval)
+- ⏳ Phase 13.2: Backend - Retreat Module (Queries & Mutations)
+- ⏳ Phase 13.3: Frontend Types & Hooks
+- ⏳ Phase 13.4: Tabbed UI Components (Teachers, Schedule, Staff)
+- ⏳ Phase 13.5: Integration with Spiritual Retreat page
+- ⏳ Phase 13.6: Testing
 
 ---
 
@@ -1416,6 +1419,695 @@ Upload hook providing:
 - Added Spiritual Retreat to Events sub-menu
 - Uses Mountain icon from lucide-react
 - Accessible at `/events/spiritual-retreat`
+
+---
+
+## Phase 13: Spiritual Retreat Enhancement
+
+**Status:** ⏳ Planned  
+**Goal:** Add teachers, teaching lessons, and staff personnel management to Spiritual Retreat events with tabbed UI interface  
+**Estimated Time:** 11.5 hours  
+**Priority:** HIGH
+
+### Requirements Summary
+
+- **Teachers:** Must have qualified status (Pastor, Leader, Elder, or Deacon)
+- **Schedule:** 1-3 day retreats with lesson/activity timeline, no overlapping sessions
+- **Staff:** Any attendee can be staff, free-form role text
+- **UI:** Tabbed layout (Overview | Teachers | Schedule | Staff | Attendance)
+- **Layout:** Easy to switch between tabs and accordion layouts
+
+---
+
+### Phase 13.1: Database Schema & Validators ⏳ WAITING FOR APPROVAL
+
+**Time:** 1 hour  
+**Files:** `convex/schema.ts`, `convex/events/validators.ts`
+
+#### Schema Changes
+
+Add to `events` table in `convex/schema.ts`:
+
+```typescript
+retreatTeachers: v.optional(v.array(v.object({
+  attendeeId: v.id('attendees'),
+  subject: v.optional(v.string()),
+  bio: v.optional(v.string()),
+}))),
+retreatLessons: v.optional(v.array(v.object({
+  id: v.string(),
+  title: v.string(),
+  description: v.optional(v.string()),
+  teacherId: v.optional(v.id('attendees')),
+  day: v.optional(v.number()), // 1, 2, 3 for multi-day
+  startTime: v.string(), // "HH:mm" format
+  endTime: v.string(), // "HH:mm" format
+  location: v.optional(v.string()),
+  type: v.union(
+    v.literal('teaching'),
+    v.literal('meal'),
+    v.literal('break'),
+    v.literal('worship'),
+    v.literal('registration'),
+    v.literal('closing'),
+    v.literal('other')
+  ),
+}))),
+retreatStaff: v.optional(v.array(v.object({
+  attendeeId: v.id('attendees'),
+  role: v.string(),
+  responsibilities: v.optional(v.string()),
+  isLead: v.optional(v.boolean()),
+})))
+```
+
+#### Validators
+
+Add to `convex/events/validators.ts`:
+
+- `qualifiedTeacherStatuses` array: ['Pastor', 'Leader', 'Elder', 'Deacon']
+- `validateTeacherStatus(attendeeId)` - Check if attendee has qualified status
+- `validateLessonOverlap(eventId, lesson)` - Check for time conflicts on same day
+- `validateLessonTimes(startTime, endTime)` - Ensure end > start
+
+**Acceptance Criteria:**
+
+- [ ] Schema updated with three new optional fields
+- [ ] Validators created for teacher status and lesson overlap
+- [ ] TypeScript types generated (`pnpm dlx convex dev --once`)
+
+---
+
+### Phase 13.2: Backend - Retreat Module ⏳ WAITING FOR APPROVAL
+
+**Time:** 2 hours  
+**New Folder:** `convex/retreat/`  
+**Files:** `queries.ts`, `mutations.ts`, `validators.ts`
+
+#### Queries (4 total)
+
+1. **`getRetreatDetails(ctx, eventId)`**
+   - Fetch event with teachers, lessons, staff populated with attendee data
+   - Join attendee info for all references
+
+2. **`getQualifiedTeachers(ctx)`**
+   - List all attendees with Pastor/Leader/Elder/Deacon status
+   - Used for teacher selection dropdown
+
+3. **`checkTeacherLessons(ctx, eventId, teacherId)`**
+   - Check if teacher has assigned lessons
+   - Used before allowing teacher removal
+
+4. **`getLessonConflicts(ctx, eventId, lesson)`**
+   - Return list of conflicting lessons (same day, overlapping time)
+   - Used for overlap validation
+
+#### Mutations (12 total)
+
+**Teacher Management:**
+
+- `addTeacher(ctx, eventId, attendeeId, subject?, bio?)`
+  - Validate attendee has qualified status
+  - Prevent duplicates
+- `removeTeacher(ctx, eventId, attendeeId)`
+  - Check if teacher has lessons (return warning flag)
+  - Allow removal with force flag
+- `updateTeacher(ctx, eventId, attendeeId, subject?, bio?)`
+
+**Lesson Management:**
+
+- `addLesson(ctx, eventId, lesson)`
+  - Validate no time conflicts (same day)
+  - Validate teacher exists (if provided)
+  - Validate times (end > start)
+- `updateLesson(ctx, eventId, lessonId, updates)`
+  - Re-validate conflicts if time/day changed
+- `removeLesson(ctx, eventId, lessonId)`
+- `reorderLessons(ctx, eventId, lessonIds)`
+
+**Staff Management:**
+
+- `addStaff(ctx, eventId, attendeeId, role, responsibilities?, isLead?)`
+  - Any attendee status allowed
+- `updateStaff(ctx, eventId, attendeeId, role?, responsibilities?, isLead?)`
+- `removeStaff(ctx, eventId, attendeeId)`
+
+**Overlap Detection Logic:**
+
+```typescript
+const hasOverlap = lessons
+  .filter((l) => l.day === newLesson.day && l.id !== newLesson.id)
+  .some(
+    (l) => newLesson.startTime < l.endTime && newLesson.endTime > l.startTime,
+  )
+```
+
+**Acceptance Criteria:**
+
+- [ ] All 4 queries implemented and tested via Convex dashboard
+- [ ] All 12 mutations implemented with proper validation
+- [ ] Teacher status validation rejects non-qualified attendees
+- [ ] Overlap detection prevents conflicting lessons on same day
+- [ ] Removal warnings returned when teacher has assigned lessons
+
+---
+
+### Phase 13.3: Frontend Types & Hooks ⏳ WAITING FOR APPROVAL
+
+**Time:** 1.5 hours  
+**Files:** `src/features/events/types.ts`, `src/features/events/hooks/useRetreat.ts`
+
+#### TypeScript Types
+
+Add to `src/features/events/types.ts`:
+
+```typescript
+export interface RetreatTeacher {
+  attendeeId: string
+  subject?: string
+  bio?: string
+  attendee?: Attendee // Joined data
+}
+
+export interface RetreatLesson {
+  id: string
+  title: string
+  description?: string
+  teacherId?: string
+  day: number
+  startTime: string
+  endTime: string
+  location?: string
+  type:
+    | 'teaching'
+    | 'meal'
+    | 'break'
+    | 'worship'
+    | 'registration'
+    | 'closing'
+    | 'other'
+  teacher?: Attendee // Joined data
+}
+
+export interface RetreatStaff {
+  attendeeId: string
+  role: string
+  responsibilities?: string
+  isLead?: boolean
+  attendee?: Attendee // Joined data
+}
+
+export interface RetreatDetails {
+  teachers: RetreatTeacher[]
+  lessons: RetreatLesson[]
+  staff: RetreatStaff[]
+}
+
+export type LessonType =
+  | 'teaching'
+  | 'meal'
+  | 'break'
+  | 'worship'
+  | 'registration'
+  | 'closing'
+  | 'other'
+
+export const LESSON_TYPE_COLORS: Record<LessonType, string> = {
+  teaching: 'bg-green-100 text-green-700',
+  meal: 'bg-yellow-100 text-yellow-700',
+  break: 'bg-gray-100 text-gray-700',
+  worship: 'bg-green-100 text-green-700',
+  registration: 'bg-blue-100 text-blue-700',
+  closing: 'bg-purple-100 text-purple-700',
+  other: 'bg-gray-100 text-gray-700',
+}
+```
+
+#### Custom Hook
+
+**File:** `src/features/events/hooks/useRetreat.ts`
+
+```typescript
+export function useRetreatDetails(eventId: string) {
+  // Query: getRetreatDetails
+}
+
+export function useQualifiedTeachers() {
+  // Query: getQualifiedTeachers
+}
+
+export function useRetreatMutations() {
+  // All 12 mutations wrapped with TanStack Query
+  return {
+    addTeacher: useMutation(api.retreat.addTeacher),
+    removeTeacher: useMutation(api.retreat.removeTeacher),
+    updateTeacher: useMutation(api.retreat.updateTeacher),
+    addLesson: useMutation(api.retreat.addLesson),
+    updateLesson: useMutation(api.retreat.updateLesson),
+    removeLesson: useMutation(api.retreat.removeLesson),
+    addStaff: useMutation(api.retreat.addStaff),
+    updateStaff: useMutation(api.retreat.updateStaff),
+    removeStaff: useMutation(api.retreat.removeStaff),
+  }
+}
+```
+
+**Acceptance Criteria:**
+
+- [ ] All TypeScript types defined with proper optional fields
+- [ ] Lesson type color mapping created
+- [ ] Custom hook provides all retreat queries and mutations
+- [ ] Hook integrates with TanStack Query for caching
+
+---
+
+### Phase 13.4: Tabbed UI Components ⏳ WAITING FOR APPROVAL
+
+**Time:** 4 hours  
+**Architecture:** Swappable layout system (tabs | accordion)  
+**Files:** 4 new components
+
+#### Component 1: RetreatDetails.tsx (Container)
+
+**File:** `src/features/events/components/RetreatDetails.tsx`
+
+**Props:**
+
+```typescript
+interface RetreatDetailsProps {
+  event: Event
+  layout?: 'tabs' | 'accordion'
+}
+```
+
+**Features:**
+
+- Manages active tab state
+- Renders tab navigation with 5 tabs:
+  - Overview (existing EventDetails content)
+  - Teachers
+  - Schedule
+  - Staff
+  - Attendance (existing AttendanceManager)
+- Passes layout prop to control presentation
+- Easy to switch: change `layout="tabs"` to `layout="accordion"`
+
+**Tab Navigation:**
+
+```tsx
+<Tabs defaultValue="overview" className="space-y-6">
+  <TabsList variant="line" className="w-full justify-start">
+    <TabsTrigger value="overview" className="gap-2">
+      <BookOpen className="size-4" />
+      Overview
+    </TabsTrigger>
+    <TabsTrigger value="teachers" className="gap-2">
+      <UserCircle className="size-4" />
+      Teachers
+    </TabsTrigger>
+    <TabsTrigger value="schedule" className="gap-2">
+      <Clock className="size-4" />
+      Schedule
+    </TabsTrigger>
+    <TabsTrigger value="staff" className="gap-2">
+      <Users className="size-4" />
+      Staff
+    </TabsTrigger>
+    <TabsTrigger value="attendance" className="gap-2">
+      <Mountain className="size-4" />
+      Attendance
+    </TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="overview">...</TabsContent>
+  <TabsContent value="teachers">...</TabsContent>
+  <TabsContent value="schedule">...</TabsContent>
+  <TabsContent value="staff">...</TabsContent>
+  <TabsContent value="attendance">...</TabsContent>
+</Tabs>
+```
+
+#### Component 2: RetreatTeachers.tsx
+
+**File:** `src/features/events/components/RetreatTeachers.tsx`
+
+**Features:**
+
+- Display teachers as cards with avatar, name, status badge, subject, assigned sessions
+- "Add Teacher" button opens searchable dropdown
+- Search filters: only Pastor/Leader/Elder/Deacon attendees
+- Actions per teacher: Edit subject/bio, Remove (with warning if has lessons)
+- Empty state with helpful message
+
+**Warning Dialog on Remove:**
+
+```
+┌─────────────────────────────────────────┐
+│ Remove Teacher?                [X]     │
+├─────────────────────────────────────────┤
+│                                         │
+│ John Smith has 2 assigned lessons:     │
+│ • Session 1: "Spiritual Renewal"       │
+│ • Session 2: "Power of Prayer"         │
+│                                         │
+│ Removing this teacher will unassign    │
+│ them from these lessons.               │
+│                                         │
+│ [Cancel]          [Remove Anyway]      │
+└─────────────────────────────────────────┘
+```
+
+**Teacher Card:**
+
+- Avatar with initials
+- Name + status badge (Pastor/Leader/Elder/Deacon)
+- Email
+- Subject topic (editable)
+- Assigned sessions count
+- Actions dropdown
+
+#### Component 3: RetreatSchedule.tsx
+
+**File:** `src/features/events/components/RetreatSchedule.tsx`
+
+**Features:**
+
+- Day tabs: Day 1, Day 2, Day 3 (only show days with lessons + next empty day)
+- Timeline view with time slots
+- Visual overlap detection (red border + warning icon)
+- Color-coded lesson types:
+  - Teaching: Green
+  - Meal: Yellow
+  - Break: Gray
+  - Worship: Green
+  - Registration: Blue
+  - Closing: Purple
+  - Other: Gray
+
+**Add/Edit Lesson Modal:**
+
+```
+┌─────────────────────────────────────────┐
+│ Add Schedule Item               [X]     │
+├─────────────────────────────────────────┤
+│                                         │
+│ Day *          [Day 1 ▼]                │
+│                                         │
+│ Start Time *   [09:00]                  │
+│                                         │
+│ End Time *     [10:30]                  │
+│                                         │
+│ Type *         [Teaching ▼]             │
+│                [Teaching|Meal|Break|...]│
+│                                         │
+│ Title *        [Session 1: Renewal    │
+│                _____________________]   │
+│                                         │
+│ Teacher        [John Smith ▼]           │
+│                (Optional)               │
+│                                         │
+│ Location       [Main Chapel            │
+│                _____________________]   │
+│                                         │
+│ Description    [Optional details...    │
+│                _____________________]   │
+│                                         │
+│ ⚠️ Warning: Overlaps with "Coffee      │
+│    Break" (10:00 - 10:30)              │
+│                                         │
+│        [Cancel]        [Save Item]     │
+└─────────────────────────────────────────┘
+```
+
+**Overlap Detection:**
+
+- Real-time validation as user changes times
+- Red warning alert shows conflicting lesson name
+- Save button disabled while conflict exists
+- Backend double-checks before saving
+
+**Timeline View:**
+
+```
+ 8:00 AM ─┬─ [Meal] Registration & Breakfast
+          │   Location: Dining Hall
+ 9:00 AM ─┼─ [Teaching] Session 1: "Spiritual Renewal"
+          │   Teacher: John Smith | Location: Main Chapel
+10:30 AM ─┼─ [Break] Coffee Break
+12:00 PM ─┼─ [Meal] Lunch
+ 2:00 PM ─┼─ [Teaching] Session 2: "Power of Prayer"
+          │   Teacher: Sarah Johnson
+ 3:30 PM ─┼─ [Worship] Prayer & Ministry Time
+ 4:30 PM ─┴─ [Closing] Closing & Departure
+```
+
+#### Component 4: RetreatStaff.tsx
+
+**File:** `src/features/events/components/RetreatStaff.tsx`
+
+**Features:**
+
+- Grid layout: 2 columns on desktop, 1 on mobile
+- "Add Staff" button opens searchable dropdown (any attendee)
+- Free-form role text input
+- Optional responsibilities textarea
+- "Lead Contact" checkbox (only one lead per role type recommended)
+
+**Staff Card:**
+
+```
+┌─────────────────────────────────────────┐
+│ Avatar │ David Chen                     │
+│  [DC]  │ d.chen@church.com              │
+│        │ ┌────────────────────────────┐ │
+│        │ │ Badge: Sound Tech          │ │
+│        │ │ Role: Audio/Visual Setup   │ │
+│        │ └────────────────────────────┘ │
+│        │ [Edit] [Remove]               │
+└─────────────────────────────────────────┘
+```
+
+**Add Staff Modal:**
+
+```
+┌─────────────────────────────────────────┐
+│ Add Staff Member                [X]     │
+├─────────────────────────────────────────┤
+│                                         │
+│ Search Person  [Search attendees...     │
+│               _____________________]    │
+│               [Dropdown results]        │
+│                                         │
+│ Role *         [Sound Tech            │
+│               _____________________]    │
+│                                         │
+│ Responsibilities [Setup microphones...  │
+│               _____________________]    │
+│                                         │
+│ ☑ Lead Contact for this role            │
+│                                         │
+│        [Cancel]        [Add Staff]     │
+└─────────────────────────────────────────┘
+```
+
+**Acceptance Criteria:**
+
+- [ ] RetreatDetails container renders 5 tabs with icons
+- [ ] Layout prop allows easy switching (tabs | accordion)
+- [ ] Teachers tab shows qualified attendees only in search
+- [ ] Warning dialog shown before removing teacher with lessons
+- [ ] Schedule shows day tabs (Day 1, 2, 3) based on lesson data
+- [ ] Visual overlap detection with red borders and warning icons
+- [ ] Save button disabled when time conflicts exist
+- [ ] Staff grid responsive (2 cols → 1 col on mobile)
+- [ ] Free-form role text with responsibilities field
+- [ ] All empty states implemented with helpful messages
+
+---
+
+### Phase 13.5: Integration ⏳ WAITING FOR APPROVAL
+
+**Time:** 1 hour  
+**File:** `src/routes/events.spiritual-retreat.tsx`
+
+#### Implementation Options
+
+**Option A: Replace EventsContent with RetreatDetails (Recommended)**
+
+Replace the generic `EventsContent` with `RetreatDetails` for full control:
+
+```typescript
+function SpiritualRetreatPage() {
+  const { data: eventTypes, isPending } = useEventTypesList()
+  const retreatType = eventTypes?.find((et) => et.name === RETREAT_NAME)
+
+  // Fetch retreat-specific event
+  const { data: retreatEvent } = useCurrentEvent({
+    eventTypeId: retreatType?._id
+  })
+
+  if (!retreatEvent) {
+    return <EmptyEventState ... />
+  }
+
+  return (
+    <RetreatDetails
+      event={retreatEvent}
+      layout="tabs" // Easy to switch to "accordion"
+    />
+  )
+}
+```
+
+**Option B: Extend EventsContent with custom component prop**
+
+If we want to keep the existing wrapper:
+
+```typescript
+<EventsContent
+  // ...existing props
+  customDetailsComponent={RetreatDetails}
+  customDetailsProps={{ layout: 'tabs' }}
+/>
+```
+
+#### Breadcrumb Updates
+
+Update breadcrumbs to show retreat context:
+
+```
+Home > Events > Spiritual Retreat > [Active Tab Name]
+```
+
+**Acceptance Criteria:**
+
+- [ ] Spiritual Retreat page uses RetreatDetails component
+- [ ] All 5 tabs functional and accessible
+- [ ] Breadcrumbs reflect retreat context
+- [ ] Navigation between tabs works smoothly
+- [ ] Back button returns to correct parent page
+
+---
+
+### Phase 13.6: Testing ⏳ WAITING FOR APPROVAL
+
+**Time:** 2 hours  
+**Test Files:** 6 new test files
+
+#### Convex Tests (18 tests)
+
+**File:** `tests/unit/convex/retreat/mutations.test.ts`
+
+1. Teacher validation (6 tests)
+   - ✅ Accepts Pastor as teacher
+   - ✅ Accepts Leader as teacher
+   - ✅ Accepts Elder as teacher
+   - ✅ Accepts Deacon as teacher
+   - ❌ Rejects Member as teacher
+   - ❌ Rejects Visitor as teacher
+
+2. Overlap detection (6 tests)
+   - ✅ Allows non-overlapping lessons on same day
+   - ❌ Rejects overlapping lessons on same day
+   - ✅ Allows same time on different days
+   - ✅ Handles edge cases (back-to-back sessions)
+   - ✅ Detects partial overlaps
+   - ✅ Allows updating lesson without conflict
+
+3. Teacher removal warnings (3 tests)
+   - ✅ Allows removal when no lessons assigned
+   - ⚠️ Returns warning when lessons assigned
+   - ✅ Force removal unassigns lessons
+
+4. Staff CRUD (3 tests)
+   - ✅ Allows any attendee as staff
+   - ✅ Updates role/responsibilities
+   - ✅ Removes staff member
+
+#### Component Tests (12 tests)
+
+**File:** `tests/unit/components/events/RetreatTeachers.test.tsx` (4 tests)
+
+- Renders teacher list
+- Shows warning dialog on remove
+- Filters search to qualified attendees only
+- Handles empty state
+
+**File:** `tests/unit/components/events/RetreatSchedule.test.tsx` (4 tests)
+
+- Renders timeline with day tabs
+- Shows overlap warning
+- Disables save on conflict
+- Handles empty state
+
+**File:** `tests/unit/components/events/RetreatStaff.test.tsx` (4 tests)
+
+- Renders staff grid
+- Allows any attendee in search
+- Handles role text input
+- Handles empty state
+
+**Acceptance Criteria:**
+
+- [ ] 18 Convex tests passing
+- [ ] 12 Component tests passing
+- [ ] All teacher validation scenarios covered
+- [ ] All overlap detection scenarios covered
+- [ ] Warning dialog behavior tested
+
+---
+
+## Visual Preview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Header Area                                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ Event Banner                                                            │ │
+│ │ "Spring Spiritual Retreat 2026"                    [Green Badge]           │ │
+│ │ March 15, 2026 • 8:00 AM - 5:00 PM    Retreat    [Active Badge]           │ │
+│ │ Mountain View Camp                                                      │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ [Overview] [Teachers] [Schedule] [Staff] [Attendance]                     │ │
+│ │  (line variant tabs with green accent when active)                      │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│ TEACHERS TAB:                                                               │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ Teachers (3)                              [+ Add Teacher]              │ │
+│ ├─────────────────────────────────────────────────────────────────────────┤ │
+│ │ Avatar│ John Smith      │ Topic: "Renewal"    │ Session 1              │ │
+│ │  [JS] │ Senior Pastor   │ 9:00 AM             │ [Actions ▼]            │ │
+│ ├─────────────────────────────────────────────────────────────────────────┤ │
+│ │ Avatar│ Sarah Johnson   │ Topic: "Prayer"     │ Session 2              │ │
+│ │  [SJ] │ Worship Leader  │ 11:00 AM            │ [Actions ▼]            │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│ SCHEDULE TAB:                                                               │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ [Day 1] [Day 2] [Day 3]                    [+ Add Item]                │ │
+│ ├─────────────────────────────────────────────────────────────────────────┤ │
+│ │ 8:00 AM ━ [Meal] Registration & Breakfast                             │ │
+│ │ 9:00 AM ━ [Teaching] Session 1: "Spiritual Renewal" - John Smith       │ │
+│ │ 11:00 AM ━ [Teaching] Session 2: "Power of Prayer" - Sarah Johnson    │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│ STAFF TAB:                                                                  │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ Staff Assignments (6)                       [+ Add Staff]                │ │
+│ ├─────────────────────────────────────────────────────────────────────────┤ │
+│ │ ┌────────────────────┐  ┌────────────────────┐                         │ │
+│ │ │ David Chen         │  │ Lisa Wong          │                         │ │
+│ │ │ [Sound Tech]       │  │ [Registration]     │                         │ │
+│ │ │ Audio/Visual       │  │ Check-in Desk      │                         │ │
+│ │ └────────────────────┘  └────────────────────┘                         │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 

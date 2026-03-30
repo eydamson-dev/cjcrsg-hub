@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 13 Documentation** - Comprehensive implementation plan for Spiritual Retreat Enhancement
+  - Added detailed Phase 13 section to `docs/TASKS.md` (695 lines)
+  - 6 sub-phases: Database Schema, Backend Module, Frontend Hooks, UI Components, Integration, Testing
+  - Visual mockups and ASCII diagrams for all 5 tabs (Overview, Teachers, Schedule, Staff, Attendance)
+  - Complete acceptance criteria for each phase
+  - Estimated time: 11.5 hours across 12 files
+  - Requirements: Teachers (Pastor/Leader/Elder/Deacon), 1-3 day schedule, free-form staff roles
+  - Features: Tabbed layout with swappable accordion mode, overlap detection, warning dialogs
+
 - **Spiritual Retreat Page** - Dedicated event page for Spiritual Retreat events
   - New route: `/events/spiritual-retreat`
   - Looks for "Retreat" event type in database
