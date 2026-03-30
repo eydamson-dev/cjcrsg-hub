@@ -2,7 +2,7 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 11 - Complete (Image Upload with Convex Storage)  
+**Status:** Phase 12 - Complete (Spiritual Retreat Page)  
 **Last Updated:** 2026-03-30
 
 ---
@@ -77,6 +77,9 @@ The system is fully functional for core church operations:
 - View event history and analytics
 - **Manage event media and documentation with persistent storage**
 - **Image upload with Ctrl+V paste support**
+- **Dedicated Sunday Service event page** (`/events/sunday-service`)
+- **Dedicated Spiritual Retreat event page** (`/events/spiritual-retreat`)
+- Filtered history and archive by event type
 
 ✅ **User Experience**
 
@@ -89,25 +92,8 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Recently Completed:**
-
-- ✅ Phase 6: Event History page with server-side pagination
-- ✅ Reusable EventList component with table/cards views
-- ✅ New Convex queries: listActive, countActive, countArchived
-- ✅ Server-side filtering and pagination for archive page
-- ✅ Phase 8: AttendanceManager refactor with "Add Attendance" button
-- ✅ Unified AttendeeSearchModal with search + selected attendees
-- ✅ Inviter selection with full Attendee object return
-- ✅ CreateAttendeeModal with optional name pre-population
-- ✅ Phase 9: All test failures fixed (553 unit + 42 E2E = 595 total)
-- ✅ Phase 10.1-10.11: Sunday Service dedicated page with breadcrumbs and loading states
-- ✅ Phase 11: Image Upload with Convex Storage
-  - Fixed validation to accept blob URLs, data URIs, any HTTP/HTTPS URL
-  - Added Convex file storage backend with upload mutations
-  - Added useFileUpload hook for frontend uploads
-  - Updated BannerUploader with Convex storage + Ctrl+V paste support
-  - Updated MediaGallery to use Convex storage only
-  - Fixed thumbnail display in history/archive list views
+**Status:** Phase 12 - Complete (Spiritual Retreat Page)  
+**Last Updated:** 2026-03-30
 
 **Next Up:**
 

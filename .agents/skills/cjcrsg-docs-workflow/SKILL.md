@@ -1,6 +1,6 @@
 ---
 name: cjcrsg-docs-workflow
-description: Documentation workflow for CJCRSG-Hub task tracking and changelog management. Use when updating TASKS.md, TDD_TASKS.md, or CHANGELOG.md to maintain accurate project status and change history.
+description: Documentation workflow for CJCRSG-Hub task tracking, changelog management, and AGENTS.md status updates. Use when updating TASKS.md, TDD_TASKS.md, CHANGELOG.md, or AGENTS.md.
 ---
 
 # CJCRSG Documentation Workflow
@@ -13,15 +13,18 @@ Guidelines for updating project documentation files.
 - Adding changelog entries
 - Marking tasks complete
 - Tracking project progress
+- Updating project status overview
 
 ---
 
 ## Documentation Separation
 
-| File                | Purpose                | Update When...                               |
-| ------------------- | ---------------------- | -------------------------------------------- |
-| `docs/TASKS.md`     | Feature implementation | Working on UI, backend features, bug fixes   |
-| `docs/TDD_TASKS.md` | Testing & TDD          | Working on test setup, unit tests, E2E tests |
+| File                | Purpose                   | Update When...                                |
+| ------------------- | ------------------------- | --------------------------------------------- |
+| `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    |
+| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  |
+| `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know |
+| `AGENTS.md`         | Project overview & status | Completing phases, adding new capabilities    |
 
 ---
 
@@ -41,6 +44,34 @@ Guidelines for updating project documentation files.
 - ✅ Task X.X: Description
 - ✅ Task X.X: Description
 ```
+
+---
+
+## AGENTS.md Updates
+
+**When to update:**
+
+- Completing a phase or major feature
+- Adding new capabilities that should be highlighted
+- Changing project status
+
+**What to update:**
+
+- Status line (top of file): `Phase X - Complete (Feature Name)`
+- Current Capabilities section: Add bullet points for new features
+- Next Up section: Update if priorities change
+
+**What NOT to include:**
+
+- ❌ "Recently Completed" list (belongs in TASKS.md)
+- ❌ Detailed task breakdown (belongs in TASKS.md)
+- ❌ Testing details (belongs in TDD_TASKS.md)
+
+**Keep AGENTS.md focused on:**
+
+- Current state of the app
+- What capabilities exist NOW
+- Brief 2-3 item roadmap
 
 ---
 
@@ -107,8 +138,30 @@ Use `[WIP]` prefix for incomplete features:
 | `docs/TASKS.md`     | Feature implementation tasks |
 | `docs/TDD_TASKS.md` | Testing tasks                |
 | `CHANGELOG.md`      | Change log                   |
+| `AGENTS.md`         | Project overview & status    |
 | `docs/GIT.md`       | Git workflow details         |
 
 ---
 
-\_Last Updated: 2026-03-21
+## Workflow Summary
+
+**On every commit, check and update files as needed:**
+
+1. **TASKS.md** (required for feature work)
+   - Add to "Completed Tasks" section
+   - Update phase status
+
+2. **CHANGELOG.md** (required for user-facing changes)
+   - Add to [Unreleased] section
+   - Follow category rules
+
+3. **AGENTS.md** (update if needed)
+   - Status line (always update on phase completion)
+   - Current Capabilities (only if new capability added)
+   - Next Up (only if roadmap changes)
+
+**Only update files that NEED updating** - not every file every time.
+
+---
+
+\_Last Updated: 2026-03-30
