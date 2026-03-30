@@ -3,8 +3,8 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-03-30  
-**Current Phase:** Phase 11 - Image Upload with Convex Storage  
-**Status:** ✅ Completed | Image upload, Ctrl+V paste, thumbnail fix
+**Current Phase:** Phase 12 - Spiritual Retreat Page  
+**Status:** ✅ Completed | Added /events/spiritual-retreat route
 
 **Next Up:**
 
@@ -1390,6 +1390,32 @@ Upload hook providing:
 ### Test Results
 
 - All 553 tests passing
+
+---
+
+## Phase 12: Spiritual Retreat Page
+
+**Status:** ✅ Complete 2026-03-30
+
+**Goal:** Create a dedicated event page for Spiritual Retreat events, similar to Sunday Service page.
+
+### Implementation
+
+**New File:** `src/routes/events.spiritual-retreat.tsx`
+
+- Route: `/events/spiritual-retreat`
+- Looks for "Retreat" event type
+- Default times: 08:00 - 17:00 (full day retreat)
+- Title: "Spiritual Retreat"
+- Subtitle: "Manage spiritual retreat events"
+- Uses green color from Retreat event type
+- Filtered history and archive links
+
+**Updated:** `src/lib/navigation.ts`
+
+- Added Spiritual Retreat to Events sub-menu
+- Uses Mountain icon from lucide-react
+- Accessible at `/events/spiritual-retreat`
 
 ---
 

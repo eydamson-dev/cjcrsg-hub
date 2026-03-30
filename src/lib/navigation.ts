@@ -7,6 +7,7 @@ import {
   Palette,
   Church,
   List,
+  Mountain,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -48,6 +49,12 @@ export const navItems: NavItem[] = [
         href: '/events/sunday-service',
         icon: Church,
         description: 'Manage Sunday worship services',
+      },
+      {
+        title: 'Spiritual Retreat',
+        href: '/events/spiritual-retreat',
+        icon: Mountain,
+        description: 'Manage spiritual retreat events',
       },
     ],
   },

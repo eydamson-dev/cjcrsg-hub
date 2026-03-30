@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Spiritual Retreat Page** - Dedicated event page for Spiritual Retreat events
+  - New route: `/events/spiritual-retreat`
+  - Looks for "Retreat" event type in database
+  - Default times: 08:00 - 17:00 (full day retreat)
+  - Filtered history and archive links (by event type)
+  - Added to Events navigation menu with Mountain icon
+
 - **Image Upload with Convex Storage** - Persistent image uploads for event banners and media galleries
   - Fixed validation in `isValidImageUrl` to accept blob URLs, data URIs, and any HTTP/HTTPS URL
   - Added Convex file storage backend (`convex/events/files.ts`)

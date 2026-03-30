@@ -16,6 +16,7 @@ import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
 import { Route as EventsTestRouteImport } from './routes/events.test'
 import { Route as EventsSundayServiceRouteImport } from './routes/events.sunday-service'
+import { Route as EventsSpiritualRetreatRouteImport } from './routes/events.spiritual-retreat'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsHistoryRouteImport } from './routes/events.history'
 import { Route as EventsArchiveRouteImport } from './routes/events.archive'
@@ -59,6 +60,11 @@ const EventsTestRoute = EventsTestRouteImport.update({
 const EventsSundayServiceRoute = EventsSundayServiceRouteImport.update({
   id: '/events/sunday-service',
   path: '/events/sunday-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsSpiritualRetreatRoute = EventsSpiritualRetreatRouteImport.update({
+  id: '/events/spiritual-retreat',
+  path: '/events/spiritual-retreat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees/': typeof AttendeesIndexRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees': typeof AttendeesIndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
   '/events/new': typeof EventsNewRoute
+  '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
   '/attendees/': typeof AttendeesIndexRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
     | '/attendees/'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
     | '/attendees'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/events/archive'
     | '/events/history'
     | '/events/new'
+    | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
     | '/attendees/'
@@ -228,6 +240,7 @@ export interface RootRouteChildren {
   EventsArchiveRoute: typeof EventsArchiveRoute
   EventsHistoryRoute: typeof EventsHistoryRoute
   EventsNewRoute: typeof EventsNewRoute
+  EventsSpiritualRetreatRoute: typeof EventsSpiritualRetreatRoute
   EventsSundayServiceRoute: typeof EventsSundayServiceRoute
   EventsTestRoute: typeof EventsTestRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       path: '/events/sunday-service'
       fullPath: '/events/sunday-service'
       preLoaderRoute: typeof EventsSundayServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/spiritual-retreat': {
+      id: '/events/spiritual-retreat'
+      path: '/events/spiritual-retreat'
+      fullPath: '/events/spiritual-retreat'
+      preLoaderRoute: typeof EventsSpiritualRetreatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/new': {
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsArchiveRoute: EventsArchiveRoute,
   EventsHistoryRoute: EventsHistoryRoute,
   EventsNewRoute: EventsNewRoute,
+  EventsSpiritualRetreatRoute: EventsSpiritualRetreatRoute,
   EventsSundayServiceRoute: EventsSundayServiceRoute,
   EventsTestRoute: EventsTestRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
