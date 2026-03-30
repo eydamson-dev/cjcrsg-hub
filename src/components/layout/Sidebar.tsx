@@ -66,12 +66,12 @@ export function Sidebar() {
 
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
-            const isActive = location.href === item.href
+            const isActive = location.pathname === item.href
             const hasChildren = item.children && item.children.length > 0
 
             if (hasChildren) {
               const childHrefs = item.children!.map((c) => c.href)
-              const isChildActive = childHrefs.includes(location.href)
+              const isChildActive = childHrefs.includes(location.pathname)
 
               return (
                 <Accordion
@@ -82,28 +82,29 @@ export function Sidebar() {
                   <AccordionItem value={item.href} className="border-none">
                     <AccordionTrigger
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:no-underline',
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50',
                         isChildActive || isActive
                           ? 'text-foreground'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                          : 'text-muted-foreground hover:text-foreground',
                       )}
                     >
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex flex-col gap-1 pl-4">
+                      <div className="flex flex-col gap-1 pl-4 border-l border-muted">
                         {item.children!.map((child) => {
-                          const isChildItemActive = location.href === child.href
+                          const isChildItemActive =
+                            location.pathname === child.href
                           return (
                             <Link
                               key={child.href}
                               to={child.href}
                               className={cn(
-                                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors border-l-2 -ml-px',
                                 isChildItemActive
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                  ? 'bg-primary/10 text-primary border-primary font-medium'
+                                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-transparent font-medium',
                               )}
                             >
                               <child.icon className="h-4 w-4" />
@@ -123,10 +124,10 @@ export function Sidebar() {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors border-l-2 -ml-px',
                   isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    ? 'bg-primary/10 text-primary border-primary font-medium'
+                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-transparent font-medium',
                 )}
               >
                 <item.icon className="h-5 w-5" />

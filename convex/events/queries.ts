@@ -1,6 +1,57 @@
 import { query } from '../_generated/server'
 import { v } from 'convex/values'
+import { Id } from '../_generated/dataModel'
 import { paginationOptsValidator } from 'convex/server'
+
+/**
+ * Helper to resolve banner image URL from storage ID or return as-is.
+ * - If bannerImage is a Convex storage ID, generates a CDN URL
+ * - If bannerImage is an external URL, returns it unchanged
+ * - If bannerImage is undefined/null, returns undefined
+ */
+async function resolveBannerUrl(
+  ctx: { storage: { getUrl: (id: Id<'_storage'>) => Promise<string | null> } },
+  bannerImage?: string,
+): Promise<string | undefined> {
+  if (!bannerImage) return undefined
+  if (isConvexStorageId(bannerImage)) {
+    const url = await ctx.storage.getUrl(bannerImage as Id<'_storage'>)
+    return url || bannerImage
+  }
+  return bannerImage
+}
+
+/**
+ * Helper to resolve media URLs from storage IDs or return as-is.
+ * - If media URL is a Convex storage ID, generates a CDN URL
+ * - If media URL is an external URL, returns it unchanged
+ */
+async function resolveMediaUrls(
+  ctx: { storage: { getUrl: (id: Id<'_storage'>) => Promise<string | null> } },
+  media?: Array<{ url: string; type: 'image' | 'video'; caption?: string }>,
+): Promise<
+  Array<{ url: string; type: 'image' | 'video'; caption?: string }> | undefined
+> {
+  if (!media || media.length === 0) return undefined
+  const resolved = await Promise.all(
+    media.map(async (item) => {
+      if (isConvexStorageId(item.url)) {
+        const url = await ctx.storage.getUrl(item.url as Id<'_storage'>)
+        return { ...item, url: url || item.url }
+      }
+      return item
+    }),
+  )
+  return resolved
+}
+
+/**
+ * Check if a string looks like a Convex storage ID.
+ * Convex storage IDs are typically 20+ char alphanumeric strings.
+ */
+function isConvexStorageId(id: string): boolean {
+  return /^[a-z0-9]{20,}$/i.test(id)
+}
 
 /**
  * List events with optional filters and pagination.
@@ -73,12 +124,14 @@ export const list = query({
 
     const result = await eventsQuery.order('desc').paginate(paginationOpts)
 
-    // Join eventType data for each event
+    // Join eventType data and resolve banner URLs for each event
     const pageWithEventTypes = await Promise.all(
       result.page.map(async (event) => {
         const eventType = await ctx.db.get(event.eventTypeId)
+        const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
         return {
           ...event,
+          bannerImage,
           eventType: eventType
             ? { name: eventType.name, color: eventType.color }
             : null,
@@ -105,8 +158,14 @@ export const getById = query({
 
     const eventType = await ctx.db.get(event.eventTypeId)
 
+    // Resolve banner and media URLs from storage IDs
+    const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
+    const media = await resolveMediaUrls(ctx, event.media)
+
     return {
       ...event,
+      bannerImage,
+      media,
       eventType: eventType
         ? { name: eventType.name, color: eventType.color }
         : null,
@@ -140,8 +199,14 @@ export const getCurrentEvent = query({
       .withIndex('by_event', (q) => q.eq('eventId', event._id))
       .collect()
 
+    // Resolve banner and media URLs from storage IDs
+    const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
+    const media = await resolveMediaUrls(ctx, event.media)
+
     return {
       ...event,
+      bannerImage,
+      media,
       eventType: eventType
         ? { name: eventType.name, color: eventType.color }
         : null,
@@ -213,7 +278,7 @@ export const listActive = query({
 
     const result = await eventsQuery.order('desc').paginate(paginationOpts)
 
-    // Join eventType data and attendance count for each event
+    // Join eventType data, attendance count, and resolve banner URLs for each event
     const pageWithDetails = await Promise.all(
       result.page.map(async (event) => {
         const eventType = await ctx.db.get(event.eventTypeId)
@@ -223,8 +288,11 @@ export const listActive = query({
           .withIndex('by_event', (q) => q.eq('eventId', event._id))
           .collect()
 
+        const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
+
         return {
           ...event,
+          bannerImage,
           eventType: eventType
             ? { name: eventType.name, color: eventType.color }
             : null,
@@ -300,7 +368,7 @@ export const listArchive = query({
 
     const result = await eventsQuery.order('desc').paginate(paginationOpts)
 
-    // Join eventType data and attendance count for each event
+    // Join eventType data, attendance count, and resolve banner URLs for each event
     const pageWithDetails = await Promise.all(
       result.page.map(async (event) => {
         const eventType = await ctx.db.get(event.eventTypeId)
@@ -310,8 +378,11 @@ export const listArchive = query({
           .withIndex('by_event', (q) => q.eq('eventId', event._id))
           .collect()
 
+        const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
+
         return {
           ...event,
+          bannerImage,
           eventType: eventType
             ? { name: eventType.name, color: eventType.color }
             : null,
@@ -535,8 +606,14 @@ export const getCurrentEventByType = query({
       .withIndex('by_event', (q) => q.eq('eventId', event._id))
       .collect()
 
+    // Resolve banner and media URLs from storage IDs
+    const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
+    const media = await resolveMediaUrls(ctx, event.media)
+
     return {
       ...event,
+      bannerImage,
+      media,
       eventType: eventType
         ? { name: eventType.name, color: eventType.color }
         : null,

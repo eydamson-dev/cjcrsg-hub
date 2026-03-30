@@ -1,14 +1,15 @@
 import { v } from 'convex/values'
 
 /**
- * Validates image URL format only — no HEAD requests.
- * Valid: ends in .jpg, .jpeg, .png, .gif, .webp, .svg (case-insensitive)
- * Valid: starts with data:image/ (base64 data URI)
- * Invalid: any other format
+ * Validates image URL format.
+ * Valid: data URIs (data:image/...), blob URLs (blob:...), or any http(s) URL
+ * This is permissive because we can't reliably validate without fetching.
  */
 export function isValidImageUrl(url: string): boolean {
   if (url.startsWith('data:image/')) return true
-  return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)
+  if (url.startsWith('blob:')) return true
+  if (url.startsWith('http://') || url.startsWith('https://')) return true
+  return false
 }
 
 /**

@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Image Upload with Convex Storage** - Persistent image uploads for event banners and media galleries
+  - Fixed validation in `isValidImageUrl` to accept blob URLs, data URIs, and any HTTP/HTTPS URL
+  - Added Convex file storage backend (`convex/events/files.ts`)
+    - Mutations: `generateUploadUrl`, `updateBanner`, `addMediaItem`, `removeMediaItem`, `getFileUrl`
+    - 10MB file size limit
+  - Updated frontend components to use Convex storage:
+    - `useFileUpload.ts`: Upload hook for orchestration
+    - `BannerUploader.tsx`: Supports both Convex storage AND external URLs
+    - `MediaGallery.tsx`: Uses Convex storage only
+    - Ctrl+V paste support in banner uploader (image files and URLs)
+  - Fixed banner URL resolution in list queries (`list`, `listActive`, `listArchive`)
+    - Thumbnails now display correctly in history and archive list views
+
 - **Phase 6: Event History & EventList Component** - New Event History page and reusable EventList component with server-side pagination
   - New route: `/events/history` - Event History page for viewing active events (isActive=true)
   - `src/features/events/components/EventList.tsx`: Reusable event display component

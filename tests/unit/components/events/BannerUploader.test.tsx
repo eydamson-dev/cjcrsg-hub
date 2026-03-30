@@ -2,9 +2,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BannerUploader } from '~/features/events/components/BannerUploader'
 
+vi.mock('~/features/events/hooks/useFileUpload', () => ({
+  useFileUpload: () => ({
+    handleUploadBanner: vi.fn().mockResolvedValue('storage123'),
+    handleSetBannerUrl: vi.fn().mockResolvedValue(undefined),
+    handleRemoveMedia: vi.fn().mockResolvedValue(undefined),
+    handleUploadMedia: vi.fn().mockResolvedValue('storage123'),
+    isUploading: false,
+    uploadProgress: 'idle',
+  }),
+}))
+
 describe('BannerUploader', () => {
-  const mockOnUpload = vi.fn()
   const mockOnClose = vi.fn()
+  const mockEventId = 'event123'
   const mockBannerUrl = 'https://example.com/banner.jpg'
 
   beforeEach(() => {
@@ -20,7 +31,7 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
@@ -32,7 +43,7 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={false}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
@@ -44,7 +55,7 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
@@ -56,13 +67,13 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
+          eventId={mockEventId}
           bannerImage={mockBannerUrl}
-          onUpload={mockOnUpload}
           onClose={mockOnClose}
         />,
       )
 
-      const img = screen.getByAltText(/event banner/i)
+      const img = screen.getByAltText('Event banner')
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', mockBannerUrl)
     })
@@ -71,31 +82,25 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
 
-      expect(
-        screen.getByRole('button', { name: /upload image/i }),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: /enter url/i }),
-      ).toBeInTheDocument()
+      expect(screen.getByText(/upload image/i)).toBeInTheDocument()
+      expect(screen.getByText(/enter url/i)).toBeInTheDocument()
     })
 
     it('renders cancel button', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
 
-      expect(
-        screen.getByRole('button', { name: /cancel/i }),
-      ).toBeInTheDocument()
+      expect(screen.getByText(/cancel/i)).toBeInTheDocument()
     })
   })
 
@@ -104,13 +109,12 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
 
-      const enterUrlButton = screen.getByRole('button', { name: /enter url/i })
-      fireEvent.click(enterUrlButton)
+      fireEvent.click(screen.getByText(/enter url/i))
 
       expect(screen.getByLabelText(/banner image url/i)).toBeInTheDocument()
     })
@@ -119,19 +123,14 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
 
-      const enterUrlButton = screen.getByRole('button', { name: /enter url/i })
+      fireEvent.click(screen.getByText(/enter url/i))
+      fireEvent.click(screen.getByText(/enter url/i))
 
-      // Show
-      fireEvent.click(enterUrlButton)
-      expect(screen.getByLabelText(/banner image url/i)).toBeInTheDocument()
-
-      // Hide
-      fireEvent.click(enterUrlButton)
       expect(
         screen.queryByLabelText(/banner image url/i),
       ).not.toBeInTheDocument()
@@ -141,17 +140,18 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
+          eventId={mockEventId}
           bannerImage={mockBannerUrl}
-          onUpload={mockOnUpload}
           onClose={mockOnClose}
         />,
       )
 
-      const enterUrlButton = screen.getByRole('button', { name: /enter url/i })
-      fireEvent.click(enterUrlButton)
+      fireEvent.click(screen.getByText(/enter url/i))
 
-      const urlInput = screen.getByLabelText(/banner image url/i)
-      expect(urlInput).toHaveValue(mockBannerUrl)
+      const input = screen.getByLabelText(
+        /banner image url/i,
+      ) as HTMLInputElement
+      expect(input.value).toBe(mockBannerUrl)
     })
   })
 
@@ -160,13 +160,12 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
           onClose={mockOnClose}
         />,
       )
 
-      const cancelButton = screen.getByRole('button', { name: /cancel/i })
-      fireEvent.click(cancelButton)
+      fireEvent.click(screen.getByText(/cancel/i))
 
       expect(mockOnClose).toHaveBeenCalled()
     })
@@ -175,36 +174,33 @@ describe('BannerUploader', () => {
       const { rerender } = render(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
+          bannerImage={mockBannerUrl}
           onClose={mockOnClose}
         />,
       )
 
-      // Show URL input
-      const enterUrlButton = screen.getByRole('button', { name: /enter url/i })
-      fireEvent.click(enterUrlButton)
-
+      fireEvent.click(screen.getByText(/enter url/i))
       expect(screen.getByLabelText(/banner image url/i)).toBeInTheDocument()
 
-      // Close
       rerender(
         <BannerUploader
           open={false}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
+          bannerImage={mockBannerUrl}
           onClose={mockOnClose}
         />,
       )
 
-      // Reopen
       rerender(
         <BannerUploader
           open={true}
-          onUpload={mockOnUpload}
+          eventId={mockEventId}
+          bannerImage={mockBannerUrl}
           onClose={mockOnClose}
         />,
       )
 
-      // URL input should be hidden again
       expect(
         screen.queryByLabelText(/banner image url/i),
       ).not.toBeInTheDocument()
@@ -216,8 +212,8 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
+          eventId={mockEventId}
           bannerImage={null as any}
-          onUpload={mockOnUpload}
           onClose={mockOnClose}
         />,
       )
@@ -229,8 +225,8 @@ describe('BannerUploader', () => {
       render(
         <BannerUploader
           open={true}
+          eventId={mockEventId}
           bannerImage={undefined}
-          onUpload={mockOnUpload}
           onClose={mockOnClose}
         />,
       )

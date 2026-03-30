@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Upload, Trash2, Play, Image as ImageIcon } from 'lucide-react'
+import { Upload, Trash2, Play, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
+import { useFileUpload } from '../hooks/useFileUpload'
 
 export interface MediaItem {
   url: string
@@ -26,24 +27,28 @@ export interface MediaItem {
 
 interface MediaGalleryProps {
   open?: boolean
+  eventId: string
   media: MediaItem[]
-  onAdd: (item: MediaItem) => void
-  onDelete: (index: number) => void
   editable?: boolean
   onClose?: () => void
 }
 
 export function MediaGallery({
   open,
+  eventId,
   media,
-  onAdd,
-  onDelete,
   editable = true,
   onClose,
 }: MediaGalleryProps) {
-  const [isUploading, setIsUploading] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const { handleUploadMedia, handleRemoveMedia, isUploading } = useFileUpload({
+    onSuccess: () => {
+      // The mutation already added to database, so we just need to trigger a refresh
+      // The parent will re-fetch the event and update the list
+    },
+  })
 
   const isOpen = open ?? false
 
@@ -57,19 +62,14 @@ export function MediaGallery({
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setIsUploading(true)
-      setTimeout(() => {
-        const mockUrl = URL.createObjectURL(file)
-        const isVideo = file.type.startsWith('video/')
-        onAdd({
-          url: mockUrl,
-          type: isVideo ? 'video' : 'image',
-        })
-        setIsUploading(false)
-      }, 1000)
+    if (file && eventId) {
+      try {
+        await handleUploadMedia(eventId, file)
+      } catch (error) {
+        console.error('Upload failed:', error)
+      }
     }
     e.target.value = ''
   }
@@ -78,9 +78,13 @@ export function MediaGallery({
     setItemToDelete(index)
   }
 
-  const confirmDelete = () => {
-    if (itemToDelete !== null) {
-      onDelete(itemToDelete)
+  const confirmDelete = async () => {
+    if (itemToDelete !== null && eventId) {
+      try {
+        await handleRemoveMedia(eventId, itemToDelete)
+      } catch (error) {
+        console.error('Delete failed:', error)
+      }
       setItemToDelete(null)
     }
   }
@@ -146,8 +150,17 @@ export function MediaGallery({
                   onClick={handleFileClick}
                   disabled={isUploading}
                 >
-                  <Upload className="mr-2 size-4" />
-                  {isUploading ? 'Uploading...' : 'Add Image / Video'}
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="mr-2 size-4" />
+                      Add Image / Video
+                    </>
+                  )}
                 </Button>
               </div>
             )}

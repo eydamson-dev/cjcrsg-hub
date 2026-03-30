@@ -19,7 +19,7 @@ import { AttendanceManager } from './AttendanceManager'
 import { BasicInfoEditModal } from './BasicInfoEditModal'
 import { DescriptionEditModal } from './DescriptionEditModal'
 import { BannerUploader } from './BannerUploader'
-import { MediaGallery, type MediaItem } from './MediaGallery'
+import { MediaGallery } from './MediaGallery'
 import { StatusAndTypeEditModal } from './StatusAndTypeEditModal'
 import { useEventTypesList } from '../hooks/useEventTypes'
 import {
@@ -122,59 +122,6 @@ export function EventDetails({
         description,
       })
       setShowDescriptionModal(false)
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const handleUpdateBanner = async (bannerImage: string) => {
-    if (isUnsaved) {
-      onUpdate?.({ bannerImage })
-      setShowBannerUploader(false)
-      return
-    }
-
-    try {
-      await updateEvent.mutateAsync({
-        id: event._id,
-        bannerImage,
-      })
-      setShowBannerUploader(false)
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const handleAddMedia = async (item: MediaItem) => {
-    const currentMedia = event.media || []
-    if (isUnsaved) {
-      onUpdate?.({ media: [...currentMedia, item] })
-      return
-    }
-
-    try {
-      await updateEvent.mutateAsync({
-        id: event._id,
-        media: [...currentMedia, item],
-      })
-    } catch (error) {
-      // Error handled by hook
-    }
-  }
-
-  const handleDeleteMedia = async (index: number) => {
-    const currentMedia = event.media || []
-    const newMedia = currentMedia.filter((_, i) => i !== index)
-    if (isUnsaved) {
-      onUpdate?.({ media: newMedia })
-      return
-    }
-
-    try {
-      await updateEvent.mutateAsync({
-        id: event._id,
-        media: newMedia,
-      })
     } catch (error) {
       // Error handled by hook
     }
@@ -591,16 +538,15 @@ export function EventDetails({
 
       <BannerUploader
         open={showBannerUploader}
+        eventId={event._id}
         bannerImage={event.bannerImage}
-        onUpload={handleUpdateBanner}
         onClose={() => setShowBannerUploader(false)}
       />
 
       <MediaGallery
         open={showMediaGallery}
+        eventId={event._id}
         media={event.media || []}
-        onAdd={handleAddMedia}
-        onDelete={handleDeleteMedia}
         onClose={() => setShowMediaGallery(false)}
       />
     </div>
