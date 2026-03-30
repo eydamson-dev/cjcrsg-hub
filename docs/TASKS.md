@@ -2,9 +2,9 @@
 
 Complete feature catalog for the church management system.
 
-**Last Updated:** 2026-03-28  
-**Current Phase:** Phase 9 - Complete  
-**Status:** ✅ Completed | Task 9.1 - Testing & Documentation Updates
+**Last Updated:** 2026-03-30  
+**Current Phase:** Phase 11 - Image Upload with Convex Storage  
+**Status:** ✅ Completed | Image upload, Ctrl+V paste, thumbnail fix
 
 **Next Up:**
 
@@ -1267,6 +1267,129 @@ const eventType = eventTypes?.find(et => et._id === event?.eventTypeId)
 - [ ] Event Detail page: Back button respects parent event type
 - [ ] Fallback route works for unhandled event types
 - [ ] Fallback redirects to `/events` if event type not found
+
+---
+
+## Phase 11: Image Upload with Convex Storage
+
+**Status:** ✅ Complete 2026-03-30
+
+**Goal:** Implement persistent image uploads for event banners and media galleries using Convex storage.
+
+### Problem
+
+1. **Validation was too restrictive** - The `isValidImageUrl` validator only accepted URLs ending with specific extensions (.jpg, .jpeg, .png, .gif, .webp, .svg) or data URIs. It rejected blob URLs from `URL.createObjectURL()` and URLs without extensions.
+
+2. **Images didn't persist** - The original implementation used `URL.createObjectURL()` which creates temporary blob URLs that only exist in the current browser session. These become invalid after page reload.
+
+### Solution
+
+#### Phase 1: Fix Validation
+
+**File:** `convex/events/validators.ts`
+
+Updated `isValidImageUrl` to accept:
+
+- Data URIs (`data:image/...`)
+- Blob URLs (`blob:...`)
+- Any HTTP/HTTPS URL (no longer requires file extension)
+
+---
+
+#### Phase 2: Convex File Storage Backend
+
+**File:** `convex/events/files.ts` (NEW)
+
+Created mutations for file upload handling:
+
+| Mutation            | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| `generateUploadUrl` | Creates a pre-signed upload URL for client-side upload    |
+| `updateBanner`      | Updates event bannerImage with storage ID or external URL |
+| `addMediaItem`      | Adds media item to event's media array                    |
+| `removeMediaItem`   | Removes media item from event's media array               |
+| `getFileUrl`        | Gets CDN URL from storage ID                              |
+
+**File:** `convex/events/queries.ts`
+
+Added URL resolution helpers:
+
+- `resolveBannerUrl(ctx, bannerImage)` - Converts storage IDs to CDN URLs
+- `resolveMediaUrls(ctx, media)` - Converts media array storage IDs to CDN URLs
+
+Updated queries to resolve URLs:
+
+- `getById` - Resolves banner and media URLs
+- `getCurrentEvent` - Resolves banner and media URLs
+- `getCurrentEventByType` - Resolves banner and media URLs
+- `list` - Resolves banner URLs
+- `listActive` - Resolves banner URLs
+- `listArchive` - Resolves banner URLs
+
+---
+
+#### Phase 3: Frontend Hooks and Components
+
+**File:** `src/features/events/hooks/useFileUpload.ts` (NEW)
+
+Upload hook providing:
+
+- `uploadFile(file: File)` - Uploads file to Convex storage
+- `uploadFromUrl(url: string)` - Validates external URL
+- `generateDownloadUrl(storageId)` - Gets CDN URL for storage ID
+
+**File:** `src/features/events/components/BannerUploader.tsx`
+
+- Now supports both Convex storage AND external URLs
+- Added Ctrl+V paste support:
+  - Pasted image files are uploaded to Convex storage
+  - Pasted image URLs are validated and set as banner
+- Toast notifications for success/error
+- Hint text for users about paste functionality
+
+**File:** `src/features/events/components/MediaGallery.tsx`
+
+- Now uses Convex storage only (no external URLs)
+- Drag-and-drop upload support
+- 10MB file size limit
+
+**File:** `src/features/events/components/EventDetails.tsx`
+
+- Passes eventId to BannerUploader and MediaGallery
+
+---
+
+#### Phase 4: Fix Thumbnail Display in List Views
+
+**Problem:** Thumbnails were broken in history and archive list views.
+
+**Cause:** The `list`, `listActive`, and `listArchive` queries weren't resolving banner URLs from storage IDs.
+
+**Fix:** Added `resolveBannerUrl` call to all three queries to convert storage IDs to CDN URLs before returning results.
+
+---
+
+### Files Created
+
+| File                                         | Description            |
+| -------------------------------------------- | ---------------------- |
+| `convex/events/files.ts`                     | File storage mutations |
+| `src/features/events/hooks/useFileUpload.ts` | Upload hook            |
+
+### Files Modified
+
+| File                                                   | Changes                                            |
+| ------------------------------------------------------ | -------------------------------------------------- |
+| `convex/events/validators.ts`                          | Fixed isValidImageUrl validation                   |
+| `convex/events/queries.ts`                             | Added URL resolution helpers, updated list queries |
+| `src/features/events/components/BannerUploader.tsx`    | Added Convex storage + paste support               |
+| `src/features/events/components/MediaGallery.tsx`      | Changed to Convex storage only                     |
+| `src/features/events/components/EventDetails.tsx`      | Pass eventId to upload components                  |
+| `tests/unit/components/events/BannerUploader.test.tsx` | Updated mock                                       |
+
+### Test Results
+
+- All 553 tests passing
 
 ---
 

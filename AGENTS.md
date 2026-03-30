@@ -2,8 +2,8 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 10 - Complete (Sunday Service + Loading Improvements)  
-**Last Updated:** 2026-03-28
+**Status:** Phase 11 - Complete (Image Upload with Convex Storage)  
+**Last Updated:** 2026-03-30
 
 ---
 
@@ -75,7 +75,8 @@ The system is fully functional for core church operations:
 - **Unified attendee selection with inviter assignment**
 - **Quick attendee creation from attendance modal**
 - View event history and analytics
-- Manage event media and documentation
+- **Manage event media and documentation with persistent storage**
+- **Image upload with Ctrl+V paste support**
 
 ✅ **User Experience**
 
@@ -99,19 +100,20 @@ The system is fully functional for core church operations:
 - ✅ Inviter selection with full Attendee object return
 - ✅ CreateAttendeeModal with optional name pre-population
 - ✅ Phase 9: All test failures fixed (553 unit + 42 E2E = 595 total)
-- ✅ Phase 10.1: Backend queries getCurrentEventByType, getStatsByEventType
-- ✅ Phase 10.2: Frontend hooks with eventTypeId support
-- ✅ Phase 10.3-10.4: Extract EventsContent, update EmptyEventState
-- ✅ Phase 10.5: Update QuickStats with optional label props
-- ✅ Phase 10.6: Update events.index.tsx to use EventsContent
-- ✅ Phase 10.7: Create /events/sunday-service route
-- ✅ Phase 10.8-10.9: Update navigation & sidebar with accordion
-- ✅ Phase 10.10: Breadcrumb navigation enhancement
-- ✅ Phase 10.11: Loading state improvements (PageLoader component, loader prop)
+- ✅ Phase 10.1-10.11: Sunday Service dedicated page with breadcrumbs and loading states
+- ✅ Phase 11: Image Upload with Convex Storage
+  - Fixed validation to accept blob URLs, data URIs, any HTTP/HTTPS URL
+  - Added Convex file storage backend with upload mutations
+  - Added useFileUpload hook for frontend uploads
+  - Updated BannerUploader with Convex storage + Ctrl+V paste support
+  - Updated MediaGallery to use Convex storage only
+  - Fixed thumbnail display in history/archive list views
 
 **Next Up:**
 
-- ⏳ Phase 11: Add more dedicated event type pages
+- ⏳ Future: Attendance reporting & analytics
+- ⏳ Future: Dashboard statistics widgets
+- ⏳ Future: Data export to CSV
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 
