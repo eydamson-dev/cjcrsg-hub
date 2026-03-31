@@ -138,6 +138,42 @@ pnpm dev
 
 ---
 
+## AI Tools & Capabilities
+
+This project uses specialized AI skills and MCPs (Model Context Protocols):
+
+### Project Skills (Custom Knowledge)
+
+- **cjcrsg-hub** - Main project guidance (architecture, patterns, conventions)
+- **cjcrsg-task-manager** - Task planning and tracking (show tasks, plan phase)
+- **cjcrsg-dev-workflow** - Development methodology and implementation approach
+- **cjcrsg-pre-commit** - Quality checks before committing
+- **cjcrsg-docs-workflow** - Documentation updates (TASKS.md, CHANGELOG.md)
+- **cjcrsg-testing-workflow** - Testing decisions and requirements
+- **cjcrsg-git-conventions** - Git branch naming and commit format
+
+### Platform Skills
+
+- **convex-quickstart** - Initialize Convex projects
+- **convex-setup-auth** - Set up Convex authentication
+- **convex-migration-helper** - Schema migrations
+- **convex-performance-audit** - Performance optimization
+- **convex-create-component** - Build reusable Convex components
+- **shadcn** - UI component management
+
+### Available MCPs (Declared in opencode.json)
+
+- **convex** - Direct database operations, queries, mutations
+- **playwright** - E2E testing, browser automation
+- **vitest** - Unit testing, coverage analysis
+- **chrome-devtools** - Browser debugging, performance profiling
+- **shadcn** - Component registry operations
+
+**Skills:** Located in `.agents/skills/`
+**MCPs:** Configured in `opencode.json`
+
+---
+
 ## Quick Links
 
 ### 📋 Documentation
