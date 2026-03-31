@@ -2,8 +2,8 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 12 - Complete (Spiritual Retreat Page)  
-**Last Updated:** 2026-03-30
+**Status:** Phase 13 - Spiritual Retreat Enhancement - In Progress  
+**Last Updated:** 2026-03-31
 
 ---
 
@@ -79,6 +79,10 @@ The system is fully functional for core church operations:
 - **Image upload with Ctrl+V paste support**
 - **Dedicated Sunday Service event page** (`/events/sunday-service`)
 - **Dedicated Spiritual Retreat event page** (`/events/spiritual-retreat`)
+  - **Tabbed interface** (Overview, Teachers, Schedule, Staff, Attendance)
+  - **Teacher management** with qualified status validation (Pastor/Leader/Elder/Deacon)
+  - **Schedule builder** with day tabs and time conflict detection
+  - **Staff assignments** with role and responsibilities fields
 - Filtered history and archive by event type
 
 ✅ **User Experience**
@@ -92,14 +96,22 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Status:** Phase 12 - Complete (Spiritual Retreat Page)  
-**Last Updated:** 2026-03-30
+**Status:** Phase 13 - Spiritual Retreat Enhancement - Complete  
+**Last Updated:** 2026-03-31
+
+**Phase Progress:**
+
+- ✅ Phase 13.1: Database Schema & Validators
+- ✅ Phase 13.2: Backend - Retreat Module (queries/mutations)
+- ✅ Phase 13.3: Frontend Types & Hooks
+- ✅ Phase 13.4: Tabbed UI Components
+- ✅ Phase 13.5: Integration
+- ✅ Phase 13 Tests: 37 new backend tests (591 total)
 
 **Next Up:**
 
-- ⏳ Future: Attendance reporting & analytics
-- ⏳ Future: Dashboard statistics widgets
-- ⏳ Future: Data export to CSV
+- Future: Attendance reporting & analytics
+- Future: Dashboard statistics widgets
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 

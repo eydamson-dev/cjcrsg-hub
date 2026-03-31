@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 13: Spiritual Retreat Enhancement** - Complete implementation for managing Spiritual Retreat events
+  - **Database Schema:** Added `retreatTeachers`, `retreatLessons`, `retreatStaff` fields to events table
+  - **Backend API:** Created retreat module with 4 queries and 10 mutations
+    - Teacher management (add/remove/update with qualified status validation)
+    - Lesson scheduling with day tabs and time conflict detection
+    - Staff assignments with roles and responsibilities
+  - **Frontend Integration:** Created types, hooks, and UI components
+    - `RetreatDetails` - Tabbed container (Overview, Teachers, Schedule, Staff, Attendance)
+    - `RetreatTeachers` - Teacher cards with status filtering and warning dialogs
+    - `RetreatSchedule` - Day-based timeline with overlap detection
+    - `RetreatStaff` - Responsive grid for staff management
+  - **Dedicated Route:** `/events/spiritual-retreat` with full retreat management interface
+  - **Schema Updates:** Added Pastor/Leader/Elder/Deacon as valid attendee statuses
+  - **Tests:** 37 new backend tests added (591 total tests passing)
+
+### Added
+
+- **Phase 13: Spiritual Retreat Enhancement** - Complete implementation for managing Spiritual Retreat events
+  - **Database Schema:** Added `retreatTeachers`, `retreatLessons`, `retreatStaff` fields to events table
+  - **Backend API:** Created retreat module with 4 queries and 10 mutations
+    - Teacher management (add/remove/update with qualified status validation)
+    - Lesson scheduling with day tabs and time conflict detection
+    - Staff assignments with roles and responsibilities
+  - **Frontend Integration:** Created types, hooks, and UI components
+    - `RetreatDetails` - Tabbed container (Overview, Teachers, Schedule, Staff, Attendance)
+    - `RetreatTeachers` - Teacher cards with status filtering and warning dialogs
+    - `RetreatSchedule` - Day-based timeline with overlap detection
+    - `RetreatStaff` - Responsive grid for staff management
+  - **Dedicated Route:** `/events/spiritual-retreat` with full retreat management interface
+  - **Schema Updates:** Added Pastor/Leader/Elder/Deacon as valid attendee statuses
+  - **Tests:** 37 new backend tests added (591 total tests passing)
+
+- **Sunday Service & Spiritual Retreat Pages** - Dedicated event management pages
+  - `/events/sunday-service` - Sunday Service specific page
+  - `/events/spiritual-retreat` - Spiritual Retreat specific page with tabbed interface
+  - Filtered history and archive links for each event type
+
+### Changed
+
+- **Phase 13 Documentation** - Comprehensive implementation plan for Spiritual Retreat Enhancement
+
+### Changed
+
 - **Phase 13 Documentation** - Comprehensive implementation plan for Spiritual Retreat Enhancement
   - Added detailed Phase 13 section to `docs/TASKS.md` (695 lines)
   - 6 sub-phases: Database Schema, Backend Module, Frontend Hooks, UI Components, Integration, Testing

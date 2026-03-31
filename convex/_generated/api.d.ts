@@ -25,6 +25,8 @@ import type * as events_queries from "../events/queries.js";
 import type * as events_validators from "../events/validators.js";
 import type * as http from "../http.js";
 import type * as myFunctions from "../myFunctions.js";
+import type * as retreat_mutations from "../retreat/mutations.js";
+import type * as retreat_queries from "../retreat/queries.js";
 
 import type {
   ApiFromModules,
@@ -50,6 +52,8 @@ declare const fullApi: ApiFromModules<{
   "events/validators": typeof events_validators;
   http: typeof http;
   myFunctions: typeof myFunctions;
+  "retreat/mutations": typeof retreat_mutations;
+  "retreat/queries": typeof retreat_queries;
 }>;
 
 /**

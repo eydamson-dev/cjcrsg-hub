@@ -16,6 +16,10 @@ export default defineSchema({
       v.literal('member'),
       v.literal('visitor'),
       v.literal('inactive'),
+      v.literal('Pastor'),
+      v.literal('Leader'),
+      v.literal('Elder'),
+      v.literal('Deacon'),
     ),
     joinDate: v.optional(v.number()),
     notes: v.optional(v.string()),
@@ -68,6 +72,52 @@ export default defineSchema({
           url: v.string(),
           type: v.union(v.literal('image'), v.literal('video')),
           caption: v.optional(v.string()),
+        }),
+      ),
+    ),
+    // Spiritual Retreat specific fields
+    // Teachers: Must have qualified status (Pastor, Leader, Elder, Deacon)
+    retreatTeachers: v.optional(
+      v.array(
+        v.object({
+          attendeeId: v.id('attendees'),
+          subject: v.optional(v.string()),
+          bio: v.optional(v.string()),
+        }),
+      ),
+    ),
+    // Schedule: Lessons and activities for retreat
+    retreatLessons: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          title: v.string(),
+          description: v.optional(v.string()),
+          teacherId: v.optional(v.id('attendees')),
+          day: v.optional(v.number()), // 1, 2, 3 for multi-day
+          startTime: v.string(), // "HH:mm" format
+          endTime: v.string(), // "HH:mm" format
+          location: v.optional(v.string()),
+          type: v.union(
+            v.literal('teaching'),
+            v.literal('meal'),
+            v.literal('break'),
+            v.literal('worship'),
+            v.literal('registration'),
+            v.literal('closing'),
+            v.literal('other'),
+          ),
+        }),
+      ),
+    ),
+    // Staff: Any attendee can be staff with a role
+    retreatStaff: v.optional(
+      v.array(
+        v.object({
+          attendeeId: v.id('attendees'),
+          role: v.string(),
+          responsibilities: v.optional(v.string()),
+          isLead: v.optional(v.boolean()),
         }),
       ),
     ),
