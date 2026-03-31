@@ -8,6 +8,18 @@ Complete feature catalog for the church management system.
 
 **Next Up:**
 
+- ⏳ Phase 14: Event-Specific Forms & Extensions (Planned)
+  - Task 14.1: Schema cleanup and extension table creation
+  - Task 14.2: Update event backend mutations
+  - Task 14.3: Migrate Phase 13 retreat mutations
+  - Task 14.4: Create reusable form field components
+  - Task 14.5: Create generic event form
+  - Task 14.6: Create Spiritual Retreat form
+  - Task 14.7: Create Event Form Factory
+  - Task 14.8: Update event creation route
+  - Task 14.9: Update event edit route
+  - Task 14.10: Update Spiritual Retreat dedicated page
+  - Task 14.11: Wipe event data and test
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1093,6 +1105,683 @@ Home > Events > Spiritual Retreat > [Active Tab Name]
 │ └─────────────────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Phase 14: Event-Specific Forms & Extensions
+
+**Status:** ⏳ Planned  
+**Goal:** Create type-specific forms for events using an extension table architecture  
+**Estimated Total Time:** ~8.5 hours
+
+**Overview:**
+Instead of embedding all event type fields in a single `events` table, this phase implements an extension table pattern where generic events use the base `events` table, and specialized event types (like Spiritual Retreat) store their specific data in separate extension tables. This keeps the schema clean and makes it easy to add new event types in the future.
+
+**Key Decisions:**
+
+- Extension table name: `spiritualRetreatEventExtensions`
+- Event type detection: Hardcoded by name (e.g., "Spiritual Retreat")
+- Generic events: No extension data, simple form
+- Specialized events: Full tabbed interface with extension data
+
+---
+
+### Task 14.1: Schema Cleanup and Extension Table Creation
+
+**Time:** 45 minutes  
+**Status:** ⏳ Pending  
+**Files:** `convex/schema.ts`
+
+**Description:**
+Remove retreat-specific fields from the generic `events` table and create a new extension table for Spiritual Retreat data. Since we'll wipe all event data, no migration is needed.
+
+**Steps:**
+
+1. **Remove from `events` table:**
+   - `retreatTeachers` field (lines 80-88)
+   - `retreatLessons` field (lines 90-112)
+   - `retreatStaff` field (lines 114-123)
+
+2. **Add new table `spiritualRetreatEventExtensions`:**
+
+   ```typescript
+   spiritualRetreatEventExtensions: defineTable({
+     eventId: v.id('events'),
+     teachers: v.array(
+       v.object({
+         attendeeId: v.id('attendees'),
+         subject: v.optional(v.string()),
+         bio: v.optional(v.string()),
+       }),
+     ),
+     lessons: v.array(
+       v.object({
+         id: v.string(),
+         title: v.string(),
+         description: v.optional(v.string()),
+         teacherId: v.optional(v.id('attendees')),
+         day: v.optional(v.number()), // 1, 2, 3 for multi-day
+         startTime: v.string(), // "HH:mm" format
+         endTime: v.string(), // "HH:mm" format
+         location: v.optional(v.string()),
+         type: v.union(
+           v.literal('teaching'),
+           v.literal('meal'),
+           v.literal('break'),
+           v.literal('worship'),
+           v.literal('registration'),
+           v.literal('closing'),
+           v.literal('other'),
+         ),
+       }),
+     ),
+     staff: v.array(
+       v.object({
+         attendeeId: v.id('attendees'),
+         role: v.string(),
+         responsibilities: v.optional(v.string()),
+         isLead: v.optional(v.boolean()),
+       }),
+     ),
+   }).index('by_event', ['eventId'])
+   ```
+
+3. **Regenerate Convex types:**
+   ```bash
+   pnpm dlx convex dev --once
+   ```
+
+**Acceptance Criteria:**
+
+- [ ] Schema compiles without errors
+- [ ] All existing event data wiped (manual action)
+- [ ] New extension table appears in Convex dashboard
+- [ ] `events` table only has generic fields
+
+---
+
+### Task 14.2: Update Event Backend Mutations
+
+**Time:** 1.5 hours  
+**Status:** ⏳ Pending  
+**Files:** `convex/events/mutations.ts`, `convex/events/queries.ts`
+
+**Description:**
+Update existing event mutations to handle extension tables and support event-type-specific creation.
+
+**Steps:**
+
+1. **Update `create` mutation in `convex/events/mutations.ts`:**
+   - After creating event, fetch the event type
+   - If `eventType.name === 'Spiritual Retreat'`, create empty record in `spiritualRetreatEventExtensions`
+   - Return both event and extension IDs
+
+2. **Update `getById` query in `convex/events/queries.ts`:**
+   - After fetching event, check if `eventType.name === 'Spiritual Retreat'`
+   - If yes, query `spiritualRetreatEventExtensions` table
+   - Return combined object: `{ ...event, retreatData: extension | null }`
+
+3. **Update `update` mutation:**
+   - Handle case where generic fields are updated (no extension change)
+   - Ensure extension data stays intact when updating generic fields
+
+**Code Example:**
+
+```typescript
+// In getById query
+const event = await ctx.db.get(args.id)
+if (!event) return null
+
+const eventType = await ctx.db.get(event.eventTypeId)
+let retreatData = null
+
+if (eventType?.name === 'Spiritual Retreat') {
+  retreatData = await ctx.db
+    .query('spiritualRetreatEventExtensions')
+    .withIndex('by_event', (q) => q.eq('eventId', event._id))
+    .first()
+}
+
+return { ...event, eventType, retreatData }
+```
+
+**Acceptance Criteria:**
+
+- [ ] Creating a Spiritual Retreat also creates empty extension record
+- [ ] Fetching a Spiritual Retreat includes retreatData in response
+- [ ] Generic events work as before (no extension data)
+- [ ] All existing event mutations continue to work
+
+---
+
+### Task 14.3: Migrate Phase 13 Retreat Mutations to Extension Table
+
+**Time:** 1.5 hours  
+**Status:** ⏳ Pending  
+**Files:** `convex/retreat/mutations.ts`, `convex/retreat/queries.ts`
+
+**Description:**
+Update all Phase 13 retreat mutations to use the new extension table instead of embedded fields in the events table.
+
+**Steps:**
+
+1. **Update teacher mutations:**
+   - `addTeacher`: Insert into `spiritualRetreatEventExtensions` teachers array
+   - `removeTeacher`: Remove from teachers array, validate no assigned lessons first
+   - `updateTeacher`: Update subject/bio in teachers array
+
+2. **Update lesson mutations:**
+   - `addLesson`: Insert into lessons array with overlap validation
+   - `updateLesson`: Update lesson fields with overlap validation
+   - `removeLesson`: Remove from lessons array
+   - `reorderLessons`: Reorder lessons array
+
+3. **Update staff mutations:**
+   - `addStaff`: Insert into staff array
+   - `updateStaff`: Update role/responsibilities
+   - `removeStaff`: Remove from staff array
+
+4. **Update queries:**
+   - `getRetreatDetails`: Fetch from extension table instead of events
+   - `checkTeacherLessons`: Check in extension table's lessons array
+   - `getLessonConflicts`: Check in extension table's lessons array
+
+**Key Changes:**
+
+- Change from: `ctx.db.patch(eventId, { retreatTeachers: ... })`
+- Change to: Update `spiritualRetreatEventExtensions` record directly
+
+**Acceptance Criteria:**
+
+- [ ] All 12 retreat mutations updated to use extension table
+- [ ] 4 retreat queries updated to use extension table
+- [ ] Teacher status validation still works (Pastor/Leader/Elder/Deacon only)
+- [ ] Lesson overlap detection still works
+- [ ] All 37 Phase 13 tests still pass after updates
+
+---
+
+### Task 14.4: Create Reusable Form Field Components
+
+**Time:** 1.5 hours  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/forms/fields/BasicInfoFields.tsx`, `DescriptionField.tsx`, `BannerUploadField.tsx`
+
+**Description:**
+Extract reusable field components from existing modals to use in both generic and specialized forms. These components will work with react-hook-form.
+
+**Components to Create:**
+
+1. **BasicInfoFields.tsx** (extracted from BasicInfoEditModal):
+   - Event name input (required, min 2 chars)
+   - Date picker (using existing date picker component)
+   - Start time dropdown (30-min increments, 00:00 to 23:30)
+   - End time dropdown (must be after start time)
+   - Location input (optional)
+   - Props: `control`, `errors`, `defaultValues`
+
+2. **DescriptionField.tsx** (extracted from DescriptionEditModal):
+   - Textarea for event description
+   - Character count display (optional)
+   - Props: `control`, `name`, `label`
+
+3. **BannerUploadField.tsx** (extracted from BannerUploader):
+   - Image upload with Convex storage integration
+   - Preview display
+   - Remove/change functionality
+   - Support for URL input or file upload
+   - Props: `eventId`, `currentUrl`, `onUpload`, `onRemove`
+
+**Props Interface Pattern:**
+
+```typescript
+interface FieldProps {
+  control: Control<any>
+  name?: string
+  label?: string
+  error?: FieldError
+}
+```
+
+**Acceptance Criteria:**
+
+- [ ] Each field component accepts `control` from react-hook-form
+- [ ] Validation rules embedded in components (zod schemas)
+- [ ] Error messages display correctly
+- [ ] Components work in both create and edit modes
+- [ ] Styling consistent with existing modals (shadcn/ui)
+
+---
+
+### Task 14.5: Create Generic Event Form
+
+**Time:** 1 hour  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/forms/GenericEventForm.tsx`
+
+**Description:**
+Create a simple form for generic events (no extensions) using the reusable field components from Task 14.4.
+
+**Features:**
+
+1. **Form Structure:**
+   - Section 1: Basic Info (name, date, time, location)
+   - Section 2: Description (textarea)
+   - Section 3: Banner Image (upload field)
+
+2. **Validation:**
+   - Name: required, min 2 characters
+   - Date: required
+   - Start time: optional but if set, end time must be after
+   - End time: optional but must be after start time
+
+3. **Actions:**
+   - Submit button with loading state
+   - Cancel button (optional, based on context)
+   - Success/error toast notifications
+
+**Props:**
+
+```typescript
+interface GenericEventFormProps {
+  mode: 'create' | 'edit'
+  event?: EventWithType // Pre-populated data for edit mode
+  onSave: (data: EventFormData) => void
+  onCancel?: () => void
+}
+```
+
+**Acceptance Criteria:**
+
+- [ ] Form validates all required fields
+- [ ] Shows loading state during submit
+- [ ] Success toast on creation/update
+- [ ] Error toast on failure with message
+- [ ] Works for any event type without extension data
+- [ ] Responsive layout (mobile-friendly)
+
+---
+
+### Task 14.6: Create Spiritual Retreat Form
+
+**Time:** 2 hours  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/forms/SpiritualRetreatForm.tsx`
+
+**Description:**
+Create specialized tabbed form for Spiritual Retreats using existing Phase 13 components integrated with the new form structure.
+
+**Tab Structure:**
+
+1. **Overview Tab:**
+   - BasicInfoFields component
+   - DescriptionField component
+   - BannerUploadField component
+   - Summary cards showing counts:
+     - "3 Teachers assigned"
+     - "8 Lessons scheduled"
+     - "5 Staff members"
+
+2. **Teachers Tab:**
+   - Integrate existing `RetreatTeachers` component
+   - Add/remove teachers
+   - Validate qualified status (Pastor/Leader/Elder/Deacon only)
+   - Show warning dialog when removing teacher with assigned lessons
+   - Edit subject and bio for each teacher
+
+3. **Schedule Tab:**
+   - Integrate existing `RetreatSchedule` component
+   - Day tabs (Day 1, Day 2, Day 3) - only show days with content
+   - Timeline view of lessons
+   - Color-coded by lesson type (teaching=green, meal=yellow, etc.)
+   - Add/edit lessons with overlap detection
+   - Drag to reorder lessons
+
+4. **Staff Tab:**
+   - Integrate existing `RetreatStaff` component
+   - Grid layout (2 columns desktop, 1 column mobile)
+   - Add any attendee as staff
+   - Role text input (free-form)
+   - Responsibilities textarea
+   - Lead contact checkbox
+
+**Header/Actions:**
+
+- Event type badge: "Spiritual Retreat" (green)
+- Save button (commits all tabs at once)
+- Cancel button
+- Unsaved changes indicator (if user tries to leave)
+
+**State Management:**
+
+- Use react-hook-form for generic fields
+- Use local state for retreat-specific data (teachers, lessons, staff)
+- On save: combine both into single API call
+
+**Acceptance Criteria:**
+
+- [ ] All 4 tabs render correctly with proper content
+- [ ] Teachers tab validates qualified status (rejects Member/Visitor)
+- [ ] Schedule tab detects time overlaps and prevents saving conflicts
+- [ ] Changes persist when switching tabs (unsaved state)
+- [ ] Save button commits all data at once
+- [ ] Works in both create and edit modes
+- [ ] Shows unsaved changes warning if user tries to navigate away
+
+---
+
+### Task 14.7: Create Event Form Factory
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/forms/EventFormFactory.tsx`
+
+**Description:**
+Create the main orchestrator component that renders the appropriate form based on event type name. This is the single entry point for all event forms.
+
+**Implementation:**
+
+```typescript
+// EventFormFactory.tsx
+export function EventFormFactory({
+  mode,
+  eventTypeName,
+  event,
+  onSave,
+  onCancel
+}: EventFormFactoryProps) {
+  switch(eventTypeName) {
+    case 'Spiritual Retreat':
+      return (
+        <SpiritualRetreatForm
+          mode={mode}
+          event={event}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
+      );
+    // Future event types:
+    // case 'Sunday Service':
+    //   return <SundayServiceForm ... />;
+    default:
+      return (
+        <GenericEventForm
+          mode={mode}
+          event={event}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
+      );
+  }
+}
+
+interface EventFormFactoryProps {
+  mode: 'create' | 'edit';
+  eventTypeName: string;
+  event?: EventWithExtensionData;
+  onSave: (data: any) => void;
+  onCancel?: () => void;
+}
+```
+
+**Usage Examples:**
+
+```typescript
+// Creating from "All Events" page
+<EventFormFactory
+  mode="create"
+  eventTypeName="Spiritual Retreat"
+  onSave={handleCreate}
+/>
+
+// Editing any event type
+<EventFormFactory
+  mode="edit"
+  eventTypeName={event.eventType.name}
+  event={event}
+  onSave={handleUpdate}
+/>
+```
+
+**Acceptance Criteria:**
+
+- [ ] Detects "Spiritual Retreat" and renders specialized form
+- [ ] All other types render generic form
+- [ ] Props correctly passed to child forms
+- [ ] Type-safe with TypeScript
+- [ ] Easy to add new event types (just add case to switch)
+
+---
+
+### Task 14.8: Update Event Creation Route
+
+**Time:** 45 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.new.tsx`
+
+**Description:**
+Replace the 345-line inline form with the new EventFormFactory. The route will handle event type selection and pass the appropriate form.
+
+**Current State:**
+
+- 345 lines of inline form code
+- Manual state management
+- Custom validation
+- All event types use same form
+
+**New Implementation:**
+
+1. **Keep event type selector dropdown:**
+   - List all active event types
+   - Show color dot for each type
+   - Default to first type or previously selected
+
+2. **Replace form section:**
+   - Remove all inline form JSX (~200 lines)
+   - Replace with `<EventFormFactory />`
+   - Pass `selectedEventType.name` as prop
+
+3. **Handle callbacks:**
+   - `onSave`: Create event via API, then navigate
+   - `onCancel`: Navigate back to events list
+
+4. **Loading states:**
+   - Show skeleton while event types loading
+   - Disable form while submitting
+
+**Acceptance Criteria:**
+
+- [ ] Form renders based on selected event type
+- [ ] Creating Spiritual Retreat shows specialized form with tabs
+- [ ] Creating generic event shows simple form
+- [ ] After creation, redirects to appropriate page:
+  - Generic events → `/events`
+  - Spiritual Retreat → `/events/spiritual-retreat`
+- [ ] No console errors
+- [ ] Form is responsive
+
+---
+
+### Task 14.9: Update Event Edit Route
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.$id.edit.tsx` (create if doesn't exist)
+
+**Description:**
+Create or update the edit route to use EventFormFactory with pre-populated data.
+
+**Implementation:**
+
+1. **Fetch event data:**
+   - Use `useEvent` hook to get event by ID
+   - Include extension data (retreatData if applicable)
+   - Show loading state while fetching
+
+2. **Render form:**
+
+   ```typescript
+   <EventFormFactory
+     mode="edit"
+     eventTypeName={event.eventType.name}
+     event={event}
+     onSave={handleUpdate}
+     onCancel={() => navigate('/events')}
+   />
+   ```
+
+3. **Handle update:**
+   - Call appropriate mutation based on event type
+   - Show success toast
+   - Navigate back to event detail or list
+
+**Acceptance Criteria:**
+
+- [ ] Pre-populates form with existing data
+- [ ] Editing Spiritual Retreat shows all tabs with saved data
+- [ ] Editing generic event shows basic form
+- [ ] Updates persist correctly to backend
+- [ ] Redirects after successful save
+- [ ] Handles 404 (event not found) gracefully
+
+---
+
+### Task 14.10: Update Spiritual Retreat Dedicated Page
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.spiritual-retreat.tsx`
+
+**Description:**
+Ensure the dedicated retreat page uses the new form for creating and editing retreats consistently.
+
+**Updates Needed:**
+
+1. **Creation flow:**
+   - When clicking "Start Spiritual Retreat" or "Create Retreat"
+   - Open modal or navigate to creation with `EventFormFactory`
+   - Pre-select "Spiritual Retreat" type (not changeable)
+
+2. **Editing flow:**
+   - When editing existing retreat from dedicated page
+   - Use same `EventFormFactory` with edit mode
+   - Ensure all tabs (Teachers, Schedule, Staff) work correctly
+
+3. **Integration check:**
+   - Verify Phase 13 components still integrate properly
+   - Teachers component loads from extension table
+   - Schedule component loads lessons from extension table
+   - Staff component loads from extension table
+
+**Acceptance Criteria:**
+
+- [ ] Dedicated page can create new retreats with full form
+- [ ] Can edit existing retreats from dedicated page
+- [ ] All Phase 13 features still functional:
+  - Add/remove teachers
+  - Add/remove/edit lessons
+  - Add/remove staff
+  - Overlap detection
+  - Qualified status validation
+- [ ] Consistent UX with generic creation page
+
+---
+
+### Task 14.11: Wipe Event Data and Test
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** Manual testing, no code changes
+
+**Description:**
+Clear all existing event data and perform comprehensive testing of the new form system.
+
+**Data Wipe Steps:**
+
+1. Go to Convex dashboard (local or cloud)
+2. Navigate to `events` table
+3. Select all and delete (or use query runner)
+4. Verify `spiritualRetreatEventExtensions` table is empty
+5. Keep `eventTypes` data (don't delete types)
+
+**Test Scenarios:**
+
+1. **Generic Event Creation:**
+   - Navigate to `/events/new`
+   - Select generic event type (e.g., "Youth Event")
+   - Fill basic info only
+   - Save and verify redirect
+   - Check event appears in list
+
+2. **Spiritual Retreat Creation (All Events page):**
+   - Navigate to `/events/new`
+   - Select "Spiritual Retreat"
+   - Verify tabbed form appears
+   - Fill Overview tab
+   - Add teachers
+   - Add lessons with different days/times
+   - Add staff
+   - Save and verify
+
+3. **Spiritual Retreat Creation (Dedicated page):**
+   - Navigate to `/events/spiritual-retreat`
+   - Click "Start Spiritual Retreat"
+   - Verify full form opens
+   - Create retreat with all data
+   - Verify appears on dedicated page
+
+4. **Editing:**
+   - Edit generic event (should show simple form)
+   - Edit retreat (should show tabbed form with all data)
+   - Make changes and save
+   - Verify changes persist
+
+5. **Validation:**
+   - Try to save without required fields
+   - Try to create overlapping lessons (should prevent)
+   - Try to add non-qualified teacher (should prevent)
+
+6. **Regression Testing:**
+   - Run full test suite: `pnpm test`
+   - All 553+ tests should pass
+   - No console errors
+   - No TypeScript errors: `pnpm dev:ts`
+
+**Acceptance Criteria:**
+
+- [ ] All existing event data wiped
+- [ ] All 553+ existing tests still pass
+- [ ] Generic event creation works
+- [ ] Retreat creation works with all tabs (Teachers, Schedule, Staff)
+- [ ] Editing works for both types
+- [ ] Phase 13 features functional (overlap detection, status validation)
+- [ ] No console errors or warnings
+- [ ] Responsive on mobile and desktop
+
+---
+
+## Summary
+
+| Task      | Time         | Focus             | Dependencies |
+| --------- | ------------ | ----------------- | ------------ |
+| 14.1      | 45 min       | Schema changes    | None         |
+| 14.2      | 1.5 hrs      | Backend mutations | 14.1         |
+| 14.3      | 1.5 hrs      | Migrate Phase 13  | 14.1, 14.2   |
+| 14.4      | 1.5 hrs      | Reusable fields   | None         |
+| 14.5      | 1 hr         | Generic form      | 14.4         |
+| 14.6      | 2 hrs        | Retreat form      | 14.3, 14.4   |
+| 14.7      | 30 min       | Factory pattern   | 14.5, 14.6   |
+| 14.8      | 45 min       | Create route      | 14.7         |
+| 14.9      | 30 min       | Edit route        | 14.7         |
+| 14.10     | 30 min       | Dedicated page    | 14.6, 14.7   |
+| 14.11     | 30 min       | Testing           | All above    |
+| **Total** | **~8.5 hrs** |                   |              |
+
+**Next Phase Ideas:**
+
+- Phase 15: Sunday Service Extensions (sermon series, worship leader, offering tracking)
+- Phase 16: Attendance Reporting & Analytics
+- Phase 17: Dashboard Statistics Widgets
 
 ---
 
