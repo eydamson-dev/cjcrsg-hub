@@ -37,12 +37,12 @@ Before committing, determine your work type and update the appropriate doc files
 
 ### Documentation Checklist
 
-- [ ] **TASKS.md** - Updated "Current Session" (feature/bug work)
-- [ ] **TDD_TASKS.md** - Updated "Current Progress" (test work)
+- [ ] **TASKS.md** - Updated "Current Session" (use `cjcrsg-task-manager` skill)
+- [ ] **TDD_TASKS.md** - Updated "Current Progress" (use `cjcrsg-task-manager` skill)
 - [ ] **CHANGELOG.md** - Added entry under [Unreleased] (user-facing changes)
 - [ ] **AGENTS.md** - Updated status (phase completion)
 
-**Tip:** Focus on updating the primary doc based on work type. Only update secondary docs if applicable.
+**Tip:** Use `cjcrsg-task-manager` skill for all task management. Use this skill for documentation formatting.
 
 ---
 

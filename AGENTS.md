@@ -150,6 +150,17 @@ pnpm dev
 - **[Testing](docs/TESTING.md)** - Testing strategy & checklist
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues & fixes
 
+### 🎯 Task Management
+
+Use the **`cjcrsg-task-manager`** skill for:
+
+- Starting and completing tasks
+- Planning new phases/features
+- Checking project status
+- Standardized task naming and tracking
+
+**Quick commands:** `show tasks`, `start task`, `task complete`, `plan phase`
+
 ### 🚀 Quick Start
 
 ```bash

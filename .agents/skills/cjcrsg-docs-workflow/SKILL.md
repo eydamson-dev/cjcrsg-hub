@@ -145,11 +145,14 @@ Use `[WIP]` prefix for incomplete features:
 
 ## Workflow Summary
 
-**On every commit, check and update files as needed:**
+**For task management (starting, completing, planning tasks), use `cjcrsg-task-manager` skill.**
 
-1. **TASKS.md** (required for feature work)
-   - Add to "Completed Tasks" section
-   - Update phase status
+**For documentation formatting and updates:**
+
+1. **TASKS.md updates** (required for feature work)
+   - Use `cjcrsg-task-manager` to update "Current Session" section
+   - Follow naming convention: `Task X.Y: Name`
+   - Use standardized status emojis: ⏳ 🚧 ✅
 
 2. **CHANGELOG.md** (required for user-facing changes)
    - Add to [Unreleased] section
