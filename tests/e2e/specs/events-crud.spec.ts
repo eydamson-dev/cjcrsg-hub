@@ -142,8 +142,10 @@ test.describe('Events CRUD', () => {
       timeout: 5000,
     })
 
-    // Verify the updated name is displayed
-    await expect(page.getByText(updatedEventName)).toBeVisible()
+    // Verify the updated name is displayed in the heading
+    await expect(
+      page.getByRole('heading', { name: updatedEventName }),
+    ).toBeVisible()
   })
 
   test('user can view event details', async ({ page }) => {

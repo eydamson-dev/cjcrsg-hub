@@ -16,6 +16,36 @@ Quality gates and enforcement rules before every commit.
 
 ---
 
+## 📋 Documentation Reminder
+
+Before committing, determine your work type and update the appropriate doc files.
+
+**Reference:** Use the `cjcrsg-docs-workflow` skill for detailed guidance on:
+
+- Updating "Current Session" sections in TASKS.md/TDD_TASKS.md
+- Changelog entry formatting and categories
+- When to update AGENTS.md
+
+### Quick Decision Guide
+
+| Work Type        | Primary Doc  | Secondary Doc |
+| ---------------- | ------------ | ------------- |
+| Feature work     | TASKS.md     | CHANGELOG.md  |
+| Testing/TDD work | TDD_TASKS.md | CHANGELOG.md  |
+| Bug fix          | TASKS.md     | CHANGELOG.md  |
+| Phase completion | AGENTS.md    | TASKS.md      |
+
+### Documentation Checklist
+
+- [ ] **TASKS.md** - Updated "Current Session" (feature/bug work)
+- [ ] **TDD_TASKS.md** - Updated "Current Progress" (test work)
+- [ ] **CHANGELOG.md** - Added entry under [Unreleased] (user-facing changes)
+- [ ] **AGENTS.md** - Updated status (phase completion)
+
+**Tip:** Focus on updating the primary doc based on work type. Only update secondary docs if applicable.
+
+---
+
 ## Important: Git CLI vs GitHub CLI
 
 **This project uses native `git` CLI only** - NOT `gh` CLI.
@@ -41,8 +71,8 @@ Quality gates and enforcement rules before every commit.
 - [ ] New shared components have tests (if applicable)
 - [ ] Bug fixes include regression test (if applicable)
 - [ ] Update CHANGELOG.md (if user-facing change)
-- [ ] Update TASKS.md "Current Session" (if feature work)
-- [ ] Update TDD_TASKS.md "Current Progress" (if test work)
+- [ ] Update TASKS.md "Current Session" (if feature/bug work)
+- [ ] Update TDD_TASKS.md "Current Progress" (if test/TDD work)
 ```
 
 ---
@@ -129,4 +159,4 @@ git push -u origin branch       # Push
 
 ---
 
-\_Last Updated: 2026-03-21
+\_Last Updated: 2026-03-31
