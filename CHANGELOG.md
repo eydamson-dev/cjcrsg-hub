@@ -9,37 +9,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Phase 13.3: Frontend Types & Hooks** - Spiritual Retreat frontend integration
-  - Added retreat types to `src/features/events/types.ts`
-    - `LessonType`, `LESSON_TYPE_COLORS`, `LESSON_TYPE_LABELS`
-    - `RetreatTeacher`, `RetreatLesson`, `RetreatStaff`, `RetreatDetails`
-    - Input types for mutations: `AddTeacherInput`, `UpdateTeacherInput`, etc.
-  - Created `src/features/events/hooks/useRetreat.ts` with 15 exported functions
-    - Queries: `useRetreatDetails`, `useQualifiedTeachers`, `useCheckTeacherLessons`, `useLessonConflicts`
-    - Teacher mutations: `useAddTeacher`, `useRemoveTeacher`, `useUpdateTeacher`
-    - Lesson mutations: `useAddLesson`, `useUpdateLesson`, `useRemoveLesson`, `useReorderLessons`
-    - Staff mutations: `useAddStaff`, `useUpdateStaff`, `useRemoveStaff`
-    - Convenience: `useRetreatMutations()` returns all 10 mutations
+- **Phase 13: Spiritual Retreat Enhancement** - Complete implementation for managing Spiritual Retreat events
+  - **Database Schema:** Added `retreatTeachers`, `retreatLessons`, `retreatStaff` fields to events table
+  - **Backend API:** Created retreat module with 4 queries and 10 mutations
+    - Teacher management (add/remove/update with qualified status validation)
+    - Lesson scheduling with day tabs and time conflict detection
+    - Staff assignments with roles and responsibilities
+  - **Frontend Integration:** Created types, hooks, and UI components
+    - `RetreatDetails` - Tabbed container (Overview, Teachers, Schedule, Staff, Attendance)
+    - `RetreatTeachers` - Teacher cards with status filtering and warning dialogs
+    - `RetreatSchedule` - Day-based timeline with overlap detection
+    - `RetreatStaff` - Responsive grid for staff management
+  - **Dedicated Route:** `/events/spiritual-retreat` with full retreat management interface
+  - **Schema Updates:** Added Pastor/Leader/Elder/Deacon as valid attendee statuses
+  - **Tests:** 37 new backend tests added (591 total tests passing)
 
-- **Phase 13.2: Backend - Retreat Module** - Spiritual Retreat backend API
-  - Created `convex/retreat/queries.ts` with 4 queries
-    - `getRetreatDetails` - Fetches event with teachers/lessons/staff joined with attendee data
-    - `getQualifiedTeachers` - Lists attendees with Pastor/Leader/Elder/Deacon status
-    - `checkTeacherLessons` - Checks if teacher has assigned lessons (for warning dialog)
-    - `getLessonConflicts` - Returns conflicting lessons for overlap detection
-  - Created `convex/retreat/mutations.ts` with 10 mutations
-    - Teachers: `addTeacher`, `removeTeacher`, `updateTeacher`
-    - Lessons: `addLesson`, `updateLesson`, `removeLesson`, `reorderLessons`
-    - Staff: `addStaff`, `updateStaff`, `removeStaff`
-  - Teacher status validation rejects non-qualified attendees
-  - Overlap detection prevents conflicting lessons on same day
+### Added
 
-- **Phase 13.1: Database Schema** - Spiritual Retreat Enhancement schema changes
-  - Added `retreatTeachers`, `retreatLessons`, `retreatStaff` optional fields to events table
-  - Added retreat validators: `qualifiedTeacherStatuses`, `validateLessonTimes`, `validateLessonOverlap`
-  - Teacher statuses: Pastor, Leader, Elder, Deacon
-  - Lesson types: teaching, meal, break, worship, registration, closing, other
-  - Overlap detection prevents conflicting lessons on same day
+- **Phase 13: Spiritual Retreat Enhancement** - Complete implementation for managing Spiritual Retreat events
+  - **Database Schema:** Added `retreatTeachers`, `retreatLessons`, `retreatStaff` fields to events table
+  - **Backend API:** Created retreat module with 4 queries and 10 mutations
+    - Teacher management (add/remove/update with qualified status validation)
+    - Lesson scheduling with day tabs and time conflict detection
+    - Staff assignments with roles and responsibilities
+  - **Frontend Integration:** Created types, hooks, and UI components
+    - `RetreatDetails` - Tabbed container (Overview, Teachers, Schedule, Staff, Attendance)
+    - `RetreatTeachers` - Teacher cards with status filtering and warning dialogs
+    - `RetreatSchedule` - Day-based timeline with overlap detection
+    - `RetreatStaff` - Responsive grid for staff management
+  - **Dedicated Route:** `/events/spiritual-retreat` with full retreat management interface
+  - **Schema Updates:** Added Pastor/Leader/Elder/Deacon as valid attendee statuses
+  - **Tests:** 37 new backend tests added (591 total tests passing)
+
+- **Sunday Service & Spiritual Retreat Pages** - Dedicated event management pages
+  - `/events/sunday-service` - Sunday Service specific page
+  - `/events/spiritual-retreat` - Spiritual Retreat specific page with tabbed interface
+  - Filtered history and archive links for each event type
+
+### Changed
+
+- **Phase 13 Documentation** - Comprehensive implementation plan for Spiritual Retreat Enhancement
 
 ### Changed
 

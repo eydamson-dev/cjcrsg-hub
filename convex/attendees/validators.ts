@@ -4,6 +4,10 @@ export const attendeeStatus = v.union(
   v.literal('member'),
   v.literal('visitor'),
   v.literal('inactive'),
+  v.literal('Pastor'),
+  v.literal('Leader'),
+  v.literal('Elder'),
+  v.literal('Deacon'),
 )
 
 export const attendeeFields = {

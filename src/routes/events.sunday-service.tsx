@@ -14,7 +14,7 @@ export const Route = createFileRoute('/events/sunday-service')({
 })
 
 // Hardcoded event type name for Sunday Service page
-const SUNDAY_SERVICE_NAME = 'Sunday service'
+const SUNDAY_SERVICE_NAME = 'Sunday Service'
 
 function SundayServicePage() {
   const { data: eventTypes, isPending } = useEventTypesList()

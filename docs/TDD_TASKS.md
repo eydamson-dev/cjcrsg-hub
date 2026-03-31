@@ -3,27 +3,67 @@
 Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Estimated Total Time:** 9.5 hours  
-**Last Updated:** 2026-03-26
+**Last Updated:** 2026-03-31
 
 ---
 
 ## Current Progress
 
-**Updated:** 2026-03-28
+**Updated:** 2026-03-31
 
-**Phase:** Phase 9 - Complete  
-**Status:** ✅ Completed | Task 9.1 - Testing & Documentation Updates  
-**Summary:** All test failures fixed after Phase 8 refactoring
+**Phase:** Phase 13 - Spiritual Retreat Enhancement - Complete  
+**Status:** ✅ Completed | Phase 13 backend tests added
 
 **Summary:**
 
-Fixed all failing tests after Phase 8 AttendanceManager refactor:
+Added 37 new backend tests for Spiritual Retreat module:
 
-1. **Unit Test Fixes:**
-   - ✅ Fixed `AttendanceManager.test.tsx` (unit/events) - 10 tests passing
-   - ✅ Fixed `AttendanceManager.test.tsx` (components/events) - 16 tests passing
-   - ✅ Fixed `EventArchive.test.tsx` - 17 tests passing (updated mocks for EventList)
-   - ✅ Fixed `convex/events/queries.test.ts` - 26 tests passing (fixed listArchive tests)
+1. **Teacher Validation Tests (10 tests)**
+   - Accepts Pastor as teacher ✅
+   - Accepts Leader as teacher ✅
+   - Accepts Elder as teacher ✅
+   - Accepts Deacon as teacher ✅
+   - Rejects Member as teacher ✅
+   - Rejects Visitor as teacher ✅
+   - Rejects duplicate teacher ✅
+   - Rejects non-existent attendee ✅
+   - Rejects non-existent event ✅
+   - Requires authentication ✅
+
+2. **Teacher Removal Tests (4 tests)**
+   - Removes teacher without lessons ✅
+   - Throws error when teacher has lessons without forceRemove ✅
+   - Force removes teacher and unassigns lessons ✅
+   - Throws error when teacher not found ✅
+
+3. **Lesson Management Tests (15 tests)**
+   - Adds lesson with valid times ✅
+   - Rejects when end time before start time ✅
+   - Rejects overlapping lessons on same day ✅
+   - Allows non-overlapping lessons on same day ✅
+   - Allows same time on different days ✅
+   - Allows back-to-back lessons ✅
+   - Validates teacher exists when provided ✅
+   - Updates lesson fields ✅
+   - Validates overlap when time changes ✅
+   - Throws error when lesson not found ✅
+   - Removes lesson ✅
+   - Reorders lessons ✅
+   - And more...
+
+4. **Staff CRUD Tests (8 tests)**
+   - Adds any attendee as staff ✅
+   - Allows member status as staff ✅
+   - Allows visitor as staff ✅
+   - Rejects duplicate staff ✅
+   - Updates staff role and responsibilities ✅
+   - Throws error when staff not found ✅
+   - Removes staff member ✅
+
+**Test Results:**
+
+- **New Tests Added:** 37 tests (Phase 13 retreat mutations)
+- **Total Tests:** 591 tests passing (554 Convex + Component + E2E)
 
 2. **E2E Test Fixes:**
    - ✅ Fixed `user can edit an existing event` - Changed to navigate to /events/history instead of /events/archive

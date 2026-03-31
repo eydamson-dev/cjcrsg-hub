@@ -140,9 +140,9 @@ export interface RetreatTeacher {
     _id: string
     firstName: string
     lastName: string
-    email?: string
+    email?: string | null
     status: 'member' | 'visitor' | 'inactive'
-  }
+  } | null
 }
 
 export interface RetreatLesson {
@@ -159,7 +159,7 @@ export interface RetreatLesson {
     _id: string
     firstName: string
     lastName: string
-  }
+  } | null
 }
 
 export interface RetreatStaff {
@@ -171,8 +171,8 @@ export interface RetreatStaff {
     _id: string
     firstName: string
     lastName: string
-    email?: string
-  }
+    email?: string | null
+  } | null
 }
 
 export interface RetreatDetails {
