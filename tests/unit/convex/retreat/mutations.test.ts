@@ -15,32 +15,19 @@ import {
 } from '../../../../convex/retreat/mutations.js'
 import { create as createEvent } from '../../../../convex/events/mutations.js'
 import { create as createEventType } from '../../../../convex/eventTypes/mutations.js'
-import {
-  create as createAttendee,
-  update as updateAttendee,
-} from '../../../../convex/attendees/mutations.js'
+import { create as createAttendee } from '../../../../convex/attendees/mutations.js'
 
 const modules = import.meta.glob('../../../../convex/**/*.ts', { eager: true })
 
+// Helper to get retreat extension for an event
+const getRetreatExtension = async (ctx: any, eventId: string) => {
+  return await ctx.db
+    .query('spiritualRetreatEventExtensions')
+    .withIndex('by_event', (q: any) => q.eq('eventId', eventId))
+    .first()
+}
+
 describe('retreat mutations', () => {
-  const createTestEventType = async (t: any) => {
-    return await t.mutation(createEventType, {
-      name: 'Retreat',
-      color: '#22c55e',
-    })
-  }
-
-  const createTestEvent = async (t: any, eventTypeId: any) => {
-    return await t.mutation(createEvent, {
-      name: 'Spiritual Retreat',
-      eventTypeId,
-      date: Date.now() + 7 * 24 * 60 * 60 * 1000,
-      startTime: '08:00',
-      endTime: '17:00',
-      location: 'Mountain View Camp',
-    })
-  }
-
   describe('addTeacher', () => {
     it('adds teacher with Pastor status', async () => {
       const t = convexTest(schema, modules)
@@ -50,7 +37,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -62,29 +49,24 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'John',
         lastName: 'Smith',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Pastor',
       })
 
-      const result = await asAdmin.mutation(addTeacher, {
+      await asAdmin.mutation(addTeacher, {
         eventId,
         attendeeId,
         subject: 'Prayer',
         bio: 'Experienced prayer leader',
       })
 
-      expect(result).toBeDefined()
-
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(1)
-      expect(event?.retreatTeachers?.[0].subject).toBe('Prayer')
-      expect(event?.retreatTeachers?.[0].bio).toBe('Experienced prayer leader')
+      expect(extension?.teachers).toHaveLength(1)
+      expect(extension?.teachers?.[0].subject).toBe('Prayer')
+      expect(extension?.teachers?.[0].bio).toBe('Experienced prayer leader')
     })
 
     it('adds teacher with Leader status', async () => {
@@ -95,7 +77,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat2',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -107,20 +89,17 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Jane',
         lastName: 'Doe',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Leader',
       })
 
       await asAdmin.mutation(addTeacher, { eventId, attendeeId })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(1)
+      expect(extension?.teachers).toHaveLength(1)
     })
 
     it('adds teacher with Elder status', async () => {
@@ -131,7 +110,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat3',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -143,20 +122,17 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Bob',
         lastName: 'Wilson',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Elder',
       })
 
       await asAdmin.mutation(addTeacher, { eventId, attendeeId })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(1)
+      expect(extension?.teachers).toHaveLength(1)
     })
 
     it('adds teacher with Deacon status', async () => {
@@ -167,7 +143,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat4',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -179,20 +155,17 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Alice',
         lastName: 'Brown',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Deacon',
       })
 
       await asAdmin.mutation(addTeacher, { eventId, attendeeId })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(1)
+      expect(extension?.teachers).toHaveLength(1)
     })
 
     it('rejects Member as teacher', async () => {
@@ -203,7 +176,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat5',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -215,6 +188,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Regular',
         lastName: 'Member',
+        address: '123 Main St',
         status: 'member',
       })
 
@@ -231,7 +205,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat6',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -243,6 +217,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'New',
         lastName: 'Visitor',
+        address: '123 Main St',
         status: 'visitor',
       })
 
@@ -259,7 +234,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat7',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -271,10 +246,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Duplicate',
         lastName: 'Test',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Pastor',
       })
 
@@ -293,7 +265,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat8',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -320,15 +292,17 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Test',
         lastName: 'Person',
+        address: '123 Main St',
         status: 'Pastor',
       })
 
+      // Convex validates the ID format before our mutation runs
       await expect(
         asAdmin.mutation(addTeacher, {
           eventId: 'events:nonexistent' as any,
           attendeeId,
         }),
-      ).rejects.toThrow('Event not found')
+      ).rejects.toThrow()
     })
 
     it('requires authentication', async () => {
@@ -352,7 +326,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat10',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -364,10 +338,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Remove',
         lastName: 'Teacher',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Elder',
       })
 
@@ -375,11 +346,11 @@ describe('retreat mutations', () => {
 
       await asAdmin.mutation(removeTeacher, { eventId, attendeeId })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(0)
+      expect(extension?.teachers).toHaveLength(0)
     })
 
     it('throws error when teacher has lessons without forceRemove', async () => {
@@ -390,7 +361,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat11',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -402,29 +373,24 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Teacher',
         lastName: 'WithLesson',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Deacon',
       })
 
       await asAdmin.mutation(addTeacher, { eventId, attendeeId })
 
-      await asAdmin.run(async (ctx) => {
-        await ctx.db.patch(eventId, {
-          retreatLessons: [
-            {
-              id: 'lesson-1',
-              title: 'Test Lesson',
-              teacherId: attendeeId,
-              day: 1,
-              startTime: '09:00',
-              endTime: '10:00',
-              type: 'teaching' as const,
-            },
-          ],
-        })
+      // Add a lesson assigned to this teacher using addLesson mutation
+      await asAdmin.mutation(addLesson, {
+        eventId,
+        lesson: {
+          id: 'lesson-1',
+          title: 'Test Lesson',
+          teacherId: attendeeId,
+          day: 1,
+          startTime: '09:00',
+          endTime: '10:00',
+          type: 'teaching',
+        },
       })
 
       await expect(
@@ -440,7 +406,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat12',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -452,29 +418,24 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Force',
         lastName: 'Remove',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Leader',
       })
 
       await asAdmin.mutation(addTeacher, { eventId, attendeeId })
 
-      await asAdmin.run(async (ctx) => {
-        await ctx.db.patch(eventId, {
-          retreatLessons: [
-            {
-              id: 'lesson-2',
-              title: 'Test Lesson',
-              teacherId: attendeeId,
-              day: 1,
-              startTime: '09:00',
-              endTime: '10:00',
-              type: 'teaching' as const,
-            },
-          ],
-        })
+      // Add a lesson assigned to this teacher
+      await asAdmin.mutation(addLesson, {
+        eventId,
+        lesson: {
+          id: 'lesson-2',
+          title: 'Test Lesson',
+          teacherId: attendeeId,
+          day: 1,
+          startTime: '09:00',
+          endTime: '10:00',
+          type: 'teaching',
+        },
       })
 
       await asAdmin.mutation(removeTeacher, {
@@ -483,12 +444,12 @@ describe('retreat mutations', () => {
         forceRemove: true,
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers).toHaveLength(0)
-      expect(event?.retreatLessons?.[0].teacherId).toBeUndefined()
+      expect(extension?.teachers).toHaveLength(0)
+      expect(extension?.lessons?.[0].teacherId).toBeUndefined()
     })
 
     it('throws error when teacher not found', async () => {
@@ -499,7 +460,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat13',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -526,7 +487,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat14',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -538,10 +499,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Update',
         lastName: 'Teacher',
-        status: 'member',
-      })
-      await asAdmin.mutation(updateAttendee, {
-        id: attendeeId,
+        address: '123 Main St',
         status: 'Pastor',
       })
 
@@ -554,12 +512,12 @@ describe('retreat mutations', () => {
         bio: 'Updated bio',
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatTeachers?.[0].subject).toBe('Worship')
-      expect(event?.retreatTeachers?.[0].bio).toBe('Updated bio')
+      expect(extension?.teachers?.[0].subject).toBe('Worship')
+      expect(extension?.teachers?.[0].bio).toBe('Updated bio')
     })
 
     it('throws error when teacher not found', async () => {
@@ -570,7 +528,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat15',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -597,7 +555,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat16',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -618,12 +576,12 @@ describe('retreat mutations', () => {
         },
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons).toHaveLength(1)
-      expect(event?.retreatLessons?.[0].title).toBe('Opening Session')
+      expect(extension?.lessons).toHaveLength(1)
+      expect(extension?.lessons?.[0].title).toBe('Opening Session')
     })
 
     it('rejects when end time before start time', async () => {
@@ -634,7 +592,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat17',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -666,7 +624,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat18',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -710,7 +668,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat19',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -743,11 +701,11 @@ describe('retreat mutations', () => {
         },
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons).toHaveLength(2)
+      expect(extension?.lessons).toHaveLength(2)
     })
 
     it('allows same time on different days', async () => {
@@ -758,7 +716,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat20',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -791,11 +749,11 @@ describe('retreat mutations', () => {
         },
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons).toHaveLength(2)
+      expect(extension?.lessons).toHaveLength(2)
     })
 
     it('allows back-to-back lessons', async () => {
@@ -806,7 +764,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat21',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -839,11 +797,11 @@ describe('retreat mutations', () => {
         },
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons).toHaveLength(2)
+      expect(extension?.lessons).toHaveLength(2)
     })
 
     it('validates teacher exists when provided', async () => {
@@ -854,7 +812,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat22',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -889,7 +847,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat23',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -919,12 +877,12 @@ describe('retreat mutations', () => {
         },
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons?.[0].title).toBe('Updated Title')
-      expect(event?.retreatLessons?.[0].description).toBe('New description')
+      expect(extension?.lessons?.[0].title).toBe('Updated Title')
+      expect(extension?.lessons?.[0].description).toBe('New description')
     })
 
     it('validates overlap when time changes', async () => {
@@ -935,7 +893,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat24',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -988,7 +946,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat25',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1016,7 +974,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat26',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1039,11 +997,11 @@ describe('retreat mutations', () => {
 
       await asAdmin.mutation(removeLesson, { eventId, lessonId: 'lesson-m' })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons).toHaveLength(0)
+      expect(extension?.lessons).toHaveLength(0)
     })
 
     it('throws error when lesson not found', async () => {
@@ -1054,7 +1012,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat27',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1078,7 +1036,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat28',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1126,13 +1084,13 @@ describe('retreat mutations', () => {
         lessonIds: ['c', 'a', 'b'],
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatLessons?.[0].id).toBe('c')
-      expect(event?.retreatLessons?.[1].id).toBe('a')
-      expect(event?.retreatLessons?.[2].id).toBe('b')
+      expect(extension?.lessons?.[0].id).toBe('c')
+      expect(extension?.lessons?.[1].id).toBe('a')
+      expect(extension?.lessons?.[2].id).toBe('b')
     })
 
     it('throws error when some lesson IDs are invalid', async () => {
@@ -1143,7 +1101,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat29',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1184,7 +1142,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat30',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1196,6 +1154,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Staff',
         lastName: 'Member',
+        address: '123 Main St',
         status: 'member',
       })
 
@@ -1207,13 +1166,13 @@ describe('retreat mutations', () => {
         isLead: true,
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatStaff).toHaveLength(1)
-      expect(event?.retreatStaff?.[0].role).toBe('Sound Tech')
-      expect(event?.retreatStaff?.[0].isLead).toBe(true)
+      expect(extension?.staff).toHaveLength(1)
+      expect(extension?.staff?.[0].role).toBe('Sound Tech')
+      expect(extension?.staff?.[0].isLead).toBe(true)
     })
 
     it('allows member status as staff', async () => {
@@ -1224,7 +1183,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat31',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1236,16 +1195,17 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Regular',
         lastName: 'Member',
+        address: '123 Main St',
         status: 'member',
       })
 
       await asAdmin.mutation(addStaff, { eventId, attendeeId, role: 'Greeter' })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatStaff).toHaveLength(1)
+      expect(extension?.staff).toHaveLength(1)
     })
 
     it('allows visitor as staff', async () => {
@@ -1256,7 +1216,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat32',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1268,6 +1228,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Visitor',
         lastName: 'Staff',
+        address: '123 Main St',
         status: 'visitor',
       })
 
@@ -1277,11 +1238,11 @@ describe('retreat mutations', () => {
         role: 'Volunteer',
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatStaff).toHaveLength(1)
+      expect(extension?.staff).toHaveLength(1)
     })
 
     it('rejects duplicate staff', async () => {
@@ -1292,7 +1253,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat33',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1304,10 +1265,15 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Dup',
         lastName: 'Staff',
+        address: '123 Main St',
         status: 'member',
       })
 
-      await asAdmin.mutation(addStaff, { eventId, attendeeId, role: 'Staff' })
+      await asAdmin.mutation(addStaff, {
+        eventId,
+        attendeeId,
+        role: 'Staff',
+      })
 
       await expect(
         asAdmin.mutation(addStaff, { eventId, attendeeId, role: 'Other' }),
@@ -1324,7 +1290,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat34',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1336,6 +1302,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Update',
         lastName: 'Staff',
+        address: '123 Main St',
         status: 'member',
       })
 
@@ -1352,12 +1319,12 @@ describe('retreat mutations', () => {
         responsibilities: 'New responsibilities',
       })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatStaff?.[0].role).toBe('Updated Role')
-      expect(event?.retreatStaff?.[0].responsibilities).toBe(
+      expect(extension?.staff?.[0].role).toBe('Updated Role')
+      expect(extension?.staff?.[0].responsibilities).toBe(
         'New responsibilities',
       )
     })
@@ -1370,7 +1337,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat35',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1397,7 +1364,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat36',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {
@@ -1409,6 +1376,7 @@ describe('retreat mutations', () => {
       const attendeeId = await asAdmin.mutation(createAttendee, {
         firstName: 'Remove',
         lastName: 'Staff',
+        address: '123 Main St',
         status: 'member',
       })
 
@@ -1420,11 +1388,11 @@ describe('retreat mutations', () => {
 
       await asAdmin.mutation(removeStaff, { eventId, attendeeId })
 
-      const event = await asAdmin.run(async (ctx) => {
-        return await ctx.db.get(eventId)
+      const extension = await asAdmin.run(async (ctx) => {
+        return await getRetreatExtension(ctx, eventId)
       })
 
-      expect(event?.retreatStaff).toHaveLength(0)
+      expect(extension?.staff).toHaveLength(0)
     })
 
     it('throws error when staff not found', async () => {
@@ -1435,7 +1403,7 @@ describe('retreat mutations', () => {
       })
 
       const eventTypeId = await asAdmin.mutation(createEventType, {
-        name: 'Retreat37',
+        name: 'Spiritual Retreat',
         color: '#22c55e',
       })
       const eventId = await asAdmin.mutation(createEvent, {

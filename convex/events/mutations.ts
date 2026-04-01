@@ -2,6 +2,8 @@ import { mutation } from '../_generated/server'
 import { v } from 'convex/values'
 import { isValidImageUrl, mediaItemValidator, eventStatus } from './validators'
 
+const SPIRITUAL_RETREAT_NAME = 'Spiritual Retreat'
+
 /**
  * Create a new event.
  * - Required: name (min 2 chars), eventTypeId, date
@@ -13,6 +15,7 @@ import { isValidImageUrl, mediaItemValidator, eventStatus } from './validators'
  * - Validates endTime > startTime if both provided
  * - Sets createdAt, updatedAt to Date.now(), isActive: true
  * - Returns created event _id
+ * - For Spiritual Retreat events, creates extension table entry
  */
 export const create = mutation({
   args: {
@@ -83,6 +86,16 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     })
+
+    // Create extension table entry for Spiritual Retreat events
+    if (eventType.name === SPIRITUAL_RETREAT_NAME) {
+      await ctx.db.insert('spiritualRetreatEventExtensions', {
+        eventId: id,
+        teachers: [],
+        lessons: [],
+        staff: [],
+      })
+    }
 
     return id
   },

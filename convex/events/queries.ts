@@ -147,6 +147,7 @@ export const list = query({
  * Get a single event by ID with joined eventType data.
  * - Returns event with eventType: { name, color }
  * - Returns null if not found
+ * - For Spiritual Retreat events, includes retreatData from extension table
  */
 export const getById = query({
   args: {
@@ -162,6 +163,23 @@ export const getById = query({
     const bannerImage = await resolveBannerUrl(ctx, event.bannerImage)
     const media = await resolveMediaUrls(ctx, event.media)
 
+    // Fetch extension data for Spiritual Retreat events
+    let retreatData = null
+    if (eventType?.name === 'Spiritual Retreat') {
+      const extension = await ctx.db
+        .query('spiritualRetreatEventExtensions')
+        .withIndex('by_event', (q) => q.eq('eventId', event._id))
+        .first()
+
+      if (extension) {
+        retreatData = {
+          teachers: extension.teachers,
+          lessons: extension.lessons,
+          staff: extension.staff,
+        }
+      }
+    }
+
     return {
       ...event,
       bannerImage,
@@ -169,6 +187,7 @@ export const getById = query({
       eventType: eventType
         ? { name: eventType.name, color: eventType.color }
         : null,
+      retreatData,
     }
   },
 })

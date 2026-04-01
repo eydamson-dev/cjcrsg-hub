@@ -2,24 +2,13 @@
 
 Complete feature catalog for the church management system.
 
-**Last Updated:** 2026-03-31  
-**Current Phase:** Phase 13 - Spiritual Retreat Enhancement - Complete  
-**Status:** ✅ All Phase 13 Tasks Complete
+**Last Updated:** 2026-04-02  
+**Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Status:** ⏳ Phase 14.1-14.3 Complete, 14.4+ Pending
 
 **Next Up:**
 
-- ⏳ Phase 14: Event-Specific Forms & Extensions (Planned)
-  - Task 14.1: Schema cleanup and extension table creation
-  - Task 14.2: Update event backend mutations
-  - Task 14.3: Migrate Phase 13 retreat mutations
-  - Task 14.4: Create reusable form field components
-  - Task 14.5: Create generic event form
-  - Task 14.6: Create Spiritual Retreat form
-  - Task 14.7: Create Event Form Factory
-  - Task 14.8: Update event creation route
-  - Task 14.9: Update event edit route
-  - Task 14.10: Update Spiritual Retreat dedicated page
-  - Task 14.11: Wipe event data and test
+- ⏳ Phase 14.4: Create Reusable Form Field Components
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 

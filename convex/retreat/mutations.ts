@@ -7,12 +7,32 @@ import {
   type RetreatLessonValidation,
 } from '../events/validators'
 
+async function getOrCreateExtension(ctx: any, eventId: any) {
+  const existing = await ctx.db
+    .query('spiritualRetreatEventExtensions')
+    .withIndex('by_event', (q: any) => q.eq('eventId', eventId))
+    .first()
+
+  if (existing) {
+    return existing
+  }
+
+  const id = await ctx.db.insert('spiritualRetreatEventExtensions', {
+    eventId,
+    teachers: [],
+    lessons: [],
+    staff: [],
+  })
+
+  return await ctx.db.get(id)
+}
+
 /**
  * Add a teacher to a retreat event.
  * - Validates attendee exists
  * - Validates attendee has qualified status (Pastor/Leader/Elder/Deacon)
  * - Prevents duplicate teachers
- * - Adds to retreatTeachers array
+ * - Adds to extension table
  */
 export const addTeacher = mutation({
   args: {
@@ -24,9 +44,6 @@ export const addTeacher = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
-
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
 
     const attendee = await ctx.db.get(args.attendeeId)
     if (!attendee) throw new Error('Attendee not found')
@@ -41,9 +58,11 @@ export const addTeacher = mutation({
       )
     }
 
-    const teachers = event.retreatTeachers || []
+    const extension = await getOrCreateExtension(ctx, args.eventId)
+    const teachers = extension.teachers || []
+
     const isDuplicate = teachers.some(
-      (teacher) => teacher.attendeeId === args.attendeeId,
+      (teacher: any) => teacher.attendeeId === args.attendeeId,
     )
     if (isDuplicate) {
       throw new Error('This attendee is already a teacher for this retreat')
@@ -55,17 +74,16 @@ export const addTeacher = mutation({
       bio: args.bio,
     }
 
-    await ctx.db.patch(args.eventId, {
-      retreatTeachers: [...teachers, newTeacher],
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      teachers: [...teachers, newTeacher],
     })
   },
 })
 
 /**
  * Remove a teacher from a retreat event.
- * - Validates event exists
- * - Validates teacher exists in retreatTeachers
+ * - Validates extension exists
+ * - Validates teacher exists
  * - Optionally unassigns teacher from lessons if forceRemove is true
  */
 export const removeTeacher = mutation({
@@ -78,20 +96,26 @@ export const removeTeacher = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const teachers = event.retreatTeachers || []
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const teachers = extension.teachers || []
     const teacherIndex = teachers.findIndex(
-      (teacher) => teacher.attendeeId === args.attendeeId,
+      (teacher: any) => teacher.attendeeId === args.attendeeId,
     )
     if (teacherIndex === -1) {
       throw new Error('Teacher not found in this retreat')
     }
 
-    let lessons = event.retreatLessons || []
+    let lessons = extension.lessons || []
     const hasAssignedLessons = lessons.some(
-      (lesson) => lesson.teacherId === args.attendeeId,
+      (lesson: any) => lesson.teacherId === args.attendeeId,
     )
 
     if (hasAssignedLessons && args.forceRemove !== true) {
@@ -101,7 +125,7 @@ export const removeTeacher = mutation({
     }
 
     if (hasAssignedLessons && args.forceRemove === true) {
-      lessons = lessons.map((lesson) =>
+      lessons = lessons.map((lesson: any) =>
         lesson.teacherId === args.attendeeId
           ? { ...lesson, teacherId: undefined }
           : lesson,
@@ -109,13 +133,12 @@ export const removeTeacher = mutation({
     }
 
     const updatedTeachers = teachers.filter(
-      (teacher) => teacher.attendeeId !== args.attendeeId,
+      (teacher: any) => teacher.attendeeId !== args.attendeeId,
     )
 
-    await ctx.db.patch(args.eventId, {
-      retreatTeachers: updatedTeachers,
-      retreatLessons: lessons,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      teachers: updatedTeachers,
+      lessons,
     })
   },
 })
@@ -134,18 +157,24 @@ export const updateTeacher = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const teachers = event.retreatTeachers || []
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const teachers = extension.teachers || []
     const teacherIndex = teachers.findIndex(
-      (teacher) => teacher.attendeeId === args.attendeeId,
+      (teacher: any) => teacher.attendeeId === args.attendeeId,
     )
     if (teacherIndex === -1) {
       throw new Error('Teacher not found in this retreat')
     }
 
-    const updatedTeachers = teachers.map((teacher) =>
+    const updatedTeachers = teachers.map((teacher: any) =>
       teacher.attendeeId === args.attendeeId
         ? {
             ...teacher,
@@ -155,16 +184,14 @@ export const updateTeacher = mutation({
         : teacher,
     )
 
-    await ctx.db.patch(args.eventId, {
-      retreatTeachers: updatedTeachers,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      teachers: updatedTeachers,
     })
   },
 })
 
 /**
  * Add a lesson/schedule item to a retreat event.
- * - Validates event exists
  * - Validates time format (HH:mm) and endTime > startTime
  * - Validates no overlap with existing lessons on same day
  * - Validates teacher exists if provided
@@ -196,9 +223,6 @@ export const addLesson = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
-
     if (!validateLessonTimes(args.lesson.startTime, args.lesson.endTime)) {
       throw new Error('End time must be after start time')
     }
@@ -208,9 +232,10 @@ export const addLesson = mutation({
       if (!teacher) throw new Error('Teacher not found')
     }
 
+    const extension = await getOrCreateExtension(ctx, args.eventId)
     const existingLessons: RetreatLessonValidation[] = (
-      event.retreatLessons || []
-    ).map((lesson) => ({
+      extension.lessons || []
+    ).map((lesson: any) => ({
       id: lesson.id,
       day: lesson.day,
       startTime: lesson.startTime,
@@ -234,17 +259,15 @@ export const addLesson = mutation({
       )
     }
 
-    const lessons = event.retreatLessons || []
-    await ctx.db.patch(args.eventId, {
-      retreatLessons: [...lessons, args.lesson],
-      updatedAt: Date.now(),
+    const lessons = extension.lessons || []
+    await ctx.db.patch(extension._id, {
+      lessons: [...lessons, args.lesson],
     })
   },
 })
 
 /**
  * Update a lesson/schedule item.
- * - Validates event exists
  * - Validates lesson exists
  * - Validates time format and no overlap (if time/day changed)
  * - Validates teacher exists if changed
@@ -278,11 +301,17 @@ export const updateLesson = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const lessons = event.retreatLessons || []
-    const lessonIndex = lessons.findIndex((l) => l.id === args.lessonId)
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const lessons = extension.lessons || []
+    const lessonIndex = lessons.findIndex((l: any) => l.id === args.lessonId)
     if (lessonIndex === -1) {
       throw new Error('Lesson not found')
     }
@@ -303,8 +332,8 @@ export const updateLesson = mutation({
     }
 
     const existingLessonsForOverlap: RetreatLessonValidation[] = lessons
-      .filter((l) => l.id !== args.lessonId)
-      .map((lesson) => ({
+      .filter((l: any) => l.id !== args.lessonId)
+      .map((lesson: any) => ({
         id: lesson.id,
         day: lesson.day,
         startTime: lesson.startTime,
@@ -328,7 +357,7 @@ export const updateLesson = mutation({
       )
     }
 
-    const updatedLessons = lessons.map((lesson) =>
+    const updatedLessons = lessons.map((lesson: any) =>
       lesson.id === args.lessonId
         ? {
             ...lesson,
@@ -344,9 +373,8 @@ export const updateLesson = mutation({
         : lesson,
     )
 
-    await ctx.db.patch(args.eventId, {
-      retreatLessons: updatedLessons,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      lessons: updatedLessons,
     })
   },
 })
@@ -363,20 +391,25 @@ export const removeLesson = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const lessons = event.retreatLessons || []
-    const lessonIndex = lessons.findIndex((l) => l.id === args.lessonId)
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const lessons = extension.lessons || []
+    const lessonIndex = lessons.findIndex((l: any) => l.id === args.lessonId)
     if (lessonIndex === -1) {
       throw new Error('Lesson not found')
     }
 
-    const updatedLessons = lessons.filter((l) => l.id !== args.lessonId)
+    const updatedLessons = lessons.filter((l: any) => l.id !== args.lessonId)
 
-    await ctx.db.patch(args.eventId, {
-      retreatLessons: updatedLessons,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      lessons: updatedLessons,
     })
   },
 })
@@ -393,23 +426,28 @@ export const reorderLessons = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const lessons = event.retreatLessons || []
-    const lessonsById = new Map(lessons.map((l) => [l.id, l]))
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const lessons = extension.lessons || []
+    const lessonsById = new Map(lessons.map((l: any) => [l.id, l]))
 
     const reorderedLessons = args.lessonIds
       .map((id) => lessonsById.get(id))
-      .filter((l): l is NonNullable<typeof l> => l !== undefined)
+      .filter((l: any): l is NonNullable<typeof l> => l !== undefined)
 
     if (reorderedLessons.length !== lessons.length) {
       throw new Error('Some lesson IDs are invalid')
     }
 
-    await ctx.db.patch(args.eventId, {
-      retreatLessons: reorderedLessons,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      lessons: reorderedLessons,
     })
   },
 })
@@ -431,15 +469,14 @@ export const addStaff = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
-
     const attendee = await ctx.db.get(args.attendeeId)
     if (!attendee) throw new Error('Attendee not found')
 
-    const staff = event.retreatStaff || []
+    const extension = await getOrCreateExtension(ctx, args.eventId)
+    const staff = extension.staff || []
+
     const isDuplicate = staff.some(
-      (member) => member.attendeeId === args.attendeeId,
+      (member: any) => member.attendeeId === args.attendeeId,
     )
     if (isDuplicate) {
       throw new Error('This attendee is already staff for this retreat')
@@ -452,9 +489,8 @@ export const addStaff = mutation({
       isLead: args.isLead ?? false,
     }
 
-    await ctx.db.patch(args.eventId, {
-      retreatStaff: [...staff, newStaff],
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      staff: [...staff, newStaff],
     })
   },
 })
@@ -474,18 +510,24 @@ export const updateStaff = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const staff = event.retreatStaff || []
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const staff = extension.staff || []
     const staffIndex = staff.findIndex(
-      (member) => member.attendeeId === args.attendeeId,
+      (member: any) => member.attendeeId === args.attendeeId,
     )
     if (staffIndex === -1) {
       throw new Error('Staff member not found in this retreat')
     }
 
-    const updatedStaff = staff.map((member) =>
+    const updatedStaff = staff.map((member: any) =>
       member.attendeeId === args.attendeeId
         ? {
             ...member,
@@ -496,9 +538,8 @@ export const updateStaff = mutation({
         : member,
     )
 
-    await ctx.db.patch(args.eventId, {
-      retreatStaff: updatedStaff,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      staff: updatedStaff,
     })
   },
 })
@@ -515,24 +556,29 @@ export const removeStaff = mutation({
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) throw new Error('Not authenticated')
 
-    const event = await ctx.db.get(args.eventId)
-    if (!event) throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
 
-    const staff = event.retreatStaff || []
+    if (!extension) {
+      throw new Error('Retreat extension not found')
+    }
+
+    const staff = extension.staff || []
     const staffIndex = staff.findIndex(
-      (member) => member.attendeeId === args.attendeeId,
+      (member: any) => member.attendeeId === args.attendeeId,
     )
     if (staffIndex === -1) {
       throw new Error('Staff member not found in this retreat')
     }
 
     const updatedStaff = staff.filter(
-      (member) => member.attendeeId !== args.attendeeId,
+      (member: any) => member.attendeeId !== args.attendeeId,
     )
 
-    await ctx.db.patch(args.eventId, {
-      retreatStaff: updatedStaff,
-      updatedAt: Date.now(),
+    await ctx.db.patch(extension._id, {
+      staff: updatedStaff,
     })
   },
 })

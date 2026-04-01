@@ -2,8 +2,8 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 13 - Spiritual Retreat Enhancement - In Progress  
-**Last Updated:** 2026-03-31
+**Status:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Last Updated:** 2026-04-02
 
 ---
 
@@ -96,22 +96,26 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Status:** Phase 13 - Spiritual Retreat Enhancement - Complete  
-**Last Updated:** 2026-03-31
+**Status:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Last Updated:** 2026-04-02
 
 **Phase Progress:**
 
-- ✅ Phase 13.1: Database Schema & Validators
-- ✅ Phase 13.2: Backend - Retreat Module (queries/mutations)
-- ✅ Phase 13.3: Frontend Types & Hooks
-- ✅ Phase 13.4: Tabbed UI Components
-- ✅ Phase 13.5: Integration
-- ✅ Phase 13 Tests: 37 new backend tests (591 total)
+- ✅ Phase 14.1: Schema Cleanup & Extension Table Creation
+- ✅ Phase 14.2: Update Event Backend Mutations
+- ✅ Phase 14.3: Migrate Phase 13 Retreat Mutations to Extension Table
+- ⏳ Phase 14.4: Create Reusable Form Field Components
+- ⏳ Phase 14.5: Create Generic Event Form
+- ⏳ Phase 14.6: Create Spiritual Retreat Form
+- ⏳ Phase 14.7: Create Event Form Factory
+- ⏳ Phase 14.8: Update Event Creation Route
+- ⏳ Phase 14.9: Update Event Edit Route
+- ⏳ Phase 14.10: Update Spiritual Retreat Dedicated Page
+- ⏳ Phase 14.11: Wipe Event Data and Test
 
 **Next Up:**
 
-- Future: Attendance reporting & analytics
-- Future: Dashboard statistics widgets
+- Phase 14.4: Create Reusable Form Field Components
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 

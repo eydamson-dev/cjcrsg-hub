@@ -3,16 +3,34 @@
 Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Estimated Total Time:** 9.5 hours  
-**Last Updated:** 2026-03-31
+**Last Updated:** 2026-04-02
 
 ---
 
 ## Current Progress
 
-**Updated:** 2026-03-31
+**Updated:** 2026-04-02
 
-**Phase:** Phase 13 - Spiritual Retreat Enhancement - Complete  
-**Status:** ✅ Completed | Phase 13 backend tests added
+**Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Status:** ⏳ Phase 14.1-14.3 Complete (backend schema/API changes), Waiting for Phase 14.4+ Testing Tasks
+
+**Summary:**
+
+Completed Phase 14.1-14.3 (schema and backend migrations):
+
+1. **Schema Changes**
+   - Removed retreat-specific fields from `events` table
+   - Created new `spiritualRetreatEventExtensions` table with proper indexes
+
+2. **Backend Updates**
+   - Event `create` mutation now creates extension records for specialized event types
+   - Event `getById` query now joins extension data when applicable
+
+3. **Module Migration**
+   - Phase 13 retreat mutations migrated to use extension table
+   - All teacher/lesson/staff operations now work against extension records
+
+**Next Testing Phase:** Phase 14.4+ (Create Reusable Form Field Components)
 
 **Summary:**
 

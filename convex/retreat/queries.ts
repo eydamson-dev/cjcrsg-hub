@@ -1,5 +1,6 @@
 import { query } from '../_generated/server'
 import { v } from 'convex/values'
+import type { Doc } from '../_generated/dataModel'
 import {
   qualifiedTeacherStatuses,
   validateLessonOverlap,
@@ -8,7 +9,7 @@ import {
 
 /**
  * Get retreat details for an event with all related data joined.
- * - Fetches event and joins attendee data for teachers, staff, and lesson teachers
+ * - Fetches extension table and joins attendee data for teachers, staff, and lesson teachers
  * - Returns teachers with attendee info (name, email, status)
  * - Returns lessons with teacher info (name)
  * - Returns staff with attendee info (name, email)
@@ -18,18 +19,28 @@ export const getRetreatDetails = query({
     eventId: v.id('events'),
   },
   handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId)
-    if (!event) {
-      throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
+
+    if (!extension) {
+      return {
+        teachers: [],
+        lessons: [],
+        staff: [],
+      }
     }
 
-    const teachers = event.retreatTeachers || []
-    const lessons = event.retreatLessons || []
-    const staff = event.retreatStaff || []
+    const teachers = extension.teachers || []
+    const lessons = extension.lessons || []
+    const staff = extension.staff || []
 
     const teachersWithAttendee = await Promise.all(
-      teachers.map(async (teacher) => {
-        const attendee = await ctx.db.get(teacher.attendeeId)
+      teachers.map(async (teacher: any) => {
+        const attendee = (await ctx.db.get(
+          teacher.attendeeId,
+        )) as Doc<'attendees'> | null
         return {
           ...teacher,
           attendee: attendee
@@ -46,9 +57,9 @@ export const getRetreatDetails = query({
     )
 
     const lessonsWithTeacher = await Promise.all(
-      lessons.map(async (lesson) => {
+      lessons.map(async (lesson: any) => {
         const teacher = lesson.teacherId
-          ? await ctx.db.get(lesson.teacherId)
+          ? ((await ctx.db.get(lesson.teacherId)) as Doc<'attendees'> | null)
           : null
         return {
           ...lesson,
@@ -64,8 +75,10 @@ export const getRetreatDetails = query({
     )
 
     const staffWithAttendee = await Promise.all(
-      staff.map(async (member) => {
-        const attendee = await ctx.db.get(member.attendeeId)
+      staff.map(async (member: any) => {
+        const attendee = (await ctx.db.get(
+          member.attendeeId,
+        )) as Doc<'attendees'> | null
         return {
           ...member,
           attendee: attendee
@@ -126,19 +139,26 @@ export const checkTeacherLessons = query({
     teacherAttendeeId: v.id('attendees'),
   },
   handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId)
-    if (!event) {
-      throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
+
+    if (!extension) {
+      return {
+        hasLessons: false,
+        lessons: [],
+      }
     }
 
-    const lessons = event.retreatLessons || []
+    const lessons = extension.lessons || []
     const assignedLessons = lessons.filter(
-      (lesson) => lesson.teacherId === args.teacherAttendeeId,
+      (lesson: any) => lesson.teacherId === args.teacherAttendeeId,
     )
 
     return {
       hasLessons: assignedLessons.length > 0,
-      lessons: assignedLessons.map((lesson) => ({
+      lessons: assignedLessons.map((lesson: any) => ({
         id: lesson.id,
         title: lesson.title,
         day: lesson.day,
@@ -163,14 +183,18 @@ export const getLessonConflicts = query({
     excludeLessonId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId)
-    if (!event) {
-      throw new Error('Event not found')
+    const extension = await ctx.db
+      .query('spiritualRetreatEventExtensions')
+      .withIndex('by_event', (q) => q.eq('eventId', args.eventId))
+      .first()
+
+    if (!extension) {
+      return []
     }
 
     const existingLessons: RetreatLessonValidation[] = (
-      event.retreatLessons || []
-    ).map((lesson) => ({
+      extension.lessons || []
+    ).map((lesson: any) => ({
       id: lesson.id,
       day: lesson.day,
       startTime: lesson.startTime,

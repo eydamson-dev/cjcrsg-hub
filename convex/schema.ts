@@ -75,9 +75,26 @@ export default defineSchema({
         }),
       ),
     ),
-    // Spiritual Retreat specific fields
+    isActive: v.boolean(), // Soft delete flag
+    createdAt: v.number(),
+    updatedAt: v.number(), // Set on every mutation
+    completedAt: v.optional(v.number()), // Set when status becomes 'completed'
+  })
+    .index('by_date', ['date'])
+    .index('by_event_type', ['eventTypeId'])
+    .index('by_active_date', ['isActive', 'date'])
+    // Use case: "Get all upcoming events", "Get all cancelled events"
+    .index('by_status', ['status'])
+    // Use case: "Get upcoming events after today ordered by date"
+    .index('by_date_status', ['date', 'status'])
+    // Use case: "Get the single currently active event quickly"
+    .index('by_active', ['isActive', 'status']),
+
+  // Extension table for Spiritual Retreat event-specific data
+  spiritualRetreatEventExtensions: defineTable({
+    eventId: v.id('events'),
     // Teachers: Must have qualified status (Pastor, Leader, Elder, Deacon)
-    retreatTeachers: v.optional(
+    teachers: v.optional(
       v.array(
         v.object({
           attendeeId: v.id('attendees'),
@@ -87,7 +104,7 @@ export default defineSchema({
       ),
     ),
     // Schedule: Lessons and activities for retreat
-    retreatLessons: v.optional(
+    lessons: v.optional(
       v.array(
         v.object({
           id: v.string(),
@@ -111,7 +128,7 @@ export default defineSchema({
       ),
     ),
     // Staff: Any attendee can be staff with a role
-    retreatStaff: v.optional(
+    staff: v.optional(
       v.array(
         v.object({
           attendeeId: v.id('attendees'),
@@ -121,20 +138,8 @@ export default defineSchema({
         }),
       ),
     ),
-    isActive: v.boolean(), // Soft delete flag
-    createdAt: v.number(),
-    updatedAt: v.number(), // Set on every mutation
-    completedAt: v.optional(v.number()), // Set when status becomes 'completed'
-  })
-    .index('by_date', ['date'])
-    .index('by_event_type', ['eventTypeId'])
-    .index('by_active_date', ['isActive', 'date'])
-    // Use case: "Get all upcoming events", "Get all cancelled events"
-    .index('by_status', ['status'])
-    // Use case: "Get upcoming events after today ordered by date"
-    .index('by_date_status', ['date', 'status'])
-    // Use case: "Get the single currently active event quickly"
-    .index('by_active', ['isActive', 'status']),
+  }).index('by_event', ['eventId']),
+
   attendanceRecords: defineTable({
     eventId: v.id('events'),
     attendeeId: v.id('attendees'),
