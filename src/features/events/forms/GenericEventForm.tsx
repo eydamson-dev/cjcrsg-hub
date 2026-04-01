@@ -22,6 +22,8 @@ interface GenericEventFormProps {
   eventTypeId: string
   eventTypeName?: string
   initialData?: Partial<EventFullFormData>
+  onSave?: (data: unknown) => Promise<unknown>
+  onCancel?: () => void
 }
 
 export function GenericEventForm({
@@ -30,6 +32,8 @@ export function GenericEventForm({
   eventTypeId,
   eventTypeName,
   initialData,
+  onSave,
+  onCancel,
 }: GenericEventFormProps) {
   const navigate = useNavigate()
   const bannerRef = useRef<BannerUploadFieldRef>(null)
@@ -57,9 +61,19 @@ export function GenericEventForm({
   const onSubmit = async (data: EventFullFormData) => {
     try {
       const hasPendingFile = bannerRef.current?.getPendingFile()
+      const { bannerImage, ...eventData } = data
+
+      if (onSave) {
+        const saveData = {
+          ...eventData,
+          eventTypeId,
+          ...(bannerImage ? { bannerImage } : {}),
+        }
+        await onSave(saveData)
+        return
+      }
 
       if (mode === 'create') {
-        const { bannerImage, ...eventData } = data
         const newEventId = await createEvent.mutateAsync({
           ...eventData,
           eventTypeId,
@@ -77,8 +91,6 @@ export function GenericEventForm({
         toast.success('Event created successfully')
         navigate({ to: '/events' })
       } else if (mode === 'edit' && eventId) {
-        const { bannerImage, ...updateData } = data
-
         if (hasPendingFile && eventId) {
           const url = await bannerRef.current?.uploadPendingFile()
           if (url) {
@@ -90,7 +102,7 @@ export function GenericEventForm({
         } else if (bannerImage !== initialData?.bannerImage) {
           await updateEvent.mutateAsync({
             id: eventId,
-            ...updateData,
+            ...eventData,
           })
         }
 
@@ -104,9 +116,8 @@ export function GenericEventForm({
   }
 
   const handleCancel = () => {
-    bannerRef.current?.clearPendingFile()
-    if (mode === 'edit' && eventId) {
-      navigate({ to: '/events/$id', params: { id: eventId } })
+    if (onCancel) {
+      onCancel()
     } else {
       navigate({ to: '/events' })
     }

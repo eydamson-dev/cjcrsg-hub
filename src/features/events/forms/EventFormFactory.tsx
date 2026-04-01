@@ -12,6 +12,8 @@ export interface EventFormFactoryProps {
   eventTypeName: string
   eventId?: string
   event?: Event & { eventType?: EventType }
+  onSave?: (data: unknown) => Promise<unknown>
+  onCancel?: () => void
 }
 
 export function EventFormFactory({
@@ -20,6 +22,8 @@ export function EventFormFactory({
   eventTypeName,
   eventId,
   event,
+  onSave,
+  onCancel,
 }: EventFormFactoryProps) {
   if (eventTypeName === SPIRITUAL_RETREAT_TYPE) {
     return (
@@ -28,6 +32,8 @@ export function EventFormFactory({
         eventTypeId={eventTypeId!}
         eventId={eventId}
         initialData={event}
+        onSave={onSave}
+        onCancel={onCancel}
       />
     )
   }
@@ -39,6 +45,8 @@ export function EventFormFactory({
       eventTypeName={eventTypeName}
       eventId={eventId}
       initialData={event}
+      onSave={onSave}
+      onCancel={onCancel}
     />
   )
 }

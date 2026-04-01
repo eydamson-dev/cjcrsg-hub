@@ -44,7 +44,7 @@ interface SpiritualRetreatFormProps {
     bannerImage?: string
     retreatData?: RetreatDetails
   }
-  onSave?: (eventId: string) => void
+  onSave?: (data: unknown) => Promise<unknown>
   onCancel?: () => void
 }
 
@@ -88,9 +88,14 @@ export function SpiritualRetreatForm({
   const onSubmit = async (data: EventFullFormData) => {
     try {
       const hasPendingFile = bannerRef.current?.getPendingFile()
+      const { bannerImage, ...eventData } = data
+
+      if (onSave) {
+        await onSave({ ...eventData, eventTypeId })
+        return
+      }
 
       if (mode === 'create') {
-        const { bannerImage, ...eventData } = data
         const newEventId = await createEvent.mutateAsync({
           ...eventData,
           eventTypeId,
@@ -107,10 +112,7 @@ export function SpiritualRetreatForm({
 
         toast.success('Spiritual Retreat created successfully')
         navigate({ to: '/events/spiritual-retreat' })
-        onSave?.(newEventId)
       } else if (mode === 'edit' && eventId) {
-        const { bannerImage, ...updateData } = data
-
         if (hasPendingFile && eventId) {
           const url = await bannerRef.current?.uploadPendingFile()
           if (url) {
@@ -122,13 +124,12 @@ export function SpiritualRetreatForm({
         } else if (bannerImage !== initialData?.bannerImage) {
           await updateEvent.mutateAsync({
             id: eventId,
-            ...updateData,
+            ...eventData,
           })
         }
 
         toast.success('Spiritual Retreat updated successfully')
         navigate({ to: '/events/$id', params: { id: eventId } })
-        onSave?.(eventId)
       }
     } catch (error) {
       console.error('Form submission error:', error)
@@ -138,12 +139,13 @@ export function SpiritualRetreatForm({
 
   const handleCancel = () => {
     bannerRef.current?.clearPendingFile()
-    if (mode === 'edit' && eventId) {
+    if (onCancel) {
+      onCancel()
+    } else if (mode === 'edit' && eventId) {
       navigate({ to: '/events/$id', params: { id: eventId } })
     } else {
       navigate({ to: '/events' })
     }
-    onCancel?.()
   }
 
   const teachersCount =
