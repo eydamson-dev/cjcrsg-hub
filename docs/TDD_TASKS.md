@@ -11,12 +11,12 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
 **Updated:** 2026-04-02
 
-**Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.3 Complete (backend schema/API changes), Waiting for Phase 14.4+ Testing Tasks
+**Phase:** Phase 14 - Event-Specific Forms & Extensions - Testing Phase  
+**Status:** ✅ Phase 14.1-14.5 Complete, Phase 14.4-14.5 Tests Added
 
 **Summary:**
 
-Completed Phase 14.1-14.4 (schema, backend migrations, form field components):
+Completed Phase 14.1-14.5 (schema, backend migrations, form field components, generic form):
 
 1. **Schema Changes (14.1)**
    - Removed retreat-specific fields from `events` table
@@ -31,11 +31,24 @@ Completed Phase 14.1-14.4 (schema, backend migrations, form field components):
 3. **Form Field Components (14.4)**
    - Created `BasicInfoFields` - name, date, start/end time, location with zod validation
    - Created `DescriptionField` - textarea with optional char count
-   - Created `BannerUploadField` - image upload with paste support, preview, remove
+   - Created `BannerUploadField` - image upload with paste support, preview, remove, deferred upload mode
    - Created validation schemas in `forms/schemas/eventSchemas.ts`
    - Created time options utility in `forms/utils/timeOptions.ts`
 
-**Next Testing Phase:** Phase 14.5 (Create Generic Event Form)
+4. **Generic Event Form (14.5)**
+   - Created `GenericEventForm` - simple form for non-specialized event types
+   - Uses reusable field components from 14.4
+   - Supports create/edit modes with react-hook-form + zod validation
+   - Deferred banner upload (file uploaded on submit)
+   - 14 component tests added
+
+5. **Phase 14.4-14.5 Tests Added (33 new tests)**
+   - `BasicInfoFields.test.tsx` - 5 tests (renders all fields, labels, date picker, time selects, location input)
+   - `eventSchemas.test.ts` - 24 tests (validates all schemas: basic info, description, banner, full schema, isValidImageUrl)
+   - `GenericEventForm.test.tsx` - 14 tests (renders form fields, buttons, handles submission, errors)
+   - All 634 form tests passing
+
+**Next Testing Phase:** Phase 14.6 (Create Spiritual Retreat Form)
 
 **Summary:**
 

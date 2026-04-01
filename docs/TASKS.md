@@ -4,11 +4,11 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.4 Complete, 14.5+ Pending
+**Status:** ⏳ Phase 14.1-14.5 Complete, 14.6+ Pending
 
 **Next Up:**
 
-- ⏳ Phase 14.5: Create Generic Event Form
+- ⏳ Phase 14.6: Create Spiritual Retreat Form
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1345,7 +1345,7 @@ interface FieldProps {
 ### Task 14.5: Create Generic Event Form
 
 **Time:** 1 hour  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete 2026-04-02  
 **Files:** `src/features/events/forms/GenericEventForm.tsx`
 
 **Description:**

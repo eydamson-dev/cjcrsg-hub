@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 14.5: Generic Event Form** - Simple form for non-specialized event types
+  - `GenericEventForm` component using reusable field components from 14.4
+  - Supports create/edit modes with react-hook-form + zod validation
+  - Deferred banner upload (file uploaded on submit, not on select)
+  - Time validation (end time must be after start time)
+  - 14 component tests added
+
+### Added
+
 - **Phase 14.4: Reusable Form Field Components** - Created form field components for event forms
   - `BasicInfoFields` - Event name, date, time, location fields with validation
   - `DescriptionField` - Textarea with optional character count
