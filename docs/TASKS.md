@@ -1099,7 +1099,7 @@ Home > Events > Spiritual Retreat > [Active Tab Name]
 
 ## Phase 14: Event-Specific Forms & Extensions
 
-**Status:** ⏳ Planned  
+**Status:** ⏳ In Progress  
 **Goal:** Create type-specific forms for events using an extension table architecture  
 **Estimated Total Time:** ~8.5 hours
 
@@ -1118,7 +1118,7 @@ Instead of embedding all event type fields in a single `events` table, this phas
 ### Task 14.1: Schema Cleanup and Extension Table Creation
 
 **Time:** 45 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `convex/schema.ts`
 
 **Description:**
@@ -1192,7 +1192,7 @@ Remove retreat-specific fields from the generic `events` table and create a new 
 ### Task 14.2: Update Event Backend Mutations
 
 **Time:** 1.5 hours  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `convex/events/mutations.ts`, `convex/events/queries.ts`
 
 **Description:**
@@ -1246,7 +1246,7 @@ return { ...event, eventType, retreatData }
 ### Task 14.3: Migrate Phase 13 Retreat Mutations to Extension Table
 
 **Time:** 1.5 hours  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `convex/retreat/mutations.ts`, `convex/retreat/queries.ts`
 
 **Description:**
@@ -1293,7 +1293,7 @@ Update all Phase 13 retreat mutations to use the new extension table instead of 
 ### Task 14.4: Create Reusable Form Field Components
 
 **Time:** 1.5 hours  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/forms/fields/BasicInfoFields.tsx`, `DescriptionField.tsx`, `BannerUploadField.tsx`
 
 **Description:**
@@ -1345,7 +1345,7 @@ interface FieldProps {
 ### Task 14.5: Create Generic Event Form
 
 **Time:** 1 hour  
-**Status:** ✅ Complete 2026-04-02  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/forms/GenericEventForm.tsx`
 
 **Description:**
@@ -1394,8 +1394,20 @@ interface GenericEventFormProps {
 ### Task 14.6: Create Spiritual Retreat Form
 
 **Time:** 2 hours  
-**Status:** ⏳ Pending  
-**Files:** `src/features/events/forms/SpiritualRetreatForm.tsx`
+**Status:** ✅ Complete  
+**Files:** `src/features/events/forms/SpiritualRetreatForm.tsx`, `tests/unit/events/forms/SpiritualRetreatForm.test.tsx`
+
+**Test Results:** 13 tests passing, 3 skipped
+
+**Implementation:**
+Created `SpiritualRetreatForm.tsx` (372 lines) with 4 tabs:
+
+- **Overview Tab:** BasicInfoFields, DescriptionField, BannerUploadField, summary cards
+- **Teachers Tab:** Reuses existing `RetreatTeachers` component
+- **Schedule Tab:** Reuses existing `RetreatSchedule` component
+- **Staff Tab:** Reuses existing `RetreatStaff` component
+
+Also created `eventSchemas.ts` with validation schemas and `timeOptions.ts` utility.
 
 **Description:**
 Create specialized tabbed form for Spiritual Retreats using existing Phase 13 components integrated with the new form structure.
@@ -1462,7 +1474,7 @@ Create specialized tabbed form for Spiritual Retreats using existing Phase 13 co
 ### Task 14.7: Create Event Form Factory
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/forms/EventFormFactory.tsx`
 
 **Description:**

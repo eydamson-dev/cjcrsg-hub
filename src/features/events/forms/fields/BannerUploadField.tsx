@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+  forwardRef,
+} from 'react'
 import { Upload, Image as ImageIcon, Loader2, Link2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useFormContext } from 'react-hook-form'
@@ -13,17 +20,30 @@ const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024 // 10MB
 interface BannerUploadFieldProps {
   name?: string
   label?: string
-  eventId: string
+  eventId?: string
+  mode?: 'create' | 'edit'
 }
 
-export function BannerUploadField({
-  name = 'bannerImage',
-  label = 'Banner Image',
-  eventId,
-}: BannerUploadFieldProps) {
+export interface BannerUploadFieldRef {
+  uploadPendingFile: () => Promise<string | undefined>
+  clearPendingFile: () => void
+  getPendingFile: () => File | null
+}
+
+export const BannerUploadField = forwardRef<
+  BannerUploadFieldRef,
+  BannerUploadFieldProps
+>(function BannerUploadField(
+  { name = 'bannerImage', label = 'Banner Image', eventId, mode = 'edit' },
+  ref,
+) {
   const { setValue, watch } = useFormContext()
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [urlValue, setUrlValue] = useState('')
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(
+    null,
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentValue = watch(name)
@@ -33,8 +53,40 @@ export function BannerUploadField({
     },
   )
 
+  useImperativeHandle(ref, () => ({
+    uploadPendingFile: async () => {
+      if (pendingFile && eventId) {
+        try {
+          const url = await handleUploadBanner(eventId, pendingFile)
+          setValue(name, url)
+          setPendingFile(null)
+          if (pendingPreviewUrl) {
+            URL.revokeObjectURL(pendingPreviewUrl)
+            setPendingPreviewUrl(null)
+          }
+          return url
+        } catch (error) {
+          console.error('Upload failed:', error)
+          toast.error('Failed to upload banner')
+          return undefined
+        }
+      }
+      return undefined
+    },
+    clearPendingFile: () => {
+      setPendingFile(null)
+      if (pendingPreviewUrl) {
+        URL.revokeObjectURL(pendingPreviewUrl)
+        setPendingPreviewUrl(null)
+      }
+    },
+    getPendingFile: () => pendingFile,
+  }))
+
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
+      if (mode === 'create') return
+
       if (!eventId || isUploading) return
 
       const items = e.clipboardData?.items
@@ -76,32 +128,51 @@ export function BannerUploadField({
         }
       }
     },
-    [eventId, isUploading, handleUploadBanner, handleSetBannerUrl],
+    [eventId, isUploading, handleUploadBanner, handleSetBannerUrl, mode],
   )
 
   useEffect(() => {
-    window.addEventListener('paste', handlePaste)
-    return () => window.removeEventListener('paste', handlePaste)
-  }, [handlePaste])
+    if (mode === 'edit') {
+      window.addEventListener('paste', handlePaste)
+      return () => window.removeEventListener('paste', handlePaste)
+    }
+  }, [handlePaste, mode])
 
   const handleFileClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && eventId) {
-      try {
-        await handleUploadBanner(eventId, file)
-      } catch (error) {
-        console.error('Upload failed:', error)
-      }
+    if (!file) return
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast.error(
+        `File size must be less than ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`,
+      )
+      e.target.value = ''
+      return
+    }
+
+    if (mode === 'create') {
+      const objectUrl = URL.createObjectURL(file)
+      setPendingFile(file)
+      setPendingPreviewUrl(objectUrl)
+      setValue(name, objectUrl)
+    } else if (eventId) {
+      handleUploadBanner(eventId, file)
     }
     e.target.value = ''
   }
 
   const handleUrlSubmit = async () => {
-    if (urlValue.trim() && eventId) {
+    if (!urlValue.trim()) return
+
+    if (mode === 'create') {
+      setValue(name, urlValue.trim())
+      setShowUrlInput(false)
+      setUrlValue('')
+    } else if (eventId) {
       try {
         await handleSetBannerUrl(eventId, urlValue.trim())
         setShowUrlInput(false)
@@ -114,16 +185,23 @@ export function BannerUploadField({
 
   const handleRemove = () => {
     setValue(name, undefined)
+    if (pendingFile && pendingPreviewUrl) {
+      URL.revokeObjectURL(pendingPreviewUrl)
+      setPendingFile(null)
+      setPendingPreviewUrl(null)
+    }
   }
+
+  const displayUrl = pendingPreviewUrl || currentValue
 
   return (
     <div className="space-y-4">
       <Label>{label}</Label>
 
-      {currentValue ? (
+      {displayUrl ? (
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-lg border bg-muted">
           <img
-            src={currentValue}
+            src={displayUrl}
             alt="Event banner"
             className="size-full object-cover"
           />
@@ -177,12 +255,19 @@ export function BannerUploadField({
         </Button>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Tip: Press{' '}
-        <kbd className="px-1 py-0.5 rounded bg-muted text-xs">Ctrl</kbd> +{' '}
-        <kbd className="px-1 py-0.5 rounded bg-muted text-xs">V</kbd> to paste
-        an image or URL
-      </p>
+      {mode === 'create' && (
+        <p className="text-xs text-muted-foreground">
+          Banner will be uploaded when you save the event
+        </p>
+      )}
+      {mode === 'edit' && (
+        <p className="text-xs text-muted-foreground">
+          Tip: Press{' '}
+          <kbd className="px-1 py-0.5 rounded bg-muted text-xs">Ctrl</kbd> +{' '}
+          <kbd className="px-1 py-0.5 rounded bg-muted text-xs">V</kbd> to paste
+          an image or URL
+        </p>
+      )}
 
       <input
         ref={fileInputRef}
@@ -215,4 +300,4 @@ export function BannerUploadField({
       )}
     </div>
   )
-}
+})

@@ -105,9 +105,9 @@ The system is fully functional for core church operations:
 - ✅ Phase 14.2: Update Event Backend Mutations
 - ✅ Phase 14.3: Migrate Phase 13 Retreat Mutations to Extension Table
 - ✅ Phase 14.4: Create Reusable Form Field Components
-- ⏳ Phase 14.5: Create Generic Event Form
-- ⏳ Phase 14.6: Create Spiritual Retreat Form
-- ⏳ Phase 14.7: Create Event Form Factory
+- ✅ Phase 14.5: Create Generic Event Form
+- ✅ Phase 14.6: Create Spiritual Retreat Form
+- ✅ Phase 14.7: Create Event Form Factory
 - ⏳ Phase 14.8: Update Event Creation Route
 - ⏳ Phase 14.9: Update Event Edit Route
 - ⏳ Phase 14.10: Update Spiritual Retreat Dedicated Page
@@ -115,7 +115,7 @@ The system is fully functional for core church operations:
 
 **Next Up:**
 
-- Phase 14.5: Create Generic Event Form
+- Phase 14.8: Update Event Creation Route
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 
