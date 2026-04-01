@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **SpiritualRetreatForm Tests** - Fixed 3 skipped unit tests
+  - Tab switching tests now use `getByRole('tab', { name: /teachers/i })` instead of `data-value` attribute
+  - All 16 SpiritualRetreatForm component tests now passing
+  - Total tests: 661 passing (up from 658)
+
 ### Added
 
 - **Phase 14.5: Generic Event Form** - Simple form for non-specialized event types

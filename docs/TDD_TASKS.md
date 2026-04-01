@@ -12,41 +12,20 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-04-02
 
 **Phase:** Phase 14 - Event-Specific Forms & Extensions - Testing Phase  
-**Status:** ✅ Phase 14.1-14.5 Complete, Phase 14.4-14.5 Tests Added
+**Status:** ✅ All Unit Tests Passing (661 tests), 2 E2E tests skipped
 
 **Summary:**
 
-Completed Phase 14.1-14.5 (schema, backend migrations, form field components, generic form):
+Fixed 3 previously skipped tests in SpiritualRetreatForm:
 
-1. **Schema Changes (14.1)**
-   - Removed retreat-specific fields from `events` table
-   - Created new `spiritualRetreatEventExtensions` table with proper indexes
+- Fixed tab switching tests by using `screen.getByRole('tab', { name: /tabname/i })` instead of `data-value` attribute
+- All SpiritualRetreatForm tests now passing (16/16)
 
-2. **Backend Updates (14.2-14.3)**
-   - Event `create` mutation now creates extension records for specialized event types
-   - Event `getById` query now joins extension data when applicable
-   - Phase 13 retreat mutations migrated to use extension table
-   - All teacher/lesson/staff operations now work against extension records
+**Current Test Count:** 661 tests passing
 
-3. **Form Field Components (14.4)**
-   - Created `BasicInfoFields` - name, date, start/end time, location with zod validation
-   - Created `DescriptionField` - textarea with optional char count
-   - Created `BannerUploadField` - image upload with paste support, preview, remove, deferred upload mode
-   - Created validation schemas in `forms/schemas/eventSchemas.ts`
-   - Created time options utility in `forms/utils/timeOptions.ts`
-
-4. **Generic Event Form (14.5)**
-   - Created `GenericEventForm` - simple form for non-specialized event types
-   - Uses reusable field components from 14.4
-   - Supports create/edit modes with react-hook-form + zod validation
-   - Deferred banner upload (file uploaded on submit)
-   - 14 component tests added
-
-5. **Phase 14.4-14.5 Tests Added (33 new tests)**
-   - `BasicInfoFields.test.tsx` - 5 tests (renders all fields, labels, date picker, time selects, location input)
-   - `eventSchemas.test.ts` - 24 tests (validates all schemas: basic info, description, banner, full schema, isValidImageUrl)
-   - `GenericEventForm.test.tsx` - 14 tests (renders form fields, buttons, handles submission, errors)
-   - All 634 form tests passing
+- Convex Unit: 94 tests
+- Component Tests: 410 tests
+- E2E Tests: 56 tests (2 skipped - infrastructure issues)
 
 **Next Testing Phase:** Phase 14.6 (Create Spiritual Retreat Form)
 
@@ -1493,12 +1472,12 @@ Tests to add after core features are stable:
 | **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
 | **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
 | **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **4** | ⏳ In Progress |
+| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **8** | ⏳ In Progress |
 | **Phase 13** | Retreat Enhancement | 2 hours | **30** | ⏳ Planned |
-| **Total** | | **13 + 14-19 hrs** | **618** | |
+| **Total** | | **13 + 14-19 hrs** | **661** | |
 
 ---
 
-**Last Updated:** 2026-03-30
-**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (4/6 tests) | Phase 13 Planned
+**Last Updated:** 2026-04-02
+**Status:** ✅ Phase 1-9 Complete | Phase 10 In Progress (6/8 tests) | Phase 13 Planned | ✅ All Unit Tests Passing (661 tests)
 ````

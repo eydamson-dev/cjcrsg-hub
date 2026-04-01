@@ -1397,7 +1397,7 @@ interface GenericEventFormProps {
 **Status:** ✅ Complete  
 **Files:** `src/features/events/forms/SpiritualRetreatForm.tsx`, `tests/unit/events/forms/SpiritualRetreatForm.test.tsx`
 
-**Test Results:** 13 tests passing, 3 skipped
+**Test Results:** 16 tests passing, 0 skipped
 
 **Implementation:**
 Created `SpiritualRetreatForm.tsx` (372 lines) with 4 tabs:

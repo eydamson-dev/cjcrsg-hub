@@ -106,33 +106,35 @@ describe('SpiritualRetreatForm', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
   })
 
-  it.skip('switches to Teachers tab when clicked', () => {
+  it('switches to Teachers tab when clicked', async () => {
     render(<SpiritualRetreatForm {...props} />)
-    // Get all tab buttons and click the one with value "teachers"
-    const tabs = screen.getAllByRole('tab')
-    const teachersTab = tabs.find(
-      (t) => t.getAttribute('data-value') === 'teachers',
-    )
-    fireEvent.click(teachersTab!)
-    expect(screen.getByTestId('retreat-teachers')).toBeInTheDocument()
+    // Find and click the Teachers tab
+    const teachersTab = screen.getByRole('tab', { name: /teachers/i })
+    fireEvent.click(teachersTab)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('retreat-teachers')).toBeInTheDocument()
+    })
   })
 
-  it.skip('switches to Schedule tab when clicked', () => {
+  it('switches to Schedule tab when clicked', async () => {
     render(<SpiritualRetreatForm {...props} />)
-    const tabs = screen.getAllByRole('tab')
-    const scheduleTab = tabs.find(
-      (t) => t.getAttribute('data-value') === 'schedule',
-    )
-    fireEvent.click(scheduleTab!)
-    expect(screen.getByTestId('retreat-schedule')).toBeInTheDocument()
+    const scheduleTab = screen.getByRole('tab', { name: /schedule/i })
+    fireEvent.click(scheduleTab)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('retreat-schedule')).toBeInTheDocument()
+    })
   })
 
-  it.skip('switches to Staff tab when clicked', () => {
+  it('switches to Staff tab when clicked', async () => {
     render(<SpiritualRetreatForm {...props} />)
-    const tabs = screen.getAllByRole('tab')
-    const staffTab = tabs.find((t) => t.getAttribute('data-value') === 'staff')
-    fireEvent.click(staffTab!)
-    expect(screen.getByTestId('retreat-staff')).toBeInTheDocument()
+    const staffTab = screen.getByRole('tab', { name: /staff/i })
+    fireEvent.click(staffTab)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('retreat-staff')).toBeInTheDocument()
+    })
   })
 
   it('shows correct button text for create mode', () => {
