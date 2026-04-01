@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 14.4: Reusable Form Field Components** - Created form field components for event forms
+  - `BasicInfoFields` - Event name, date, time, location fields with validation
+  - `DescriptionField` - Textarea with optional character count
+  - `BannerUploadField` - Image upload with file/URL/paste support and preview
+  - Time options utility with 12-hour format (00:00 AM - 11:30 PM)
+  - Zod validation schemas (eventBasicInfoSchema, eventDescriptionSchema, eventBannerSchema)
+  - All fields use react-hook-form Controller pattern with error display below each field
+
+### Added
+
 - **Phase 14: Event-Specific Forms & Extensions** - Extension table architecture for event forms
   - **Schema Changes:** Removed retreat fields from `events` table, created `spiritualRetreatEventExtensions` table
   - **Extension Table:** New table with `eventId` index, stores teachers/lessons/staff arrays

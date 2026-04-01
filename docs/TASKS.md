@@ -4,11 +4,11 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.3 Complete, 14.4+ Pending
+**Status:** ⏳ Phase 14.1-14.4 Complete, 14.5+ Pending
 
 **Next Up:**
 
-- ⏳ Phase 14.4: Create Reusable Form Field Components
+- ⏳ Phase 14.5: Create Generic Event Form
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
