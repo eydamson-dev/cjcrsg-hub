@@ -4,12 +4,12 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Task 15.1-15.7 Complete, 15.8-15.10 Planned
+**Status:** ⏳ Task 15.1-15.8 Complete, 15.9-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.8: Delete Deprecated Components
 - ⏳ Task 15.9: Testing & Validation
+- ⏳ Task 15.10: Documentation Update
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -2050,39 +2050,31 @@ const DEFAULT_TIMES: Record<string, { start: string; end: string }> = {
 ### Task 15.8: Delete Deprecated Components
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
-**Files to Delete:**
+**Status:** ✅ Complete  
+**Files Deleted:**
 
-- `src/features/events/forms/EventFormFactory.tsx`
-- `src/features/events/forms/GenericEventForm.tsx`
-- `src/features/events/forms/SpiritualRetreatForm.tsx`
-- `src/features/events/forms/schemas/eventSchemas.ts`
-- `src/features/events/forms/fields/BasicInfoFields.tsx`
-- `src/features/events/forms/fields/DescriptionField.tsx`
-- `src/features/events/forms/fields/BannerUploadField.tsx`
-- `src/features/events/forms/timeOptions.ts`
-- `src/features/events/forms/` directory (if empty after deletions)
-- `tests/unit/events/forms/SpiritualRetreatForm.test.tsx` (if exists)
+- `src/features/events/forms/` - Entire directory (EventFormFactory, GenericEventForm, SpiritualRetreatForm, schemas, fields, utils)
+- `tests/unit/events/forms/` - Entire directory (all form tests)
+- Updated `src/routes/events.$id.edit.tsx` - Replaced EventFormFactory with GenericEventDetails
 
 **Description:**
 Remove all files no longer needed after architecture change.
 
-**Steps:**
+**Changes:**
 
-1. List all files to be deleted
-2. Check for any remaining imports in other files
-3. Delete files
-4. Remove any import statements referencing deleted files
-5. Run TypeScript check
-6. Run tests
+- Deleted entire `src/features/events/forms/` directory
+- Deleted entire `tests/unit/events/forms/` directory
+- Updated edit route to use GenericEventDetails with isUnsaved mode
+- Added smart redirection for edit route (Sunday Service/Spiritual Retreat to dedicated pages)
+- No remaining imports of deprecated components
 
 **Acceptance Criteria:**
 
-- [ ] All deprecated files deleted
-- [ ] No import errors in remaining files
-- [ ] Application compiles successfully
-- [ ] All existing tests still pass
-- [ ] No console errors from missing modules
+- [x] All deprecated files deleted
+- [x] No import errors in remaining files
+- [x] Application compiles successfully
+- [x] 591 tests passing (70 form tests removed)
+- [x] No console errors from missing modules
 
 ---
 

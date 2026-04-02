@@ -8,36 +8,38 @@
 
 ## 🎯 Current Micro-Task
 
-Task 15.8: Delete Deprecated Components (Phase 15)
+Task 15.9: Testing & Validation (Phase 15)
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                         |
-| ------------------ | ---------------------------------------------- |
-| **Just completed** | Task 15.7 - Update /events/new Route           |
-| **In progress**    | Ready to start Task 15.8                       |
-| **Next up**        | Delete EventFormFactory, forms, and test files |
+| Item               | Status                                          |
+| ------------------ | ----------------------------------------------- |
+| **Just completed** | Task 15.8 - Delete Deprecated Components        |
+| **In progress**    | Ready for commit                                |
+| **Next up**        | Testing & Validation, then documentation update |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                                                | Status  | Notes                   |
-| --------------------------------------------------- | ------- | ----------------------- |
-| `src/routes/events.sunday-service.tsx`              | ✅ Done | Task 15.4 complete      |
-| `src/features/events/components/RetreatDetails.tsx` | ✅ Done | Task 15.5 complete      |
-| `src/routes/events.spiritual-retreat.tsx`           | ✅ Done | Task 15.6 complete      |
-| `src/routes/events.new.tsx`                         | ✅ Done | Task 15.7 complete      |
-| `src/features/events/forms/`                        | 🔄 Next | Delete deprecated files |
+| File                                                | Status  | Notes                          |
+| --------------------------------------------------- | ------- | ------------------------------ |
+| `src/routes/events.sunday-service.tsx`              | ✅ Done | Task 15.4 complete             |
+| `src/features/events/components/RetreatDetails.tsx` | ✅ Done | Task 15.5 complete             |
+| `src/routes/events.spiritual-retreat.tsx`           | ✅ Done | Task 15.6 complete             |
+| `src/routes/events.new.tsx`                         | ✅ Done | Task 15.7 complete             |
+| `src/features/events/forms/`                        | ✅ Done | Deleted deprecated files       |
+| `src/routes/events.$id.edit.tsx`                    | ✅ Done | Updated to GenericEventDetails |
+| `tests/unit/events/forms/`                          | ✅ Done | Deleted deprecated tests       |
 
 ---
 
 ## 📊 Quality Status
 
-- **Tests:** 661 passing
-- **TypeScript:** 0 errors in modified files
+- **Tests:** 591 passing (70 deprecated form tests removed)
+- **TypeScript:** 0 new errors (only pre-existing)
 - **Lint:** Clean
 - **Build:** Successful
 
@@ -51,12 +53,10 @@ None
 
 ## ⚡ Immediate Next Actions
 
-1. Check which files exist in `src/features/events/forms/`
-2. Search for remaining imports of deprecated files
-3. Delete files: EventFormFactory, GenericEventForm, SpiritualRetreatForm, form fields, schemas
-4. Delete test file: SpiritualRetreatForm.test.tsx
-5. Remove empty directories
-6. Run TypeScript check and tests
+1. Commit all Phase 15 changes (Tasks 15.1-15.8)
+2. Run full test suite to validate
+3. Manual testing of all event creation flows
+4. Update TASKS.md and CHANGELOG.md
 
 ---
 
@@ -71,8 +71,9 @@ None
 
 ## 📝 Session Notes
 
-- Tasks 15.4-15.7 complete: All event creation routes now use GenericEventDetails/RetreatDetails
-- Sunday Service page uses EventPageHeader + SundayServiceDetails
-- Spiritual Retreat page uses EventPageHeader + RetreatDetails with isCreating mode
-- /events/new route uses GenericEventDetails with smart redirection
-- Next: Clean up deprecated form components before committing
+- All Phase 15 tasks 15.1-15.8 complete
+- Deprecated forms directory deleted (EventFormFactory, GenericEventForm, SpiritualRetreatForm, etc.)
+- Edit route updated to use GenericEventDetails with smart redirection
+- Test count: 591 passing (70 deprecated form tests removed as expected)
+- No new TypeScript errors from deletions
+- Ready to commit all Phase 15 changes

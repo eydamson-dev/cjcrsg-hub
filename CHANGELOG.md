@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Deprecated event form components** - Cleaned up after Phase 15 architecture change
+  - `EventFormFactory`, `GenericEventForm`, `SpiritualRetreatForm`
+  - Form field components (`BasicInfoFields`, `DescriptionField`, `BannerUploadField`)
+  - Form schemas and utilities (`eventSchemas`, `timeOptions`)
+  - All form test files (70 tests removed, 591 tests passing)
+  - Updated edit route to use `GenericEventDetails` with smart redirection
+
 ### Added
 
 - **Phase 15: Unified Event Creation Architecture** - Standardized event creation with consistent headers and components
@@ -19,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `RetreatDetails` now supports `isCreating` mode with disabled tabs and tooltips
   - Smart redirection: Sunday Service → `/events/sunday-service`, Spiritual Retreat → `/events/spiritual-retreat`, others → `/events/${eventId}`
   - All imports updated across codebase
-  - All 661 tests passing
+  - 591 tests passing (70 deprecated form tests removed)
 
 ### Fixed
 
