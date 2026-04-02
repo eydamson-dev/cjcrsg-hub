@@ -32,6 +32,7 @@ import type { RetreatDetails } from '../types'
 
 interface SpiritualRetreatFormProps {
   mode: 'create' | 'edit'
+  isUnsaved?: boolean
   eventId?: string
   eventTypeId: string
   initialData?: {
@@ -50,6 +51,7 @@ interface SpiritualRetreatFormProps {
 
 export function SpiritualRetreatForm({
   mode,
+  isUnsaved = false,
   eventId,
   eventTypeId,
   initialData,
@@ -179,33 +181,37 @@ export function SpiritualRetreatForm({
               <BookOpen className="size-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="teachers" className="gap-2">
-              <UserCircle className="size-4" />
-              Teachers
-              {teachersCount > 0 && (
-                <span className="ml-1 text-xs text-muted-foreground">
-                  ({teachersCount})
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="schedule" className="gap-2">
-              <Clock className="size-4" />
-              Schedule
-              {lessonsCount > 0 && (
-                <span className="ml-1 text-xs text-muted-foreground">
-                  ({lessonsCount})
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="staff" className="gap-2">
-              <Users className="size-4" />
-              Staff
-              {staffCount > 0 && (
-                <span className="ml-1 text-xs text-muted-foreground">
-                  ({staffCount})
-                </span>
-              )}
-            </TabsTrigger>
+            {!isUnsaved && (
+              <>
+                <TabsTrigger value="teachers" className="gap-2">
+                  <UserCircle className="size-4" />
+                  Teachers
+                  {teachersCount > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({teachersCount})
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="schedule" className="gap-2">
+                  <Clock className="size-4" />
+                  Schedule
+                  {lessonsCount > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({lessonsCount})
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="staff" className="gap-2">
+                  <Users className="size-4" />
+                  Staff
+                  {staffCount > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({staffCount})
+                    </span>
+                  )}
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -243,83 +249,91 @@ export function SpiritualRetreatForm({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Teachers
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{teachersCount}</div>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="mt-2 h-auto p-0 text-muted-foreground"
-                    onClick={() => setActiveTab('teachers')}
-                  >
-                    View teachers →
-                  </Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Lessons</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{lessonsCount}</div>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="mt-2 h-auto p-0 text-muted-foreground"
-                    onClick={() => setActiveTab('schedule')}
-                  >
-                    View schedule →
-                  </Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Staff</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{staffCount}</div>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="mt-2 h-auto p-0 text-muted-foreground"
-                    onClick={() => setActiveTab('staff')}
-                  >
-                    View staff →
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            {!isUnsaved && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Teachers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{teachersCount}</div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="mt-2 h-auto p-0 text-muted-foreground"
+                      onClick={() => setActiveTab('teachers')}
+                    >
+                      View teachers →
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Lessons
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{lessonsCount}</div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="mt-2 h-auto p-0 text-muted-foreground"
+                      onClick={() => setActiveTab('schedule')}
+                    >
+                      View schedule →
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Staff</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{staffCount}</div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="mt-2 h-auto p-0 text-muted-foreground"
+                      onClick={() => setActiveTab('staff')}
+                    >
+                      View staff →
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="teachers">
-            <RetreatTeachers
-              eventId={eventId ?? ''}
-              retreatData={retreatData}
-              isLoading={isLoadingRetreat}
-            />
-          </TabsContent>
+          {!isUnsaved && (
+            <>
+              <TabsContent value="teachers">
+                <RetreatTeachers
+                  eventId={eventId ?? ''}
+                  retreatData={retreatData}
+                  isLoading={isLoadingRetreat}
+                />
+              </TabsContent>
 
-          <TabsContent value="schedule">
-            <RetreatSchedule
-              eventId={eventId ?? ''}
-              retreatData={retreatData}
-              isLoading={isLoadingRetreat}
-            />
-          </TabsContent>
+              <TabsContent value="schedule">
+                <RetreatSchedule
+                  eventId={eventId ?? ''}
+                  retreatData={retreatData}
+                  isLoading={isLoadingRetreat}
+                />
+              </TabsContent>
 
-          <TabsContent value="staff">
-            <RetreatStaff
-              eventId={eventId ?? ''}
-              retreatData={retreatData}
-              isLoading={isLoadingRetreat}
-            />
-          </TabsContent>
+              <TabsContent value="staff">
+                <RetreatStaff
+                  eventId={eventId ?? ''}
+                  retreatData={retreatData}
+                  isLoading={isLoadingRetreat}
+                />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
 
         <div className="flex justify-end gap-2 border-t pt-4">
@@ -333,7 +347,11 @@ export function SpiritualRetreatForm({
                 Saving...
               </>
             ) : mode === 'create' ? (
-              'Create Retreat'
+              isUnsaved ? (
+                'Start Retreat'
+              ) : (
+                'Create Retreat'
+              )
             ) : (
               'Save Changes'
             )}

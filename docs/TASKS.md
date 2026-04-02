@@ -3,12 +3,14 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
-**Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.9 Complete, 14.10+ Pending
+**Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
+**Status:** ⏳ Phase 15.1-15.10 Planned, 15.1 Next Up
 
 **Next Up:**
 
-- ⏳ Phase 14.10: Update Spiritual Retreat Dedicated Page
+- ⏳ Task 15.1: Create EventPageHeader Component
+- ⏳ Task 15.2: Rename EventDetails to GenericEventDetails
+- ⏳ Task 15.3: Create SundayServiceDetails Component
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1759,15 +1761,477 @@ Clear all existing event data and perform comprehensive testing of the new form 
 | 14.11     | 30 min       | Testing           | All above    |
 | **Total** | **~8.5 hrs** |                   |              |
 
-**Next Phase Ideas:**
+---
 
-- Phase 15: Sunday Service Extensions (sermon series, worship leader, offering tracking)
-- Phase 16: Attendance Reporting & Analytics
-- Phase 17: Dashboard Statistics Widgets
+## Phase 15: Unified Event Creation Architecture
+
+**Status:** ⏳ Planned  
+**Goal:** Standardize all event creation to use GenericEventDetails, create consistent dedicated page headers, and clean up deprecated components.  
+**Estimated Time:** 5.5 hours
+
+**Overview:**
+Create a unified architecture where:
+
+- `/events/new` uses `GenericEventDetails` for ALL basic event creation
+- Dedicated pages (Sunday Service, Spiritual Retreat) handle their own specialized creation flow with local state
+- All creations redirect to the appropriate dedicated page after saving
+- Consistent headers across all dedicated pages via reusable component
+
+**Key Decisions:**
+
+- Delete EventFormFactory and all specialized form components
+- EventDetails renamed to GenericEventDetails
+- RetreatDetails supports isCreating mode (Overview editable, other tabs disabled)
+- Sunday Service gets its own SundayServiceDetails component (wrapper for now, extensible later)
+- Smart redirection based on event type name after creation
 
 ---
 
-## Development Workflow
+### Task 15.1: Create EventPageHeader Component
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/components/EventPageHeader.tsx`
+
+**Description:**
+Create a reusable header component for all dedicated event pages with consistent layout.
+
+**Features:**
+
+- Title with color dot indicator
+- Subtitle (optional)
+- Event History button (links to filtered history)
+- Archive button (links to filtered archive)
+- Create Event button (navigates to `/events/new`)
+
+**Props Interface:**
+
+```typescript
+interface EventPageHeaderProps {
+  title: string
+  subtitle?: string
+  eventColor?: string
+  eventTypeId?: string
+}
+```
+
+**Acceptance Criteria:**
+
+- [ ] Header layout matches current EventsContent header exactly
+- [ ] Buttons generate correct URLs with type filters when eventTypeId provided
+- [ ] Responsive: flex-col on mobile, flex-row on desktop
+- [ ] Color dot shows event type color
+
+---
+
+### Task 15.2: Rename EventDetails to GenericEventDetails
+
+**Time:** 45 minutes  
+**Status:** ⏳ Pending  
+**Files:**
+
+- `src/features/events/components/EventDetails.tsx` → `GenericEventDetails.tsx`
+- Update imports in: `EventsContent.tsx`, `events.$id.tsx`, `event-history.tsx`, `event-archive.tsx`
+
+**Description:**
+Rename component to clarify its purpose as the generic event creation/viewing component.
+
+**Steps:**
+
+1. Rename file from EventDetails.tsx to GenericEventDetails.tsx
+2. Update component name and all exports
+3. Update all import statements across codebase
+4. Verify no broken references
+5. Run TypeScript check
+
+**Acceptance Criteria:**
+
+- [ ] File renamed successfully
+- [ ] All imports updated (no build errors)
+- [ ] Component exports properly renamed
+- [ ] Application compiles without errors
+- [ ] No functional changes to component behavior
+
+---
+
+### Task 15.3: Create SundayServiceDetails Component
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/components/SundayServiceDetails.tsx`
+
+**Description:**
+Create dedicated component for Sunday Service page. Initially just wraps GenericEventDetails, but designed for future extension.
+
+**Props Interface:**
+
+```typescript
+interface SundayServiceDetailsProps {
+  event: Event
+  isCreating?: boolean
+  onSave?: (data: unknown) => void
+  onCancel?: () => void
+}
+```
+
+**Implementation Notes:**
+
+```typescript
+// NOTE: Future enhancement - add sermon series, worship leader,
+// offering tracking, sermon notes, etc.
+```
+
+**Acceptance Criteria:**
+
+- [ ] Component created with proper TypeScript types
+- [ ] Supports isCreating mode with save/cancel handlers
+- [ ] Wraps GenericEventDetails appropriately
+- [ ] Includes future enhancement comment/note
+- [ ] Renders without errors in both modes
+
+---
+
+### Task 15.4: Update Sunday Service Page
+
+**Time:** 45 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.sunday-service.tsx`
+
+**Description:**
+Replace EventsContent with custom implementation using SundayServiceDetails and local creation flow.
+
+**Changes:**
+
+- Remove EventsContent usage
+- Add `isCreating` state (boolean)
+- Add `unsavedEvent` state management
+- Implement handleStartUnsavedEvent() - sets default values
+- Implement handleSaveUnsaved() - creates event via API
+- Implement handleCancelUnsaved() - clears state
+- Use EventPageHeader component for consistent header
+- Conditional rendering:
+  - `isCreating=true`: Show SundayServiceDetails with isCreating
+  - `currentEvent`: Show SundayServiceDetails normally
+  - No event: Show EmptyEventState
+
+**Acceptance Criteria:**
+
+- [ ] Clicking "Start Sunday Service" shows creation form
+- [ ] Creation form uses SundayServiceDetails with isCreating=true
+- [ ] Save creates event and shows normal view
+- [ ] Cancel returns to empty state
+- [ ] Header uses EventPageHeader component
+- [ ] Header is consistent with other dedicated pages
+
+---
+
+### Task 15.5: Update RetreatDetails with isCreating Mode
+
+**Time:** 1 hour  
+**Status:** ⏳ Pending  
+**Files:** `src/features/events/components/RetreatDetails.tsx`
+
+**Description:**
+Add isCreating prop that enables creation mode: Overview tab editable, other tabs visible but disabled.
+
+**Props to Add:**
+
+```typescript
+interface RetreatDetailsProps {
+  event: Event
+  layout?: 'tabs' | 'accordion'
+  isCreating?: boolean // NEW
+  onSave?: (data: unknown) => void // NEW
+  onCancel?: () => void // NEW
+}
+```
+
+**UI Changes for isCreating=true:**
+
+- Overview tab: Shows GenericEventDetails with form fields (BasicInfo, Description, Banner)
+- Teachers tab: Visible but disabled (grayed out, no click)
+- Schedule tab: Visible but disabled
+- Staff tab: Visible but disabled
+- Attendance tab: Hidden during creation
+- Footer: [Cancel] [Start Retreat] buttons (instead of normal actions)
+
+**Tooltip for disabled tabs:** "Save event to access [Tab Name]"
+
+**Acceptance Criteria:**
+
+- [ ] Overview tab shows editable form fields in creation mode
+- [ ] Other tabs (Teachers, Schedule, Staff) visible but disabled
+- [ ] Disabled tabs show appropriate tooltip on hover
+- [ ] Save button labeled "Start Retreat"
+- [ ] Cancel button returns to empty state
+- [ ] After save, component shows all tabs enabled
+- [ ] Normal mode behavior unchanged when isCreating=false
+
+---
+
+### Task 15.6: Update Spiritual Retreat Page
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.spiritual-retreat.tsx`
+
+**Description:**
+Update to use local creation flow with RetreatDetails isCreating mode instead of instant creation.
+
+**Changes:**
+
+- Add `isCreating` state (boolean)
+- Add `unsavedEvent` state management
+- Implement handleStartUnsavedEvent() - sets default retreat values
+- Implement handleSaveUnsaved() - creates event via API
+- Implement handleCancelUnsaved() - clears state
+- Use EventPageHeader component for consistent header
+- Conditional rendering:
+  - `isCreating=true`: Show RetreatDetails with isCreating=true
+  - `currentEvent`: Show RetreatDetails normally
+  - No event: Show EmptyEventState with "Start Spiritual Retreat" button
+
+**Default Values for Creation:**
+
+- Name: `Spiritual Retreat - {today's date}`
+- Date: Today
+- Start Time: 08:00
+- End Time: 17:00
+- Location: ''
+- Description: ''
+
+**Acceptance Criteria:**
+
+- [ ] Uses EventPageHeader for consistent header
+- [ ] Clicking "Start Spiritual Retreat" shows RetreatDetails (isCreating mode)
+- [ ] Overview tab editable, other tabs visible but disabled
+- [ ] Save creates event and shows full RetreatDetails
+- [ ] Cancel returns to empty state
+- [ ] No page redirect needed (stays on same page, state changes)
+
+---
+
+### Task 15.7: Update /events/new Route
+
+**Time:** 1 hour  
+**Status:** ⏳ Pending  
+**Files:** `src/routes/events.new.tsx`
+
+**Description:**
+Replace EventFormFactory with GenericEventDetails for all event creation. Add smart redirection.
+
+**Changes:**
+
+- Remove EventFormFactory import and usage
+- Remove GenericEventForm/SpritualRetreatForm references
+- Add unsaved event state management
+- When event type selected: Show GenericEventDetails with isUnsaved=true
+- Handle save: Create event → Redirect to appropriate page
+- Implement smart redirection based on event type name
+
+**Redirection Logic:**
+
+```typescript
+const EVENT_TYPE_ROUTES: Record<string, string> = {
+  'Sunday Service': '/events/sunday-service',
+  'Spiritual Retreat': '/events/spiritual-retreat',
+  // Future types added here
+}
+
+const handleSave = async (data) => {
+  const eventId = await createEvent.mutateAsync(data)
+  const eventType = eventTypes.find((et) => et._id === data.eventTypeId)
+  const redirectUrl = EVENT_TYPE_ROUTES[eventType?.name] || `/events/${eventId}`
+  navigate({ to: redirectUrl })
+}
+```
+
+**Acceptance Criteria:**
+
+- [ ] Event type selector dropdown still works
+- [ ] GenericEventDetails shown for creation (not EventFormFactory)
+- [ ] All event types can be created via this route
+- [ ] Spiritual Retreat created here redirects to /events/spiritual-retreat
+- [ ] Sunday Service created here redirects to /events/sunday-service
+- [ ] Generic events redirect to /events/${eventId}
+- [ ] Success toast shown after creation
+
+---
+
+### Task 15.8: Delete Deprecated Components
+
+**Time:** 30 minutes  
+**Status:** ⏳ Pending  
+**Files to Delete:**
+
+- `src/features/events/forms/EventFormFactory.tsx`
+- `src/features/events/forms/GenericEventForm.tsx`
+- `src/features/events/forms/SpiritualRetreatForm.tsx`
+- `src/features/events/forms/schemas/eventSchemas.ts`
+- `src/features/events/forms/fields/BasicInfoFields.tsx`
+- `src/features/events/forms/fields/DescriptionField.tsx`
+- `src/features/events/forms/fields/BannerUploadField.tsx`
+- `src/features/events/forms/timeOptions.ts`
+- `src/features/events/forms/` directory (if empty after deletions)
+- `tests/unit/events/forms/SpiritualRetreatForm.test.tsx` (if exists)
+
+**Description:**
+Remove all files no longer needed after architecture change.
+
+**Steps:**
+
+1. List all files to be deleted
+2. Check for any remaining imports in other files
+3. Delete files
+4. Remove any import statements referencing deleted files
+5. Run TypeScript check
+6. Run tests
+
+**Acceptance Criteria:**
+
+- [ ] All deprecated files deleted
+- [ ] No import errors in remaining files
+- [ ] Application compiles successfully
+- [ ] All existing tests still pass
+- [ ] No console errors from missing modules
+
+---
+
+### Task 15.9: Testing & Validation
+
+**Time:** 1 hour  
+**Status:** ⏳ Pending  
+**Files:** Manual testing across all affected routes
+
+**Test Scenarios:**
+
+1. **Sunday Service Creation (Dedicated Page):**
+   - Navigate to /events/sunday-service
+   - Empty state shows with "Start Sunday Service" button
+   - Click button → Shows SundayServiceDetails (creation mode)
+   - Edit basic info → Click Save → Event created
+   - Shows normal SundayServiceDetails view
+
+2. **Spiritual Retreat Creation (Dedicated Page):**
+   - Navigate to /events/spiritual-retreat
+   - Empty state shows with "Start Spiritual Retreat" button
+   - Click button → Shows RetreatDetails (isCreating=true)
+   - Overview tab editable, other tabs visible but disabled
+   - Edit info → Click "Start Retreat" → Event created
+   - Shows full RetreatDetails with all tabs enabled
+
+3. **Generic Event Creation (/events/new):**
+   - Navigate to /events/new
+   - Select "Youth Event" (or any generic type)
+   - Shows GenericEventDetails with form
+   - Fill info → Save → Redirects to /events/${eventId}
+
+4. **Spiritual Retreat Creation (/events/new):**
+   - Navigate to /events/new
+   - Select "Spiritual Retreat"
+   - Shows GenericEventDetails with form
+   - Fill info → Save → Redirects to /events/spiritual-retreat
+
+5. **Sunday Service Creation (/events/new):**
+   - Navigate to /events/new
+   - Select "Sunday Service"
+   - Shows GenericEventDetails with form
+   - Fill info → Save → Redirects to /events/sunday-service
+
+6. **Header Consistency:**
+   - Check /events/sunday-service header
+   - Check /events/spiritual-retreat header
+   - Both use EventPageHeader component
+   - Layout identical, buttons work correctly
+
+7. **Cancel Behavior:**
+   - All creation flows return to empty state when Cancel clicked
+   - No event created in database
+
+**Acceptance Criteria:**
+
+- [ ] All test scenarios pass
+- [ ] No console errors
+- [ ] Responsive design works on mobile/desktop
+- [ ] TypeScript compilation successful
+- [ ] All existing tests pass (`pnpm test`)
+- [ ] Manual testing completed in browser
+
+---
+
+### Task 15.10: Documentation Update
+
+**Time:** 15 minutes  
+**Status:** ⏳ Pending  
+**Files:** `docs/TASKS.md`
+
+**Description:**
+Update Phase 15 tasks with completion status after implementation.
+
+**Acceptance Criteria:**
+
+- [ ] All completed tasks marked with ✅
+- [ ] Any skipped tasks documented with reason
+- [ ] Total time spent recorded
+- [ ] Next phase added to "Next Up" section
+
+---
+
+## Phase 15 Summary Table
+
+| Task      | Time         | Description                | Dependencies     |
+| --------- | ------------ | -------------------------- | ---------------- |
+| 15.1      | 30 min       | EventPageHeader component  | None             |
+| 15.2      | 45 min       | Rename EventDetails        | None             |
+| 15.3      | 30 min       | SundayServiceDetails       | 15.2             |
+| 15.4      | 45 min       | Update Sunday Service page | 15.1, 15.3       |
+| 15.5      | 1 hr         | RetreatDetails isCreating  | 15.2             |
+| 15.6      | 30 min       | Update Spiritual Retreat   | 15.1, 15.5       |
+| 15.7      | 1 hr         | Update /events/new         | 15.2             |
+| 15.8      | 30 min       | Delete deprecated files    | 15.4, 15.6, 15.7 |
+| 15.9      | 1 hr         | Testing & validation       | All above        |
+| 15.10     | 15 min       | Documentation update       | 15.9             |
+| **Total** | **~5.5 hrs** |                            |                  |
+
+**Next Up:**
+
+- ⏳ Task 15.1: Create EventPageHeader Component
+
+---
+
+## Architecture After Phase 15
+
+### Component Hierarchy
+
+```
+/events/new
+    ↓
+GenericEventDetails (isUnsaved=true)
+    ↓
+Save → Redirect to dedicated page
+
+/events/sunday-service
+    ↓
+Empty State → [Start] → SundayServiceDetails (isCreating)
+    ↓
+Save → SundayServiceDetails (normal)
+
+/events/spiritual-retreat
+    ↓
+Empty State → [Start] → RetreatDetails (isCreating)
+    ↓
+Save → RetreatDetails (normal with all tabs)
+```
+
+### Key Features
+
+- **Consistent Headers:** All dedicated pages use EventPageHeader
+- **Local Creation:** Dedicated pages handle their own unsaved state
+- **Smart Redirection:** /events/new redirects to appropriate page
+- **Simplified Codebase:** EventFormFactory and forms deleted
+- **Extensible:** SundayServiceDetails ready for future enhancements
+
+---
 
 1. **IMPLEMENT** - Build the feature first
 2. **MANUAL TEST** - Verify it works in the browser

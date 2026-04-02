@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
@@ -6,9 +7,11 @@ import { useEventTypesList } from '~/features/events/hooks/useEventTypes'
 import { useCurrentEvent } from '~/features/events/hooks/useEvents'
 import { useCreateEvent } from '~/features/events/hooks/useEventMutations'
 import { RetreatDetails } from '~/features/events/components/RetreatDetails'
+import { SpiritualRetreatForm } from '~/features/events/forms/SpiritualRetreatForm'
 import { PageLoader } from '~/components/ui/loading-spinner'
 import { Button } from '~/components/ui/button'
 import { Plus, Mountain } from 'lucide-react'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/events/spiritual-retreat')({
   component: SpiritualRetreatPage,
@@ -18,6 +21,16 @@ export const Route = createFileRoute('/events/spiritual-retreat')({
 })
 
 const RETREAT_NAME = 'Spiritual Retreat'
+
+interface UnsavedRetreatData {
+  name: string
+  eventTypeId: string
+  date: number
+  startTime: string
+  endTime: string
+  location: string
+  description: string
+}
 
 function SpiritualRetreatPage() {
   const { data: eventTypes, isPending: typesLoading } = useEventTypesList()
@@ -29,9 +42,12 @@ function SpiritualRetreatPage() {
 
   const createEvent = useCreateEvent()
 
+  const [unsavedRetreat, setUnsavedRetreat] =
+    useState<UnsavedRetreatData | null>(null)
+
   const isLoading = typesLoading || eventLoading
 
-  const handleCreateEvent = async () => {
+  const handleStartUnsavedEvent = () => {
     if (!retreatType) return
 
     const today = new Date()
@@ -41,19 +57,43 @@ function SpiritualRetreatPage() {
       year: 'numeric',
     })}`
 
+    setUnsavedRetreat({
+      name,
+      eventTypeId: retreatType._id,
+      date: today.getTime(),
+      startTime: '08:00',
+      endTime: '17:00',
+      location: '',
+      description: '',
+    })
+  }
+
+  const handleSaveUnsaved = async (data: unknown) => {
+    const eventData = data as {
+      name: string
+      date: number
+      startTime?: string
+      endTime?: string
+      location?: string
+      description?: string
+      bannerImage?: string
+    }
+
     try {
       await createEvent.mutateAsync({
-        name,
-        eventTypeId: retreatType._id,
-        date: today.getTime(),
-        startTime: '08:00',
-        endTime: '17:00',
-        location: '',
-        description: '',
+        ...eventData,
+        eventTypeId: unsavedRetreat!.eventTypeId,
       })
+
+      toast.success('Spiritual Retreat created successfully')
+      setUnsavedRetreat(null)
     } catch (error) {
       // Error handled by hook
     }
+  }
+
+  const handleCancelUnsaved = () => {
+    setUnsavedRetreat(null)
   }
 
   if (!retreatType && !typesLoading) {
@@ -80,6 +120,25 @@ function SpiritualRetreatPage() {
     )
   }
 
+  if (unsavedRetreat) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <div className="space-y-6 p-4">
+            <SpiritualRetreatForm
+              mode="create"
+              isUnsaved
+              eventTypeId={unsavedRetreat.eventTypeId}
+              initialData={unsavedRetreat}
+              onSave={handleSaveUnsaved}
+              onCancel={handleCancelUnsaved}
+            />
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
+
   if (!currentEvent) {
     return (
       <ProtectedRoute>
@@ -93,14 +152,9 @@ function SpiritualRetreatPage() {
               Start a Spiritual Retreat to begin managing teachers, schedule,
               and staff.
             </p>
-            <Button
-              onClick={handleCreateEvent}
-              disabled={createEvent.isPending}
-            >
+            <Button onClick={handleStartUnsavedEvent}>
               <Plus className="mr-2 h-4 w-4" />
-              {createEvent.isPending
-                ? 'Creating...'
-                : 'Start Spiritual Retreat'}
+              Start Spiritual Retreat
             </Button>
           </div>
         </Layout>
