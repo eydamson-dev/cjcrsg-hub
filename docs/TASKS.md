@@ -4,11 +4,11 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.5 Complete, 14.6+ Pending
+**Status:** ⏳ Phase 14.1-14.8 Complete, 14.9+ Pending
 
 **Next Up:**
 
-- ⏳ Phase 14.6: Create Spiritual Retreat Form
+- ⏳ Phase 14.9: Update Event Edit Route
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1557,49 +1557,36 @@ interface EventFormFactoryProps {
 ### Task 14.8: Update Event Creation Route
 
 **Time:** 45 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/routes/events.new.tsx`
 
 **Description:**
-Replace the 345-line inline form with the new EventFormFactory. The route will handle event type selection and pass the appropriate form.
+Replace the 345-line inline form with the new EventFormFactory. The route handles event type selection and passes the appropriate form.
 
-**Current State:**
+**Implementation:**
 
-- 345 lines of inline form code
-- Manual state management
-- Custom validation
-- All event types use same form
+1. **Event type selector dropdown:**
+   - Lists all active event types with color dots
+   - Default to previously selected or first type
+   - URL param support (`?type=...`)
 
-**New Implementation:**
+2. **Integrated EventFormFactory:**
+   - Renders GenericEventForm for standard events
+   - Renders SpiritualRetreatForm (4 tabs) for retreats
+   - Passes proper callbacks for save/cancel
 
-1. **Keep event type selector dropdown:**
-   - List all active event types
-   - Show color dot for each type
-   - Default to first type or previously selected
-
-2. **Replace form section:**
-   - Remove all inline form JSX (~200 lines)
-   - Replace with `<EventFormFactory />`
-   - Pass `selectedEventType.name` as prop
-
-3. **Handle callbacks:**
-   - `onSave`: Create event via API, then navigate
-   - `onCancel`: Navigate back to events list
-
-4. **Loading states:**
-   - Show skeleton while event types loading
-   - Disable form while submitting
+3. **Smart navigation on save:**
+   - Spiritual Retreat → `/events/spiritual-retreat`
+   - Other events → `/events`
 
 **Acceptance Criteria:**
 
-- [ ] Form renders based on selected event type
-- [ ] Creating Spiritual Retreat shows specialized form with tabs
-- [ ] Creating generic event shows simple form
-- [ ] After creation, redirects to appropriate page:
-  - Generic events → `/events`
-  - Spiritual Retreat → `/events/spiritual-retreat`
-- [ ] No console errors
-- [ ] Form is responsive
+- [x] Form renders based on selected event type
+- [x] Creating Spiritual Retreat shows specialized form with tabs
+- [x] Creating generic event shows simple form
+- [x] After creation, redirects to appropriate page
+- [x] No console errors
+- [x] Form is responsive
 
 ---
 
