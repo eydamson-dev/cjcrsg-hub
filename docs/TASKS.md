@@ -4,12 +4,12 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Task 15.1 Complete, 15.2-15.10 Planned
+**Status:** ⏳ Task 15.1-15.2 Complete, 15.3-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.2: Rename EventDetails to GenericEventDetails
 - ⏳ Task 15.3: Create SundayServiceDetails Component
+- ⏳ Task 15.4: Update Sunday Service Page
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1817,30 +1817,31 @@ Created a reusable header component for all dedicated event pages with consisten
 ### Task 15.2: Rename EventDetails to GenericEventDetails
 
 **Time:** 45 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:**
 
-- `src/features/events/components/EventDetails.tsx` → `GenericEventDetails.tsx`
-- Update imports in: `EventsContent.tsx`, `events.$id.tsx`, `event-history.tsx`, `event-archive.tsx`
+- `src/features/events/components/GenericEventDetails.tsx` (renamed from EventDetails.tsx)
+- Updated imports in: `EventsContent.tsx`, `events.$id.tsx`, `RetreatDetails.tsx`
+- Updated imports in: `tests/unit/events/components/EventDetails.test.tsx`, `tests/unit/components/EventDetails.test.tsx`
 
 **Description:**
-Rename component to clarify its purpose as the generic event creation/viewing component.
+Renamed component to clarify its purpose as the generic event creation/viewing component.
 
 **Steps:**
 
-1. Rename file from EventDetails.tsx to GenericEventDetails.tsx
-2. Update component name and all exports
-3. Update all import statements across codebase
-4. Verify no broken references
-5. Run TypeScript check
+1. Renamed file from EventDetails.tsx to GenericEventDetails.tsx
+2. Updated component name and all exports
+3. Updated all import statements across codebase
+4. Verified no broken references
+5. All 661 tests passing
 
 **Acceptance Criteria:**
 
-- [ ] File renamed successfully
-- [ ] All imports updated (no build errors)
-- [ ] Component exports properly renamed
-- [ ] Application compiles without errors
-- [ ] No functional changes to component behavior
+- [x] File renamed successfully
+- [x] All imports updated (no build errors)
+- [x] Component exports properly renamed
+- [x] Application compiles without errors
+- [x] No functional changes to component behavior
 
 ---
 

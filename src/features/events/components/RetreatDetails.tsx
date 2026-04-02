@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { BookOpen, UserCircle, Clock, Users, Mountain } from 'lucide-react'
-import { EventDetails } from '~/features/events/components/EventDetails'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import { AttendanceManager } from '~/features/events/components/AttendanceManager'
 import { RetreatTeachers } from './RetreatTeachers'
 import { RetreatSchedule } from './RetreatSchedule'
@@ -67,7 +67,7 @@ export function RetreatDetails({
       </TabsList>
 
       <TabsContent value="overview">
-        <EventDetails event={event} mode="dashboard" />
+        <GenericEventDetails event={event} mode="dashboard" />
       </TabsContent>
 
       <TabsContent value="teachers">
@@ -110,7 +110,7 @@ export function RetreatDetails({
             <BookOpen className="size-5" />
             Overview
           </h2>
-          <EventDetails event={event} mode="dashboard" />
+          <GenericEventDetails event={event} mode="dashboard" />
         </div>
 
         <div>

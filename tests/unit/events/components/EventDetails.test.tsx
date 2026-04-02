@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { EventDetails } from '~/features/events/components/EventDetails'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import type { Event, EventType } from '~/features/events/types'
 
 // Mock the hooks
@@ -62,7 +62,7 @@ import {
   useArchiveEvent,
 } from '~/features/events/hooks/useEventMutations'
 
-describe('EventDetails', () => {
+describe('GenericEventDetails', () => {
   const mockEventType: EventType = {
     _id: 'type-123',
     name: 'Sunday Service',
@@ -119,7 +119,7 @@ describe('EventDetails', () => {
 
   describe('Rendering', () => {
     it('renders event details in dashboard mode', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       // Check event name in h1 title (not the badge which has same text)
       expect(
@@ -134,7 +134,7 @@ describe('EventDetails', () => {
     })
 
     it('renders event details in detail mode', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(
         screen.getByRole('heading', { level: 1, name: 'Sunday Service' }),
@@ -145,13 +145,13 @@ describe('EventDetails', () => {
 
     it('shows correct navigation button based on mode', () => {
       const { rerender } = render(
-        <EventDetails event={mockEvent} mode="dashboard" />,
+        <GenericEventDetails event={mockEvent} mode="dashboard" />,
       )
 
       expect(screen.getByText('View All Events')).toBeInTheDocument()
       expect(screen.queryByText('Back to Events')).not.toBeInTheDocument()
 
-      rerender(<EventDetails event={mockEvent} mode="detail" />)
+      rerender(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Back to Events')).toBeInTheDocument()
       expect(screen.queryByText('View All Events')).not.toBeInTheDocument()
@@ -168,7 +168,9 @@ describe('EventDetails', () => {
         media: undefined,
       }
 
-      render(<EventDetails event={eventWithoutOptionals} mode="dashboard" />)
+      render(
+        <GenericEventDetails event={eventWithoutOptionals} mode="dashboard" />,
+      )
 
       expect(screen.getByText('No description added')).toBeInTheDocument()
       expect(screen.queryByText('Main Sanctuary')).not.toBeInTheDocument()
@@ -180,7 +182,7 @@ describe('EventDetails', () => {
         bannerImage: 'https://example.com/banner.jpg',
       }
 
-      render(<EventDetails event={eventWithBanner} mode="dashboard" />)
+      render(<GenericEventDetails event={eventWithBanner} mode="dashboard" />)
 
       const banner = screen.getByAltText('Sunday Service')
       expect(banner).toHaveAttribute('src', 'https://example.com/banner.jpg')
@@ -195,7 +197,7 @@ describe('EventDetails', () => {
         ],
       }
 
-      render(<EventDetails event={eventWithMedia} mode="dashboard" />)
+      render(<GenericEventDetails event={eventWithMedia} mode="dashboard" />)
 
       expect(screen.getByText('Media Gallery (2)')).toBeInTheDocument()
     })
@@ -203,7 +205,7 @@ describe('EventDetails', () => {
 
   describe('Event Status Actions', () => {
     it('shows Start Event button for upcoming events', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       expect(
         screen.getByRole('button', { name: /start event/i }),
@@ -219,7 +221,7 @@ describe('EventDetails', () => {
     it('shows Complete and Cancel buttons for active events', () => {
       const activeEvent: Event = { ...mockEvent, status: 'active' }
 
-      render(<EventDetails event={activeEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={activeEvent} mode="dashboard" />)
 
       expect(
         screen.queryByRole('button', { name: /start event/i }),
@@ -235,7 +237,7 @@ describe('EventDetails', () => {
     it('hides action buttons for completed events', () => {
       const completedEvent: Event = { ...mockEvent, status: 'completed' }
 
-      render(<EventDetails event={completedEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={completedEvent} mode="dashboard" />)
 
       expect(
         screen.queryByRole('button', { name: /start event/i }),
@@ -246,7 +248,7 @@ describe('EventDetails', () => {
     })
 
     it('calls startEvent mutation when Start Event is clicked', async () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       fireEvent.click(screen.getByRole('button', { name: /start event/i }))
       expect(mockMutateAsync).toHaveBeenCalledWith('event-123')
@@ -256,7 +258,7 @@ describe('EventDetails', () => {
   describe('Unsaved Event State', () => {
     it('shows unsaved event warning and hides attendance manager', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="dashboard"
           isUnsaved={true}
@@ -271,7 +273,7 @@ describe('EventDetails', () => {
 
     it('shows Save and Cancel buttons for unsaved events', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="dashboard"
           isUnsaved={true}
@@ -293,7 +295,7 @@ describe('EventDetails', () => {
 
     it('calls onSave when Save Event is clicked', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="dashboard"
           isUnsaved={true}
@@ -308,7 +310,7 @@ describe('EventDetails', () => {
 
     it('calls onCancel when Cancel is clicked', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="dashboard"
           isUnsaved={true}
@@ -323,7 +325,7 @@ describe('EventDetails', () => {
 
     it('calls onUpdate when basic info is updated for unsaved event', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="dashboard"
           isUnsaved={true}
@@ -344,7 +346,7 @@ describe('EventDetails', () => {
 
   describe('Modal Interactions', () => {
     it('opens basic info modal when edit button is clicked', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       const editButtons = screen.getAllByRole('button', { name: /edit/i })
       fireEvent.click(editButtons[0])
@@ -353,7 +355,7 @@ describe('EventDetails', () => {
     })
 
     it('opens description modal when edit button is clicked', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       const editButtons = screen.getAllByRole('button', { name: /edit/i })
       // Description edit button is the second one
@@ -363,7 +365,7 @@ describe('EventDetails', () => {
     })
 
     it('opens status and type modal when badge is clicked', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       const statusBadge = screen.getByText('Upcoming')
       fireEvent.click(statusBadge)

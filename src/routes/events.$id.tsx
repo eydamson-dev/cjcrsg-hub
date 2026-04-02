@@ -3,7 +3,7 @@ import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { useEvent } from '~/features/events/hooks/useEvents'
-import { EventDetails } from '~/features/events/components/EventDetails'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import {
   EventsBreadcrumb,
   BackLink,
@@ -113,7 +113,7 @@ function EventDetailPage() {
             href={parentUrl}
             parentEventTypeName={parentEventTypeName}
           />
-          <EventDetails event={eventData} mode="detail" />
+          <GenericEventDetails event={eventData} mode="detail" />
         </div>
       </Layout>
     </ProtectedRoute>
