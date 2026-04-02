@@ -31,7 +31,7 @@ import {
 } from '../hooks/useEventMutations'
 import type { Event } from '../types'
 
-interface EventDetailsProps {
+interface GenericEventDetailsProps {
   event: Event
   mode: 'dashboard' | 'detail'
   isUnsaved?: boolean
@@ -40,14 +40,14 @@ interface EventDetailsProps {
   onUpdate?: (updates: Partial<Event>) => void
 }
 
-export function EventDetails({
+export function GenericEventDetails({
   event,
   mode,
   isUnsaved = false,
   onSave,
   onCancel,
   onUpdate,
-}: EventDetailsProps) {
+}: GenericEventDetailsProps) {
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false)
   const [showDescriptionModal, setShowDescriptionModal] = useState(false)
   const [showBannerUploader, setShowBannerUploader] = useState(false)

@@ -2,7 +2,7 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Status:** Phase 15 - Unified Event Creation Architecture - In Progress  
 **Last Updated:** 2026-04-02
 
 ---
@@ -96,10 +96,10 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Status:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
+**Status:** Phase 15 - Unified Event Creation Architecture - In Progress  
 **Last Updated:** 2026-04-02
 
-**Phase Progress:**
+**Phase 14 Progress:** (Complete)
 
 - ✅ Phase 14.1: Schema Cleanup & Extension Table Creation
 - ✅ Phase 14.2: Update Event Backend Mutations
@@ -108,14 +108,27 @@ The system is fully functional for core church operations:
 - ✅ Phase 14.5: Create Generic Event Form
 - ✅ Phase 14.6: Create Spiritual Retreat Form
 - ✅ Phase 14.7: Create Event Form Factory
-- ⏳ Phase 14.8: Update Event Creation Route
-- ⏳ Phase 14.9: Update Event Edit Route
-- ⏳ Phase 14.10: Update Spiritual Retreat Dedicated Page
-- ⏳ Phase 14.11: Wipe Event Data and Test
+- ✅ Phase 14.8: Update Event Creation Route
+- ✅ Phase 14.9: Update Event Edit Route
+- ✅ Phase 14.10: Update Spiritual Retreat Dedicated Page
+- ⏳ Phase 14.11: Wipe Event Data and Test (pending data wipe)
+
+**Phase 15 Progress:** (In Progress)
+
+- ✅ Task 15.1: Create EventPageHeader Component
+- ✅ Task 15.2: Rename EventDetails to GenericEventDetails
+- ✅ Task 15.3: Create SundayServiceDetails Component
+- ⏳ Task 15.4: Update Sunday Service Page
+- ⏳ Task 15.5: Update RetreatDetails with isCreating Mode
+- ⏳ Task 15.6: Update Spiritual Retreat Page
+- ⏳ Task 15.7: Update /events/new Route
+- ⏳ Task 15.8: Delete Deprecated Components
+- ⏳ Task 15.9: Testing & Validation
+- ⏳ Task 15.10: Documentation Update
 
 **Next Up:**
 
-- Phase 14.8: Update Event Creation Route
+- Task 15.4: Update Sunday Service Page
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 
@@ -184,6 +197,7 @@ This project uses specialized AI skills and MCPs (Model Context Protocols):
 
 - **[Tasks](docs/TASKS.md)** - Feature catalog and implementation status
 - **[TDD Tasks](docs/TDD_TASKS.md)** - Testing workflow and coverage details
+- **[Session](docs/SESSION.md)** - Current session context and immediate next actions
 - **[Commands](docs/COMMANDS.md)** - All CLI commands
 - **[Conventions](docs/CONVENTIONS.md)** - Code standards & UI guidelines
 - **[Git Workflow](docs/GIT.md)** - Version control guide

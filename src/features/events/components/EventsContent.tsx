@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { Plus, History, Archive } from 'lucide-react'
 import { EmptyEventState } from '~/features/events/components/EmptyEventState'
-import { EventDetails } from '~/features/events/components/EventDetails'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import {
   useCurrentEvent,
   useEventStats,
@@ -187,7 +187,7 @@ export function EventsContent({
       <div className="space-y-6">
         {renderHeader()}
 
-        <EventDetails
+        <GenericEventDetails
           event={unsavedEvent}
           mode="dashboard"
           isUnsaved
@@ -234,7 +234,7 @@ export function EventsContent({
       <div className="space-y-6">
         {renderHeader()}
 
-        <EventDetails event={event} mode="dashboard" />
+        <GenericEventDetails event={event} mode="dashboard" />
       </div>
     )
   }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { EventDetails } from '~/features/events/components/EventDetails'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import type { Event, EventType } from '~/features/events/types'
 
 // Mock the hooks
@@ -85,7 +85,7 @@ vi.mock('~/features/events/components/StatusAndTypeEditModal', () => ({
   ),
 }))
 
-describe('EventDetails', () => {
+describe('GenericEventDetails', () => {
   const mockEvent: Event = {
     _id: 'event-123',
     name: 'Sunday Morning Service',
@@ -118,50 +118,50 @@ describe('EventDetails', () => {
 
   describe('Rendering', () => {
     it('renders event name', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Sunday Service')).toBeInTheDocument()
     })
 
     it('renders event status badge', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Upcoming')).toBeInTheDocument()
     })
 
     it('renders event type badge with color', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Sunday Service')).toBeInTheDocument()
     })
 
     it('renders event date in readable format', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText(/march 30, 2026/i)).toBeInTheDocument()
     })
 
     it('renders event time', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText(/9:00 AM - 11:00 AM/i)).toBeInTheDocument()
     })
 
     it('renders event location', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Main Sanctuary')).toBeInTheDocument()
     })
 
     it('renders event description', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText('Weekly worship service')).toBeInTheDocument()
     })
 
     it('renders placeholder when no description', () => {
       const eventWithoutDesc = { ...mockEvent, description: undefined }
-      render(<EventDetails event={eventWithoutDesc} mode="detail" />)
+      render(<GenericEventDetails event={eventWithoutDesc} mode="detail" />)
 
       expect(screen.getByText(/no description added/i)).toBeInTheDocument()
     })
@@ -171,7 +171,7 @@ describe('EventDetails', () => {
         ...mockEvent,
         bannerImage: 'https://example.com/banner.jpg',
       }
-      render(<EventDetails event={eventWithBanner} mode="detail" />)
+      render(<GenericEventDetails event={eventWithBanner} mode="detail" />)
 
       const banner = screen.getByAltText('Sunday Morning Service')
       expect(banner).toBeInTheDocument()
@@ -179,7 +179,7 @@ describe('EventDetails', () => {
     })
 
     it('renders placeholder when no banner image', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText(/click to add banner/i)).toBeInTheDocument()
     })
@@ -187,7 +187,7 @@ describe('EventDetails', () => {
 
   describe('Edit Buttons', () => {
     it('opens basic info modal when edit clicked', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       // Find the Event Details card and click its edit button
       const eventDetailsHeader = screen
@@ -205,7 +205,7 @@ describe('EventDetails', () => {
     })
 
     it('opens description modal when edit clicked', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       // Find the Description card header and click its edit button
       const descriptionHeader = screen
@@ -223,7 +223,7 @@ describe('EventDetails', () => {
     })
 
     it('opens status/type modal when status badge clicked', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       const statusBadge = screen.getByText('Upcoming')
       fireEvent.click(statusBadge)
@@ -233,7 +233,7 @@ describe('EventDetails', () => {
     })
 
     it('opens banner uploader when banner clicked', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       const banner = screen.getByText(/click to add banner/i).closest('div')!
       fireEvent.click(banner)
@@ -243,7 +243,7 @@ describe('EventDetails', () => {
     })
 
     it('opens media gallery when manage clicked', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       const manageButton = screen.getByRole('button', { name: /manage/i })
       fireEvent.click(manageButton)
@@ -256,7 +256,7 @@ describe('EventDetails', () => {
   describe('Unsaved Event Mode', () => {
     it('shows unsaved event warning card', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="detail"
           isUnsaved={true}
@@ -270,7 +270,7 @@ describe('EventDetails', () => {
 
     it('shows Save and Cancel buttons for unsaved events', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="detail"
           isUnsaved={true}
@@ -289,7 +289,7 @@ describe('EventDetails', () => {
 
     it('hides attendance manager for unsaved events', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="detail"
           isUnsaved={true}
@@ -303,7 +303,7 @@ describe('EventDetails', () => {
 
     it('calls onSave when save button clicked', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="detail"
           isUnsaved={true}
@@ -318,7 +318,7 @@ describe('EventDetails', () => {
 
     it('calls onCancel when cancel button clicked', () => {
       render(
-        <EventDetails
+        <GenericEventDetails
           event={mockEvent}
           mode="detail"
           isUnsaved={true}
@@ -334,7 +334,7 @@ describe('EventDetails', () => {
 
   describe('Navigation', () => {
     it('shows View All Events link in dashboard mode', () => {
-      render(<EventDetails event={mockEvent} mode="dashboard" />)
+      render(<GenericEventDetails event={mockEvent} mode="dashboard" />)
 
       expect(
         screen.getByRole('button', { name: /view all events/i }),
@@ -342,7 +342,7 @@ describe('EventDetails', () => {
     })
 
     it('shows Back to Events link in detail mode', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(
         screen.getByRole('button', { name: /back to events/i }),
@@ -353,7 +353,7 @@ describe('EventDetails', () => {
   describe('Status Badge Styling', () => {
     it('applies correct border color for upcoming status', () => {
       const { container } = render(
-        <EventDetails event={mockEvent} mode="detail" />,
+        <GenericEventDetails event={mockEvent} mode="detail" />,
       )
 
       const badge = container.querySelector('[class*="border-gray-300"]')
@@ -363,7 +363,7 @@ describe('EventDetails', () => {
     it('applies correct border color for active status', () => {
       const activeEvent = { ...mockEvent, status: 'active' as const }
       const { container } = render(
-        <EventDetails event={activeEvent} mode="detail" />,
+        <GenericEventDetails event={activeEvent} mode="detail" />,
       )
 
       const badge = container.querySelector('[class*="border-green-500"]')
@@ -373,7 +373,7 @@ describe('EventDetails', () => {
     it('applies correct border color for completed status', () => {
       const completedEvent = { ...mockEvent, status: 'completed' as const }
       const { container } = render(
-        <EventDetails event={completedEvent} mode="detail" />,
+        <GenericEventDetails event={completedEvent} mode="detail" />,
       )
 
       const badge = container.querySelector('[class*="border-blue-500"]')
@@ -383,7 +383,7 @@ describe('EventDetails', () => {
     it('applies correct border color for cancelled status', () => {
       const cancelledEvent = { ...mockEvent, status: 'cancelled' as const }
       const { container } = render(
-        <EventDetails event={cancelledEvent} mode="detail" />,
+        <GenericEventDetails event={cancelledEvent} mode="detail" />,
       )
 
       const badge = container.querySelector('[class*="border-red-500"]')
@@ -400,7 +400,7 @@ describe('EventDetails', () => {
           { type: 'image' as const, url: 'https://example.com/2.jpg' },
         ],
       }
-      render(<EventDetails event={eventWithMedia} mode="detail" />)
+      render(<GenericEventDetails event={eventWithMedia} mode="detail" />)
 
       expect(screen.getByText(/media gallery \(2\)/i)).toBeInTheDocument()
     })
@@ -416,13 +416,13 @@ describe('EventDetails', () => {
           { type: 'image' as const, url: 'https://example.com/5.jpg' },
         ],
       }
-      render(<EventDetails event={eventWithManyMedia} mode="detail" />)
+      render(<GenericEventDetails event={eventWithManyMedia} mode="detail" />)
 
       expect(screen.getByText(/\+1 more/i)).toBeInTheDocument()
     })
 
     it('shows empty state when no media', () => {
-      render(<EventDetails event={mockEvent} mode="detail" />)
+      render(<GenericEventDetails event={mockEvent} mode="detail" />)
 
       expect(screen.getByText(/no media added/i)).toBeInTheDocument()
     })

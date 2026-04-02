@@ -4,14 +4,19 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { EventsBreadcrumb } from '~/features/events/components/EventsBreadcrumb'
+import { GenericEventDetails } from '~/features/events/components/GenericEventDetails'
 import { useEvent } from '~/features/events/hooks/useEvents'
 import { useUpdateEvent } from '~/features/events/hooks/useEventMutations'
-import { EventFormFactory } from '~/features/events/forms/EventFormFactory'
-import { SPIRITUAL_RETREAT_TYPE } from '~/features/events/forms/EventFormFactory'
+import type { Event, EventType } from '~/features/events/types'
 
 export const Route = createFileRoute('/events/$id/edit')({
   component: EditEventContent,
 })
+
+const EVENT_TYPE_ROUTES: Record<string, string> = {
+  'Sunday Service': '/events/sunday-service',
+  'Spiritual Retreat': '/events/spiritual-retreat',
+}
 
 function EditEventContent() {
   const navigate = useNavigate()
@@ -52,37 +57,58 @@ function EditEventContent() {
 
   const eventTypeName = event.eventType?.name ?? 'Unknown'
 
-  const handleSave = async (data: unknown) => {
-    const eventData = data as {
-      name: string
-      date: number
-      startTime?: string
-      endTime?: string
-      location?: string
-      description?: string
-      bannerImage?: string
-      eventTypeId: string
-    }
-
-    const { bannerImage, ...updates } = eventData
+  const handleSave = async () => {
+    if (!event) return
 
     await updateEvent.mutateAsync({
       id: event._id,
-      ...updates,
-      ...(bannerImage ? { bannerImage } : {}),
+      name: event.name,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      location: event.location,
+      description: event.description,
+      bannerImage: event.bannerImage,
     })
 
     toast.success('Event updated successfully')
 
-    if (eventTypeName === SPIRITUAL_RETREAT_TYPE) {
-      navigate({ to: '/events/spiritual-retreat' })
-    } else {
-      navigate({ to: '/events/$id', params: { id: event._id } })
-    }
+    const redirectUrl =
+      EVENT_TYPE_ROUTES[eventTypeName] || `/events/${event._id}`
+    navigate({ to: redirectUrl })
   }
 
   const handleCancel = () => {
     navigate({ to: '/events/$id', params: { id: event._id } })
+  }
+
+  const eventType: EventType | undefined = event.eventType
+    ? {
+        _id: event.eventType.name,
+        name: event.eventType.name,
+        color: event.eventType.color || '#3b82f6',
+        isActive: true,
+        createdAt: event._creationTime,
+      }
+    : undefined
+
+  const eventForEdit: Event = {
+    _id: event._id,
+    name: event.name,
+    eventTypeId: event.eventTypeId,
+    eventType,
+    description: event.description,
+    date: event.date,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    location: event.location,
+    status: event.status,
+    bannerImage: event.bannerImage,
+    media: event.media,
+    isActive: event.isActive,
+    createdAt: event._creationTime,
+    updatedAt: event.updatedAt,
+    completedAt: event.completedAt,
   }
 
   return (
@@ -96,12 +122,10 @@ function EditEventContent() {
         parentEventTypeName={event.eventType?.name}
         showParentLink={!!event.eventType?.name}
       />
-      <EventFormFactory
-        mode="edit"
-        eventTypeId={event.eventTypeId}
-        eventTypeName={eventTypeName}
-        eventId={event._id}
-        event={event as any}
+      <GenericEventDetails
+        event={eventForEdit}
+        mode="dashboard"
+        isUnsaved
         onSave={handleSave}
         onCancel={handleCancel}
       />

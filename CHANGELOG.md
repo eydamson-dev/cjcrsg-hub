@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Deprecated event form components** - Cleaned up after Phase 15 architecture change
+  - `EventFormFactory`, `GenericEventForm`, `SpiritualRetreatForm`
+  - Form field components (`BasicInfoFields`, `DescriptionField`, `BannerUploadField`)
+  - Form schemas and utilities (`eventSchemas`, `timeOptions`)
+  - All form test files (70 tests removed, 591 tests passing)
+  - Updated edit route to use `GenericEventDetails` with smart redirection
+
+### Added
+
+- **Phase 15: Unified Event Creation Architecture** - Standardized event creation with consistent headers and components
+  - `EventPageHeader` - Reusable header component for all dedicated event pages with title, color dot, and action buttons
+  - Renamed `EventDetails` to `GenericEventDetails` to clarify its purpose as the generic event component
+  - `SundayServiceDetails` - Dedicated wrapper component for Sunday Service pages with future extensibility (sermon series, worship leader, offering tracking)
+  - Updated Sunday Service page to use local state management instead of `EventsContent`
+  - Updated Spiritual Retreat page to use `RetreatDetails` with `isCreating` mode instead of `SpiritualRetreatForm`
+  - Updated `/events/new` route to use `GenericEventDetails` with smart redirection
+  - `RetreatDetails` now supports `isCreating` mode with disabled tabs and tooltips
+  - Smart redirection: Sunday Service → `/events/sunday-service`, Spiritual Retreat → `/events/spiritual-retreat`, others → `/events/${eventId}`
+  - All imports updated across codebase
+  - 591 tests passing (70 deprecated form tests removed)
+
 ### Fixed
 
 - **SpiritualRetreatForm Tests** - Fixed 3 skipped unit tests
