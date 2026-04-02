@@ -17,6 +17,7 @@ import {
   useStartEvent,
 } from '~/features/events/hooks/useEventMutations'
 import type { Event, EventType } from '~/features/events/types'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/events/spiritual-retreat')({
   component: SpiritualRetreatPage,
@@ -102,7 +103,15 @@ function SpiritualRetreatPage() {
       await startEvent.mutateAsync(eventId)
       setUnsavedEvent(null)
     } catch (error) {
-      // Error handled by hook
+      const message =
+        error instanceof Error ? error.message : 'Failed to create event'
+      if (message.includes('already') || message.includes('active')) {
+        toast.error(
+          'An active event already exists. Complete or cancel it first.',
+        )
+      } else {
+        toast.error(message)
+      }
     }
   }
 

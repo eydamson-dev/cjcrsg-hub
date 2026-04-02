@@ -21,6 +21,7 @@ import {
   useStartEvent,
 } from '~/features/events/hooks/useEventMutations'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import type { Event, EventType } from '~/features/events/types'
 
 const searchSchema = z.object({
@@ -124,7 +125,15 @@ export function CreateEventContent() {
 
       navigate({ to: redirectUrl })
     } catch (error) {
-      // Error handled by hook
+      const message =
+        error instanceof Error ? error.message : 'Failed to create event'
+      if (message.includes('already') || message.includes('active')) {
+        toast.error(
+          'An active event already exists. Complete or cancel it first.',
+        )
+      } else {
+        toast.error(message)
+      }
     }
   }
 
