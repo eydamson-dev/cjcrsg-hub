@@ -4,12 +4,12 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Task 15.1-15.3 Complete, 15.4-15.10 Planned
+**Status:** ⏳ Task 15.1-15.4 Complete, 15.5-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.4: Update Sunday Service Page
 - ⏳ Task 15.5: RetreatDetails isCreating Mode
+- ⏳ Task 15.6: Update Spiritual Retreat Page
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1885,7 +1885,7 @@ interface SundayServiceDetailsProps {
 ### Task 15.4: Update Sunday Service Page
 
 **Time:** 45 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/routes/events.sunday-service.tsx`
 
 **Description:**
@@ -1893,26 +1893,27 @@ Replace EventsContent with custom implementation using SundayServiceDetails and 
 
 **Changes:**
 
-- Remove EventsContent usage
-- Add `isCreating` state (boolean)
-- Add `unsavedEvent` state management
-- Implement handleStartUnsavedEvent() - sets default values
-- Implement handleSaveUnsaved() - creates event via API
-- Implement handleCancelUnsaved() - clears state
-- Use EventPageHeader component for consistent header
+- Removed `EventsContent` usage
+- Added `isCreating` state and `unsavedEvent` state management
+- Implemented `handleStartUnsavedEvent()` - sets default Sunday Service values
+- Implemented `handleSaveUnsaved()` - creates event via API and starts it
+- Implemented `handleCancelUnsaved()` - clears state
+- Integrated `EventPageHeader` component for consistent header
 - Conditional rendering:
-  - `isCreating=true`: Show SundayServiceDetails with isCreating
+  - `unsavedEvent`: Show SundayServiceDetails with `isCreating=true`
   - `currentEvent`: Show SundayServiceDetails normally
-  - No event: Show EmptyEventState
+  - No event: Show EmptyEventState with "Start Sunday Service" button
 
 **Acceptance Criteria:**
 
-- [ ] Clicking "Start Sunday Service" shows creation form
-- [ ] Creation form uses SundayServiceDetails with isCreating=true
-- [ ] Save creates event and shows normal view
-- [ ] Cancel returns to empty state
-- [ ] Header uses EventPageHeader component
-- [ ] Header is consistent with other dedicated pages
+- [x] Clicking "Start Sunday Service" shows creation form
+- [x] Creation form uses SundayServiceDetails with isCreating=true
+- [x] Save creates event and shows normal view
+- [x] Cancel returns to empty state
+- [x] Header uses EventPageHeader component
+- [x] Header is consistent with other dedicated pages
+- [x] Event History and Archive buttons filter by Sunday Service type
+- [x] All 661 tests passing
 
 ---
 

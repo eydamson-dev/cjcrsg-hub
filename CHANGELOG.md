@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `EventPageHeader` - Reusable header component for all dedicated event pages with title, color dot, and action buttons
   - Renamed `EventDetails` to `GenericEventDetails` to clarify its purpose as the generic event component
   - `SundayServiceDetails` - Dedicated wrapper component for Sunday Service pages with future extensibility (sermon series, worship leader, offering tracking)
+  - Updated Sunday Service page to use local state management instead of `EventsContent`
   - All imports updated across codebase (5 files)
   - All 661 tests passing
 

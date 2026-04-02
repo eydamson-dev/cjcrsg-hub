@@ -8,34 +8,34 @@
 
 ## 🎯 Current Micro-Task
 
-Task 15.4: Update Sunday Service Page (Phase 15)
+Task 15.5: Update RetreatDetails with isCreating Mode (Phase 15)
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                                   |
-| ------------------ | -------------------------------------------------------- |
-| **Just completed** | Task 15.3 - Create SundayServiceDetails Component        |
-| **In progress**    | Starting Task 15.4 - reviewing events.sunday-service.tsx |
-| **Next up**        | Add isCreating state and EventPageHeader integration     |
+| Item               | Status                                          |
+| ------------------ | ----------------------------------------------- |
+| **Just completed** | Task 15.4 - Update Sunday Service Page          |
+| **In progress**    | Ready to start Task 15.5                        |
+| **Next up**        | Add isCreating prop to RetreatDetails component |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                                                      | Status   | Notes                             |
-| --------------------------------------------------------- | -------- | --------------------------------- |
-| `src/features/events/components/SundayServiceDetails.tsx` | ✅ Ready | Component created and tested      |
-| `src/routes/events.sunday-service.tsx`                    | 🔄 Next  | Need to refactor with local state |
-| `src/features/events/components/EventPageHeader.tsx`      | ✅ Ready | Can integrate immediately         |
+| File                                                | Status   | Notes                       |
+| --------------------------------------------------- | -------- | --------------------------- |
+| `src/routes/events.sunday-service.tsx`              | ✅ Done  | Refactored with local state |
+| `src/features/events/components/RetreatDetails.tsx` | 🔄 Next  | Need to add isCreating mode |
+| `src/routes/events.spiritual-retreat.tsx`           | ⏳ After | Will update after 15.5      |
 
 ---
 
 ## 📊 Quality Status
 
 - **Tests:** 661 passing
-- **TypeScript:** 0 errors
+- **TypeScript:** 0 errors in modified files
 - **Lint:** Clean
 - **Build:** Successful
 
@@ -49,11 +49,13 @@ None
 
 ## ⚡ Immediate Next Actions
 
-1. Read `src/routes/events.sunday-service.tsx` to understand current EventsContent usage
-2. Add `isCreating` state and `unsavedEvent` state management
-3. Implement `handleStartUnsavedEvent()` handler
-4. Integrate `EventPageHeader` component
-5. Update conditional rendering logic
+1. Read `RetreatDetails.tsx` to understand current tab structure
+2. Add `isCreating` prop to interface
+3. Add `onSave` and `onCancel` props
+4. Make Overview tab editable in creation mode
+5. Disable other tabs (Teachers, Schedule, Staff) with tooltips
+6. Hide Attendance tab during creation
+7. Add footer with Cancel/Start Retreat buttons
 
 ---
 
@@ -68,7 +70,7 @@ None
 
 ## 📝 Session Notes
 
-- Remember to use `EventPageHeader` instead of `EventsContent` for consistent headers
-- Keep `isCreating` state local to the route component
-- After save, should show normal view (no redirect needed for Sunday Service)
-- Test both empty state and existing event scenarios
+- Task 15.4 complete: Sunday Service page now uses EventPageHeader + SundayServiceDetails
+- Local state management working correctly (unsavedEvent, handleSaveUnsaved, handleCancelUnsaved)
+- All acceptance criteria met for Task 15.4
+- Next: RetreatDetails needs similar isCreating mode support
