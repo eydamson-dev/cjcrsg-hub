@@ -7,16 +7,28 @@ import { RetreatTeachers } from './RetreatTeachers'
 import { RetreatSchedule } from './RetreatSchedule'
 import { RetreatStaff } from './RetreatStaff'
 import { useRetreatDetails } from '~/features/events/hooks/useRetreat'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip'
 import type { Event } from '~/features/events/types'
 
 export interface RetreatDetailsProps {
   event: Event
   layout?: 'tabs' | 'accordion'
+  isCreating?: boolean
+  onSave?: () => void
+  onCancel?: () => void
 }
 
 export function RetreatDetails({
   event,
   layout = 'tabs',
+  isCreating = false,
+  onSave,
+  onCancel,
 }: RetreatDetailsProps) {
   const [activeTab, setActiveTab] = useState('overview')
   const { data: retreatData, isLoading } = useRetreatDetails(event._id)
@@ -28,33 +40,82 @@ export function RetreatDetails({
           <BookOpen className="size-4" />
           Overview
         </TabsTrigger>
-        <TabsTrigger value="teachers" className="gap-2">
-          <UserCircle className="size-4" />
-          Teachers
-          {retreatData?.teachers && retreatData.teachers.length > 0 && (
-            <span className="ml-1 text-xs text-muted-foreground">
-              ({retreatData.teachers.length})
-            </span>
-          )}
-        </TabsTrigger>
-        <TabsTrigger value="schedule" className="gap-2">
-          <Clock className="size-4" />
-          Schedule
-          {retreatData?.lessons && retreatData.lessons.length > 0 && (
-            <span className="ml-1 text-xs text-muted-foreground">
-              ({retreatData.lessons.length})
-            </span>
-          )}
-        </TabsTrigger>
-        <TabsTrigger value="staff" className="gap-2">
-          <Users className="size-4" />
-          Staff
-          {retreatData?.staff && retreatData.staff.length > 0 && (
-            <span className="ml-1 text-xs text-muted-foreground">
-              ({retreatData.staff.length})
-            </span>
-          )}
-        </TabsTrigger>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <TabsTrigger
+                  value="teachers"
+                  className="gap-2 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+                  disabled={isCreating}
+                >
+                  <UserCircle className="size-4" />
+                  Teachers
+                  {retreatData?.teachers && retreatData.teachers.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({retreatData.teachers.length})
+                    </span>
+                  )}
+                </TabsTrigger>
+              }
+            />
+            {isCreating && (
+              <TooltipContent>Save event to access Teachers</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <TabsTrigger
+                  value="schedule"
+                  className="gap-2 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+                  disabled={isCreating}
+                >
+                  <Clock className="size-4" />
+                  Schedule
+                  {retreatData?.lessons && retreatData.lessons.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({retreatData.lessons.length})
+                    </span>
+                  )}
+                </TabsTrigger>
+              }
+            />
+            {isCreating && (
+              <TooltipContent>Save event to access Schedule</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <TabsTrigger
+                  value="staff"
+                  className="gap-2 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+                  disabled={isCreating}
+                >
+                  <Users className="size-4" />
+                  Staff
+                  {retreatData?.staff && retreatData.staff.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({retreatData.staff.length})
+                    </span>
+                  )}
+                </TabsTrigger>
+              }
+            />
+            {isCreating && (
+              <TooltipContent>Save event to access Staff</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+
         <TabsTrigger value="attendance" className="gap-2">
           <Mountain className="size-4" />
           Attendance
@@ -67,7 +128,13 @@ export function RetreatDetails({
       </TabsList>
 
       <TabsContent value="overview">
-        <GenericEventDetails event={event} mode="dashboard" />
+        <GenericEventDetails
+          event={event}
+          mode="dashboard"
+          isUnsaved={isCreating}
+          onSave={onSave}
+          onCancel={onCancel}
+        />
       </TabsContent>
 
       <TabsContent value="teachers">
@@ -103,17 +170,21 @@ export function RetreatDetails({
   const renderAccordion = () => {
     return (
       <div className="space-y-6">
-        {/* For now, render same content but in accordion format */}
-        {/* This can be expanded later to use Accordion component */}
         <div>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <BookOpen className="size-5" />
             Overview
           </h2>
-          <GenericEventDetails event={event} mode="dashboard" />
+          <GenericEventDetails
+            event={event}
+            mode="dashboard"
+            isUnsaved={isCreating}
+            onSave={onSave}
+            onCancel={onCancel}
+          />
         </div>
 
-        <div>
+        <div className={isCreating ? 'opacity-50' : ''}>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <UserCircle className="size-5" />
             Teachers
@@ -130,7 +201,7 @@ export function RetreatDetails({
           />
         </div>
 
-        <div>
+        <div className={isCreating ? 'opacity-50' : ''}>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <Clock className="size-5" />
             Schedule
@@ -147,7 +218,7 @@ export function RetreatDetails({
           />
         </div>
 
-        <div>
+        <div className={isCreating ? 'opacity-50' : ''}>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <Users className="size-5" />
             Staff

@@ -2,33 +2,35 @@
 
 **Session Started:** 2026-04-02  
 **Last Updated:** 2026-04-02  
-**Branch:** main
+**Branch:** feature/phase15-unified-event-creation
 
 ---
 
 ## 🎯 Current Micro-Task
 
-Task 15.5: Update RetreatDetails with isCreating Mode (Phase 15)
+Task 15.8: Delete Deprecated Components (Phase 15)
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                          |
-| ------------------ | ----------------------------------------------- |
-| **Just completed** | Task 15.4 - Update Sunday Service Page          |
-| **In progress**    | Ready to start Task 15.5                        |
-| **Next up**        | Add isCreating prop to RetreatDetails component |
+| Item               | Status                                         |
+| ------------------ | ---------------------------------------------- |
+| **Just completed** | Task 15.7 - Update /events/new Route           |
+| **In progress**    | Ready to start Task 15.8                       |
+| **Next up**        | Delete EventFormFactory, forms, and test files |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                                                | Status   | Notes                       |
-| --------------------------------------------------- | -------- | --------------------------- |
-| `src/routes/events.sunday-service.tsx`              | ✅ Done  | Refactored with local state |
-| `src/features/events/components/RetreatDetails.tsx` | 🔄 Next  | Need to add isCreating mode |
-| `src/routes/events.spiritual-retreat.tsx`           | ⏳ After | Will update after 15.5      |
+| File                                                | Status  | Notes                   |
+| --------------------------------------------------- | ------- | ----------------------- |
+| `src/routes/events.sunday-service.tsx`              | ✅ Done | Task 15.4 complete      |
+| `src/features/events/components/RetreatDetails.tsx` | ✅ Done | Task 15.5 complete      |
+| `src/routes/events.spiritual-retreat.tsx`           | ✅ Done | Task 15.6 complete      |
+| `src/routes/events.new.tsx`                         | ✅ Done | Task 15.7 complete      |
+| `src/features/events/forms/`                        | 🔄 Next | Delete deprecated files |
 
 ---
 
@@ -49,13 +51,12 @@ None
 
 ## ⚡ Immediate Next Actions
 
-1. Read `RetreatDetails.tsx` to understand current tab structure
-2. Add `isCreating` prop to interface
-3. Add `onSave` and `onCancel` props
-4. Make Overview tab editable in creation mode
-5. Disable other tabs (Teachers, Schedule, Staff) with tooltips
-6. Hide Attendance tab during creation
-7. Add footer with Cancel/Start Retreat buttons
+1. Check which files exist in `src/features/events/forms/`
+2. Search for remaining imports of deprecated files
+3. Delete files: EventFormFactory, GenericEventForm, SpiritualRetreatForm, form fields, schemas
+4. Delete test file: SpiritualRetreatForm.test.tsx
+5. Remove empty directories
+6. Run TypeScript check and tests
 
 ---
 
@@ -70,7 +71,8 @@ None
 
 ## 📝 Session Notes
 
-- Task 15.4 complete: Sunday Service page now uses EventPageHeader + SundayServiceDetails
-- Local state management working correctly (unsavedEvent, handleSaveUnsaved, handleCancelUnsaved)
-- All acceptance criteria met for Task 15.4
-- Next: RetreatDetails needs similar isCreating mode support
+- Tasks 15.4-15.7 complete: All event creation routes now use GenericEventDetails/RetreatDetails
+- Sunday Service page uses EventPageHeader + SundayServiceDetails
+- Spiritual Retreat page uses EventPageHeader + RetreatDetails with isCreating mode
+- /events/new route uses GenericEventDetails with smart redirection
+- Next: Clean up deprecated form components before committing

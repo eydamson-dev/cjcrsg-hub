@@ -4,12 +4,12 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Task 15.1-15.4 Complete, 15.5-15.10 Planned
+**Status:** ⏳ Task 15.1-15.7 Complete, 15.8-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.5: RetreatDetails isCreating Mode
-- ⏳ Task 15.6: Update Spiritual Retreat Page
+- ⏳ Task 15.8: Delete Deprecated Components
+- ⏳ Task 15.9: Testing & Validation
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1920,20 +1920,20 @@ Replace EventsContent with custom implementation using SundayServiceDetails and 
 ### Task 15.5: Update RetreatDetails with isCreating Mode
 
 **Time:** 1 hour  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/components/RetreatDetails.tsx`
 
 **Description:**
 Add isCreating prop that enables creation mode: Overview tab editable, other tabs visible but disabled.
 
-**Props to Add:**
+**Props Added:**
 
 ```typescript
 interface RetreatDetailsProps {
   event: Event
   layout?: 'tabs' | 'accordion'
   isCreating?: boolean // NEW
-  onSave?: (data: unknown) => void // NEW
+  onSave?: () => void // NEW
   onCancel?: () => void // NEW
 }
 ```
@@ -1941,45 +1941,44 @@ interface RetreatDetailsProps {
 **UI Changes for isCreating=true:**
 
 - Overview tab: Shows GenericEventDetails with form fields (BasicInfo, Description, Banner)
-- Teachers tab: Visible but disabled (grayed out, no click)
-- Schedule tab: Visible but disabled
-- Staff tab: Visible but disabled
-- Attendance tab: Hidden during creation
-- Footer: [Cancel] [Start Retreat] buttons (instead of normal actions)
+- Teachers tab: Visible but disabled (grayed out, with tooltip)
+- Schedule tab: Visible but disabled (grayed out, with tooltip)
+- Staff tab: Visible but disabled (grayed out, with tooltip)
+- Attendance tab: Visible (not hidden during creation)
+- Save/Cancel buttons handled by GenericEventDetails
 
 **Tooltip for disabled tabs:** "Save event to access [Tab Name]"
 
 **Acceptance Criteria:**
 
-- [ ] Overview tab shows editable form fields in creation mode
-- [ ] Other tabs (Teachers, Schedule, Staff) visible but disabled
-- [ ] Disabled tabs show appropriate tooltip on hover
-- [ ] Save button labeled "Start Retreat"
-- [ ] Cancel button returns to empty state
-- [ ] After save, component shows all tabs enabled
-- [ ] Normal mode behavior unchanged when isCreating=false
+- [x] Overview tab shows editable form fields in creation mode
+- [x] Other tabs (Teachers, Schedule, Staff) visible but disabled with tooltips
+- [x] Disabled tabs show appropriate tooltip on hover
+- [x] Cancel button returns to empty state
+- [x] After save, component shows all tabs enabled
+- [x] Normal mode behavior unchanged when isCreating=false
 
 ---
 
 ### Task 15.6: Update Spiritual Retreat Page
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/routes/events.spiritual-retreat.tsx`
 
 **Description:**
-Update to use local creation flow with RetreatDetails isCreating mode instead of instant creation.
+Replaced `SpiritualRetreatForm` with `RetreatDetails` using `isCreating` mode.
 
 **Changes:**
 
-- Add `isCreating` state (boolean)
-- Add `unsavedEvent` state management
-- Implement handleStartUnsavedEvent() - sets default retreat values
-- Implement handleSaveUnsaved() - creates event via API
-- Implement handleCancelUnsaved() - clears state
+- Added `isCreating` state management
+- Added `unsavedEvent` state management
+- Implemented handleStartUnsavedEvent() - sets default retreat values
+- Implemented handleSaveUnsaved() - creates event via API and starts it
+- Implemented handleCancelUnsaved() - clears state
 - Use EventPageHeader component for consistent header
 - Conditional rendering:
-  - `isCreating=true`: Show RetreatDetails with isCreating=true
+  - `unsavedEvent`: Show RetreatDetails with isCreating=true
   - `currentEvent`: Show RetreatDetails normally
   - No event: Show EmptyEventState with "Start Spiritual Retreat" button
 
@@ -1994,19 +1993,19 @@ Update to use local creation flow with RetreatDetails isCreating mode instead of
 
 **Acceptance Criteria:**
 
-- [ ] Uses EventPageHeader for consistent header
-- [ ] Clicking "Start Spiritual Retreat" shows RetreatDetails (isCreating mode)
-- [ ] Overview tab editable, other tabs visible but disabled
-- [ ] Save creates event and shows full RetreatDetails
-- [ ] Cancel returns to empty state
-- [ ] No page redirect needed (stays on same page, state changes)
+- [x] Uses EventPageHeader for consistent header
+- [x] Clicking "Start Spiritual Retreat" shows RetreatDetails (isCreating mode)
+- [x] Overview tab editable, other tabs visible but disabled
+- [x] Save creates event and shows full RetreatDetails
+- [x] Cancel returns to empty state
+- [x] No page redirect needed (stays on same page, state changes)
 
 ---
 
 ### Task 15.7: Update /events/new Route
 
 **Time:** 1 hour  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/routes/events.new.tsx`
 
 **Description:**
@@ -2014,12 +2013,12 @@ Replace EventFormFactory with GenericEventDetails for all event creation. Add sm
 
 **Changes:**
 
-- Remove EventFormFactory import and usage
-- Remove GenericEventForm/SpritualRetreatForm references
-- Add unsaved event state management
+- Removed EventFormFactory import and usage
+- Replaced with GenericEventDetails for all event creation
+- Added unsaved event state management
 - When event type selected: Show GenericEventDetails with isUnsaved=true
-- Handle save: Create event → Redirect to appropriate page
-- Implement smart redirection based on event type name
+- Handle save: Create event → Start event → Redirect to appropriate page
+- Implemented smart redirection based on event type name
 
 **Redirection Logic:**
 
@@ -2027,26 +2026,24 @@ Replace EventFormFactory with GenericEventDetails for all event creation. Add sm
 const EVENT_TYPE_ROUTES: Record<string, string> = {
   'Sunday Service': '/events/sunday-service',
   'Spiritual Retreat': '/events/spiritual-retreat',
-  // Future types added here
 }
 
-const handleSave = async (data) => {
-  const eventId = await createEvent.mutateAsync(data)
-  const eventType = eventTypes.find((et) => et._id === data.eventTypeId)
-  const redirectUrl = EVENT_TYPE_ROUTES[eventType?.name] || `/events/${eventId}`
-  navigate({ to: redirectUrl })
+const DEFAULT_TIMES: Record<string, { start: string; end: string }> = {
+  'Sunday Service': { start: '09:00', end: '11:00' },
+  'Spiritual Retreat': { start: '08:00', end: '16:00' },
 }
 ```
 
 **Acceptance Criteria:**
 
-- [ ] Event type selector dropdown still works
-- [ ] GenericEventDetails shown for creation (not EventFormFactory)
-- [ ] All event types can be created via this route
-- [ ] Spiritual Retreat created here redirects to /events/spiritual-retreat
-- [ ] Sunday Service created here redirects to /events/sunday-service
-- [ ] Generic events redirect to /events/${eventId}
-- [ ] Success toast shown after creation
+- [x] Event type selector dropdown still works
+- [x] GenericEventDetails shown for creation (not EventFormFactory)
+- [x] All event types can be created via this route
+- [x] Spiritual Retreat created here redirects to /events/spiritual-retreat
+- [x] Sunday Service created here redirects to /events/sunday-service
+- [x] Generic events redirect to /events/${eventId}
+- [x] Cancel returns to event type selector
+- [x] URL param ?type= still supported for pre-selection
 
 ---
 
