@@ -4,11 +4,11 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 14 - Event-Specific Forms & Extensions - In Progress  
-**Status:** ⏳ Phase 14.1-14.8 Complete, 14.9+ Pending
+**Status:** ⏳ Phase 14.1-14.9 Complete, 14.10+ Pending
 
 **Next Up:**
 
-- ⏳ Phase 14.9: Update Event Edit Route
+- ⏳ Phase 14.10: Update Spiritual Retreat Dedicated Page
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1593,44 +1593,38 @@ Replace the 345-line inline form with the new EventFormFactory. The route handle
 ### Task 14.9: Update Event Edit Route
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
-**Files:** `src/routes/events.$id.edit.tsx` (create if doesn't exist)
+**Status:** ✅ Complete  
+**Files:** `src/routes/events.$id.edit.tsx`, `src/routes/events.$id.tsx`
 
 **Description:**
-Create or update the edit route to use EventFormFactory with pre-populated data.
+Create edit route using EventFormFactory with pre-populated data.
 
 **Implementation:**
 
-1. **Fetch event data:**
-   - Use `useEvent` hook to get event by ID
-   - Include extension data (retreatData if applicable)
-   - Show loading state while fetching
+1. **Created `events.$id.edit.tsx`:**
+   - Fetches event data using `useEvent` hook
+   - Renders `EventFormFactory` in edit mode
+   - Handles update via `useUpdateEvent` mutation
+   - Smart navigation after save (retreat → spiritual-retreat page, others → event detail)
 
-2. **Render form:**
+2. **Updated `events.$id.tsx` parent route:**
+   - Added `<Outlet />` for child routes
+   - Added `useMatchRoute` check to prevent duplicate layout rendering
+   - Only renders detail view when no child route is active
 
-   ```typescript
-   <EventFormFactory
-     mode="edit"
-     eventTypeName={event.eventType.name}
-     event={event}
-     onSave={handleUpdate}
-     onCancel={() => navigate('/events')}
-   />
-   ```
-
-3. **Handle update:**
-   - Call appropriate mutation based on event type
-   - Show success toast
-   - Navigate back to event detail or list
+3. **Handles update:**
+   - Calls `updateEvent` mutation with form data
+   - Shows success toast
+   - Navigates back to appropriate page
 
 **Acceptance Criteria:**
 
-- [ ] Pre-populates form with existing data
-- [ ] Editing Spiritual Retreat shows all tabs with saved data
-- [ ] Editing generic event shows basic form
-- [ ] Updates persist correctly to backend
-- [ ] Redirects after successful save
-- [ ] Handles 404 (event not found) gracefully
+- [x] Pre-populates form with existing data
+- [x] Editing Spiritual Retreat shows all tabs with saved data
+- [x] Editing generic event shows basic form
+- [x] Updates persist correctly to backend
+- [x] Redirects after successful save
+- [x] Handles 404 (event not found) gracefully
 
 ---
 

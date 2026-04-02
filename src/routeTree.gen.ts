@@ -25,6 +25,7 @@ import { Route as EventsIdRouteImport } from './routes/events.$id'
 import { Route as AttendeesNewRouteImport } from './routes/attendees.new'
 import { Route as AttendeesIdRouteImport } from './routes/attendees.$id'
 import { Route as AttendeesIdIndexRouteImport } from './routes/attendees.$id.index'
+import { Route as EventsIdEditRouteImport } from './routes/events.$id.edit'
 import { Route as AttendeesIdEditRouteImport } from './routes/attendees.$id.edit'
 
 const LoginRoute = LoginRouteImport.update({
@@ -107,6 +108,11 @@ const AttendeesIdIndexRoute = AttendeesIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AttendeesIdRoute,
 } as any)
+const EventsIdEditRoute = EventsIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => EventsIdRoute,
+} as any)
 const AttendeesIdEditRoute = AttendeesIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -119,7 +125,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/attendees/$id': typeof AttendeesIdRouteWithChildren
   '/attendees/new': typeof AttendeesNewRoute
-  '/events/$id': typeof EventsIdRoute
+  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/$slug': typeof EventsSlugRoute
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
+  '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id/': typeof AttendeesIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -137,7 +144,7 @@ export interface FileRoutesByTo {
   '/event-types': typeof EventTypesRoute
   '/login': typeof LoginRoute
   '/attendees/new': typeof AttendeesNewRoute
-  '/events/$id': typeof EventsIdRoute
+  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/$slug': typeof EventsSlugRoute
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
+  '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id': typeof AttendeesIdIndexRoute
 }
 export interface FileRoutesById {
@@ -157,7 +165,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/attendees/$id': typeof AttendeesIdRouteWithChildren
   '/attendees/new': typeof AttendeesNewRoute
-  '/events/$id': typeof EventsIdRoute
+  '/events/$id': typeof EventsIdRouteWithChildren
   '/events/$slug': typeof EventsSlugRoute
   '/events/archive': typeof EventsArchiveRoute
   '/events/history': typeof EventsHistoryRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
+  '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id/': typeof AttendeesIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/attendees/'
     | '/events/'
     | '/attendees/$id/edit'
+    | '/events/$id/edit'
     | '/attendees/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/attendees'
     | '/events'
     | '/attendees/$id/edit'
+    | '/events/$id/edit'
     | '/attendees/$id'
   id:
     | '__root__'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/attendees/'
     | '/events/'
     | '/attendees/$id/edit'
+    | '/events/$id/edit'
     | '/attendees/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -235,7 +247,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   AttendeesIdRoute: typeof AttendeesIdRouteWithChildren
   AttendeesNewRoute: typeof AttendeesNewRoute
-  EventsIdRoute: typeof EventsIdRoute
+  EventsIdRoute: typeof EventsIdRouteWithChildren
   EventsSlugRoute: typeof EventsSlugRoute
   EventsArchiveRoute: typeof EventsArchiveRoute
   EventsHistoryRoute: typeof EventsHistoryRoute
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AttendeesIdIndexRouteImport
       parentRoute: typeof AttendeesIdRoute
     }
+    '/events/$id/edit': {
+      id: '/events/$id/edit'
+      path: '/edit'
+      fullPath: '/events/$id/edit'
+      preLoaderRoute: typeof EventsIdEditRouteImport
+      parentRoute: typeof EventsIdRoute
+    }
     '/attendees/$id/edit': {
       id: '/attendees/$id/edit'
       path: '/edit'
@@ -385,13 +404,25 @@ const AttendeesIdRouteWithChildren = AttendeesIdRoute._addFileChildren(
   AttendeesIdRouteChildren,
 )
 
+interface EventsIdRouteChildren {
+  EventsIdEditRoute: typeof EventsIdEditRoute
+}
+
+const EventsIdRouteChildren: EventsIdRouteChildren = {
+  EventsIdEditRoute: EventsIdEditRoute,
+}
+
+const EventsIdRouteWithChildren = EventsIdRoute._addFileChildren(
+  EventsIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventTypesRoute: EventTypesRoute,
   LoginRoute: LoginRoute,
   AttendeesIdRoute: AttendeesIdRouteWithChildren,
   AttendeesNewRoute: AttendeesNewRoute,
-  EventsIdRoute: EventsIdRoute,
+  EventsIdRoute: EventsIdRouteWithChildren,
   EventsSlugRoute: EventsSlugRoute,
   EventsArchiveRoute: EventsArchiveRoute,
   EventsHistoryRoute: EventsHistoryRoute,

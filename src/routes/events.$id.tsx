@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute, useMatchRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
@@ -24,13 +24,30 @@ export const Route = createFileRoute('/events/$id')({
 function EventDetailPage() {
   const { id } = Route.useParams()
   const { data: event, isLoading } = useEvent(id)
+  const matchRoute = useMatchRoute()
+  const isEditRoute = matchRoute({ to: '/events/$id/edit', params: { id } })
+
+  if (isEditRoute) {
+    return (
+      <ProtectedRoute>
+        <Layout>
+          <div className="mx-auto max-w-7xl p-4">
+            <Outlet />
+          </div>
+        </Layout>
+      </ProtectedRoute>
+    )
+  }
 
   if (isLoading) {
     return (
       <ProtectedRoute>
         <Layout>
-          <div className="flex h-64 items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="mx-auto max-w-7xl p-4">
+            <Outlet />
+            <div className="flex h-64 items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
           </div>
         </Layout>
       </ProtectedRoute>
@@ -41,12 +58,16 @@ function EventDetailPage() {
     return (
       <ProtectedRoute>
         <Layout>
-          <div className="flex h-full items-center justify-center p-4">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold">Event Not Found</h2>
-              <p className="mt-2 text-muted-foreground">
-                The event you're looking for doesn't exist or has been deleted.
-              </p>
+          <div className="mx-auto max-w-7xl p-4">
+            <Outlet />
+            <div className="flex h-full items-center justify-center p-4">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold">Event Not Found</h2>
+                <p className="mt-2 text-muted-foreground">
+                  The event you're looking for doesn't exist or has been
+                  deleted.
+                </p>
+              </div>
             </div>
           </div>
         </Layout>
@@ -81,6 +102,7 @@ function EventDetailPage() {
     <ProtectedRoute>
       <Layout>
         <div className="mx-auto max-w-7xl p-4">
+          <Outlet />
           <EventsBreadcrumb
             items={[{ label: event.name }]}
             parentEventTypeId={parentEventTypeId}
