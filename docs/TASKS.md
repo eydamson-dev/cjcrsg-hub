@@ -4,11 +4,10 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Phase 15.1-15.10 Planned, 15.1 Next Up
+**Status:** ⏳ Task 15.1 Complete, 15.2-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.1: Create EventPageHeader Component
 - ⏳ Task 15.2: Rename EventDetails to GenericEventDetails
 - ⏳ Task 15.3: Create SundayServiceDetails Component
 - Future: Attendance reporting & analytics
@@ -1790,11 +1789,11 @@ Create a unified architecture where:
 ### Task 15.1: Create EventPageHeader Component
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/components/EventPageHeader.tsx`
 
 **Description:**
-Create a reusable header component for all dedicated event pages with consistent layout.
+Created a reusable header component for all dedicated event pages with consistent layout.
 
 **Features:**
 
@@ -1803,24 +1802,15 @@ Create a reusable header component for all dedicated event pages with consistent
 - Event History button (links to filtered history)
 - Archive button (links to filtered archive)
 - Create Event button (navigates to `/events/new`)
-
-**Props Interface:**
-
-```typescript
-interface EventPageHeaderProps {
-  title: string
-  subtitle?: string
-  eventColor?: string
-  eventTypeId?: string
-}
-```
+- Responsive: flex-col on mobile, flex-row on desktop
+- URL generation with type filters when eventTypeId provided
 
 **Acceptance Criteria:**
 
-- [ ] Header layout matches current EventsContent header exactly
-- [ ] Buttons generate correct URLs with type filters when eventTypeId provided
-- [ ] Responsive: flex-col on mobile, flex-row on desktop
-- [ ] Color dot shows event type color
+- [x] Header layout matches current EventsContent header exactly
+- [x] Buttons generate correct URLs with type filters when eventTypeId provided
+- [x] Responsive: flex-col on mobile, flex-row on desktop
+- [x] Color dot shows event type color
 
 ---
 
