@@ -141,6 +141,10 @@ export function CreateEventContent() {
     setUnsavedEvent(null)
   }
 
+  const handleUpdate = (updates: Partial<typeof unsavedEvent>) => {
+    setUnsavedEvent((prev) => (prev ? { ...prev, ...updates } : null))
+  }
+
   if (isLoadingTypes) {
     return (
       <ProtectedRoute>
@@ -168,6 +172,7 @@ export function CreateEventContent() {
               isUnsaved
               onSave={handleSave}
               onCancel={handleCancel}
+              onUpdate={handleUpdate}
             />
           </div>
         </Layout>
