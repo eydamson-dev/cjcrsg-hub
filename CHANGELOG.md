@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Phase 15: Unified Event Creation Architecture** - Standardized event creation with consistent headers and components
+  - `EventPageHeader` - Reusable header component for all dedicated event pages with title, color dot, and action buttons
+  - Renamed `EventDetails` to `GenericEventDetails` to clarify its purpose as the generic event component
+  - `SundayServiceDetails` - Dedicated wrapper component for Sunday Service pages with future extensibility (sermon series, worship leader, offering tracking)
+  - All imports updated across codebase (5 files)
+  - All 661 tests passing
+
 ### Fixed
 
 - **SpiritualRetreatForm Tests** - Fixed 3 skipped unit tests

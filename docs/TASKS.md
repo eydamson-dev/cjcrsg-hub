@@ -4,12 +4,12 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-02  
 **Current Phase:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Status:** ⏳ Task 15.1-15.2 Complete, 15.3-15.10 Planned
+**Status:** ⏳ Task 15.1-15.3 Complete, 15.4-15.10 Planned
 
 **Next Up:**
 
-- ⏳ Task 15.3: Create SundayServiceDetails Component
 - ⏳ Task 15.4: Update Sunday Service Page
+- ⏳ Task 15.5: RetreatDetails isCreating Mode
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -1848,7 +1848,7 @@ Renamed component to clarify its purpose as the generic event creation/viewing c
 ### Task 15.3: Create SundayServiceDetails Component
 
 **Time:** 30 minutes  
-**Status:** ⏳ Pending  
+**Status:** ✅ Complete  
 **Files:** `src/features/events/components/SundayServiceDetails.tsx`
 
 **Description:**
@@ -1874,11 +1874,11 @@ interface SundayServiceDetailsProps {
 
 **Acceptance Criteria:**
 
-- [ ] Component created with proper TypeScript types
-- [ ] Supports isCreating mode with save/cancel handlers
-- [ ] Wraps GenericEventDetails appropriately
-- [ ] Includes future enhancement comment/note
-- [ ] Renders without errors in both modes
+- [x] Component created with proper TypeScript types
+- [x] Supports isCreating mode with save/cancel handlers
+- [x] Wraps GenericEventDetails appropriately
+- [x] Includes future enhancement comment/note
+- [x] Renders without errors in both modes
 
 ---
 
