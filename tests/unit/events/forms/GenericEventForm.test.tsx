@@ -37,7 +37,10 @@ describe('GenericEventForm', () => {
     eventTypeName: 'Sunday Service',
   }
 
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
 
   it('renders form fields', () => {
     render(<GenericEventForm {...props} />)

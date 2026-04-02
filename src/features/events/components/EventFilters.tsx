@@ -45,13 +45,11 @@ export function EventFilters({
             <SelectItem value="all">All Types</SelectItem>
             {eventTypes.map((type) => (
               <SelectItem key={type._id} value={type._id}>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="size-2 rounded-full"
-                    style={{ backgroundColor: type.color }}
-                  />
-                  {type.name}
-                </div>
+                <span
+                  className="inline-block size-2 rounded-full mr-2"
+                  style={{ backgroundColor: type.color }}
+                />
+                {type.name}
               </SelectItem>
             ))}
           </SelectContent>
