@@ -19,12 +19,13 @@ Guidelines for updating project documentation files.
 
 ## Documentation Separation
 
-| File                | Purpose                   | Update When...                                |
-| ------------------- | ------------------------- | --------------------------------------------- |
-| `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    |
-| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  |
-| `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know |
-| `AGENTS.md`         | Project overview & status | Completing phases, adding new capabilities    |
+| File                | Purpose                   | Update When...                                | Granularity          |
+| ------------------- | ------------------------- | --------------------------------------------- | -------------------- |
+| `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    | Phase/Task level     |
+| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  | Testing tasks        |
+| `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know | Release notes        |
+| `AGENTS.md`         | Project overview & status | Completing phases, adding new capabilities    | High-level status    |
+| **`SESSION.md`**    | **Session continuity**    | **Every session start/end**                   | **Micro-task level** |
 
 ---
 
@@ -131,6 +132,34 @@ Use `[WIP]` prefix for incomplete features:
 
 ---
 
+## SESSION.md Guidelines
+
+**Purpose:** Session continuity - track what you're working on RIGHT NOW
+
+**Update when:**
+
+- Starting a new session
+- Completing a micro-task
+- Discovering blockers
+- Before committing (end session)
+
+**Contains:**
+
+- Current micro-task (more granular than TASKS.md)
+- Working files and their status
+- Immediate next actions
+- Blockers or decisions needed
+- Quality check status
+
+**Does NOT replace TASKS.md** - use both:
+
+- TASKS.md = Overall project progress
+- SESSION.md = Current session context
+
+**See [SESSION_GUIDE.md](../../docs/SESSION_GUIDE.md) for full details.**
+
+---
+
 ## File Locations
 
 | File                | Purpose                      |
@@ -139,6 +168,7 @@ Use `[WIP]` prefix for incomplete features:
 | `docs/TDD_TASKS.md` | Testing tasks                |
 | `CHANGELOG.md`      | Change log                   |
 | `AGENTS.md`         | Project overview & status    |
+| `SESSION.md`        | Session continuity           |
 | `docs/GIT.md`       | Git workflow details         |
 
 ---

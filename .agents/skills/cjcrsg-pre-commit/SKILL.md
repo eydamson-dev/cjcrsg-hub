@@ -37,12 +37,13 @@ Before committing, determine your work type and update the appropriate doc files
 
 ### Documentation Checklist
 
+- [ ] **SESSION.md** - Updated session state (start/end session)
 - [ ] **TASKS.md** - Updated "Current Session" (use `cjcrsg-task-manager` skill)
 - [ ] **TDD_TASKS.md** - Updated "Current Progress" (use `cjcrsg-task-manager` skill)
 - [ ] **CHANGELOG.md** - Added entry under [Unreleased] (user-facing changes)
 - [ ] **AGENTS.md** - Updated status (phase completion)
 
-**Tip:** Use `cjcrsg-task-manager` skill for all task management. Use this skill for documentation formatting.
+**Tip:** Use `cjcrsg-task-manager` skill for all task management. Use `SESSION.md` for session continuity. Use this skill for documentation formatting.
 
 ---
 
@@ -70,6 +71,7 @@ Before committing, determine your work type and update the appropriate doc files
 - [ ] New queries have tests (if applicable)
 - [ ] New shared components have tests (if applicable)
 - [ ] Bug fixes include regression test (if applicable)
+- [ ] Update SESSION.md - reflect current session state
 - [ ] Update CHANGELOG.md (if user-facing change)
 - [ ] Update TASKS.md "Current Session" (if feature/bug work)
 - [ ] Update TDD_TASKS.md "Current Progress" (if test/TDD work)
@@ -96,6 +98,7 @@ pnpm test              # Tests - must pass (138 tests)
 2. **Quality checks** pass (lint, typecheck, tests)
 3. **Test coverage** for new features (if required)
 4. **Documentation updates**:
+   - SESSION.md updated with current session state
    - CHANGELOG.md updated for user-facing changes
    - TASKS.md or TDD_TASKS.md updated
    - Current Session section reflects current status

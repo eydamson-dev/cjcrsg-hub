@@ -15,6 +15,59 @@ Manages project tasks with standardized naming conventions and collaborative pla
 - Checking current status
 - Creating tasks
 - Asking "what's next?"
+- Asking "show tasks" or "status"
+
+---
+
+## Always Read SESSION.md First
+
+**Before responding to ANY task-related query:**
+
+1. **Read `docs/SESSION.md`** to understand:
+   - What was just completed
+   - What's currently in progress
+   - Immediate next actions
+   - Any blockers or decisions needed
+
+2. **Then read the appropriate file:**
+   - `docs/TASKS.md` for feature tasks
+   - `docs/TDD_TASKS.md` for testing tasks
+
+3. **Combine both sources** to give a complete answer that includes:
+   - Latest completed work (from SESSION.md)
+   - Current micro-task (from SESSION.md)
+   - Next task from TASKS.md/TDD_TASKS.md
+   - Any blockers or context
+
+---
+
+## Task Manager vs SESSION.md
+
+**Use Task Manager for:**
+
+- Phase-level task tracking
+- Creating new tasks
+- Marking tasks complete
+- Planning phases
+- Updating TASKS.md "Current Session" section
+
+**Use SESSION.md for:**
+
+- Micro-task tracking (within a task)
+- File-level progress
+- Session continuity between AI conversations
+- Immediate next actions
+- Blockers and decisions
+
+**Workflow:**
+
+1. Task Manager: "Start Task 15.4" → updates TASKS.md Current Session
+2. SESSION.md: Track files being modified, next actions, blockers
+3. During work: Update SESSION.md as files complete
+4. Task Manager: "Task complete" → updates TASKS.md
+5. Pre-commit: Update both SESSION.md and TASKS.md
+
+**See [SESSION_GUIDE.md](../../docs/SESSION_GUIDE.md) for SESSION.md details.**
 
 ---
 

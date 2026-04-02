@@ -143,13 +143,20 @@ You test the changes locally:
 - Review the code changes
 - Verify everything works as expected
 
-### 3a. Update Changelog
+### 3a. Update Session & Changelog
 
-Before committing, update `CHANGELOG.md`:
+Before committing, update documentation:
 
-- Add changes under `[Unreleased]` section
-- Follow Keep a Changelog format
-- Use categories: Added, Changed, Deprecated, Removed, Fixed, Security
+1. **Update SESSION.md:**
+   - Mark completed items
+   - Update file statuses
+   - Note blockers or decisions
+   - Set timestamp
+
+2. **Update CHANGELOG.md:**
+   - Add changes under `[Unreleased]` section
+   - Follow Keep a Changelog format
+   - Use categories: Added, Changed, Deprecated, Removed, Fixed, Security
 
 Example:
 
@@ -223,6 +230,7 @@ Before committing, ensure:
 
 ### Documentation
 
+- [ ] **Update `SESSION.md`** - reflect current session state
 - [ ] **Update `CHANGELOG.md`** - add entry under `[Unreleased]`
 - [ ] **Update Task Documentation** (choose based on work type):
   - **Feature work** → Update `docs/TASKS.md` "Current Session"

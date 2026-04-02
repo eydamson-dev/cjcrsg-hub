@@ -16,9 +16,39 @@ Development methodology and feature/bug workflows.
 
 ---
 
+## Session Continuity
+
+**Always read SESSION.md before starting work** to understand:
+
+- What was just completed
+- What's in progress
+- Immediate next actions
+- Any blockers
+
+**Update SESSION.md at session start and end** for continuity between AI conversations.
+
+**See [SESSION.md](../../docs/SESSION.md) for details.**
+
+---
+
 ## Implementation-First Workflow
 
 For **ALL tasks** (backend AND frontend):
+
+### Step 0: START SESSION (Before Any Work)
+
+1. **Read SESSION.md** (if exists) to understand:
+   - What was just completed
+   - What's in progress
+   - Immediate next actions
+   - Any blockers
+
+2. **Update SESSION.md:**
+   - Set session start timestamp
+   - Define current micro-task
+   - List working files with status
+   - Note any blockers
+   - Link to relevant TASKS.md section
 
 ### Step 1: IMPLEMENT
 
@@ -46,6 +76,21 @@ After user confirmation ("works", "LGTM", etc.):
 - Frontend: Add component tests OR rely on E2E tests
 - Update test counts in documentation
 - Run all tests to verify
+
+### Step 4: END SESSION (After User Confirmation)
+
+1. **Update SESSION.md:**
+   - Update "Last Updated" timestamp
+   - Mark completed files as ✅
+   - Update in-progress items
+   - Note any blockers or decisions made
+   - Update "Next Actions" list
+
+2. **Follow pre-commit workflow:**
+   - Update TASKS.md (via cjcrsg-task-manager skill)
+   - Update CHANGELOG.md
+   - Run quality checks
+   - Commit changes
 
 ---
 
