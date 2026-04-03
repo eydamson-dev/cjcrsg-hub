@@ -3,13 +3,13 @@
 **Session Started:** 2026-04-03  
 **Last Updated:** 2026-04-03  
 **Branch:** feature/phase16-complete-auth-module  
-**Status:** Task 16.5 Complete - Ready for Commit
+**Status:** Task 16.6 Complete - Ready for Manual Testing
 
 ---
 
 ## 🎯 Current Micro-Task
 
-Phase 16: Task 16.5 Complete - Attendee List Link Status
+Phase 16: Task 16.6 Complete - Settings > Account Page
 
 ---
 
@@ -17,31 +17,31 @@ Phase 16: Task 16.5 Complete - Attendee List Link Status
 
 | Item               | Status                               |
 | ------------------ | ------------------------------------ |
-| **Just completed** | Task 16.5: Attendee List Link Status |
-| **In progress**    | Ready for commit                     |
-| **Next up**        | Task 16.6: Settings > Account Page   |
+| **Just completed** | Task 16.6: Settings > Account Page   |
+| **In progress**    | Ready for manual testing             |
+| **Next up**        | Task 16.7: OAuth Setup & E2E Testing |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                                                    | Status      | Notes                                               |
-| ------------------------------------------------------- | ----------- | --------------------------------------------------- |
-| `convex/attendees/admin.ts`                             | ✅ Complete | Added countLinked/countUnlinked queries             |
-| `convex/attendees/queries.ts`                           | ✅ Complete | Enriched list/search with user email/name           |
-| `src/features/attendees/components/LinkStatusBadge.tsx` | ✅ Complete | New component for linked/unlinked badge + tooltip   |
-| `src/features/attendees/components/AttendeeList.tsx`    | ✅ Complete | Added User Account column, link filter, quick stats |
-| `src/features/attendees/hooks/useAttendees.ts`          | ✅ Complete | Added useLinkedCount/useUnlinkedCount hooks         |
-| `src/routes/attendees.index.tsx`                        | ✅ Complete | Added link filter, role check, count queries        |
+| File                              | Status      | Notes                                                   |
+| --------------------------------- | ----------- | ------------------------------------------------------- |
+| `convex/account.ts`               | ✅ Complete | New file - getAccountInfo query, unlinkAccount mutation |
+| `src/hooks/useAccountInfo.ts`     | ✅ Complete | New file - useAccountInfo, useUnlinkAccount hooks       |
+| `src/routes/settings.account.tsx` | ✅ Complete | New file - Account settings page with auth methods      |
+| `src/lib/navigation.ts`           | ✅ Complete | Added Account link under Settings                       |
+| `src/routes/settings.index.tsx`   | ✅ Complete | Added Account card to settings grid                     |
+| `docs/TASKS.md`                   | ✅ Complete | Updated Task 16.6 status to complete                    |
+| `CHANGELOG.md`                    | ✅ Complete | Added Task 16.6 entry                                   |
 
 ---
 
 ## 📊 Quality Status
 
-- **Tests:** 588 passing (3 pre-existing failures from AttendeeStatusSelect test)
-- **TypeScript:** Pre-existing errors only (retreat components, events)
-- **Lint:** Pre-existing errors only
-- **Build:** All new files compile successfully
+- **TypeScript:** Pre-existing errors only (retreat components, events) - 0 new errors
+- **New files:** All compile successfully
+- **Lint:** Not yet run
 
 ---
 
@@ -49,26 +49,24 @@ Phase 16: Task 16.5 Complete - Attendee List Link Status
 
 **Decisions Made:**
 
-- ✅ Link status column only visible to admin/super_admin roles
-- ✅ Link filter dropdown only shown to admin/super_admin roles
-- ✅ Quick stats (linked/unlinked counts) only shown to admin/super_admin roles
-- ✅ Client-side filtering for link status (since paginated query doesn't support it server-side)
-- ✅ Tooltip shows linked user email/name on hover (linked only)
-- ✅ User email/name enriched in list and search queries for tooltip display
+- ✅ Account page accessible to all authenticated users (no role restriction)
+- ✅ Auth methods displayed with provider-specific icons (KeyRound for password, Mail for Google, Shield for Facebook)
+- ✅ Unlink button disabled when only one auth method exists
+- ✅ Confirmation dialog before unlinking OAuth accounts
+- ✅ Placeholder buttons for "Change Password", "Link Google", "Link Facebook", "Set Password"
+- ✅ Safety warning card displayed at bottom of page
 
 ---
 
 ## ⚡ Immediate Next Actions
 
-1. ✅ Task 16.5: Attendee List Link Status - COMPLETE
-   - Added LinkStatusBadge component with linked/unlinked icons and tooltip
-   - Added User Account column to attendee table (admin only)
-   - Added link filter dropdown (All accounts / Linked only / Unlinked only)
-   - Added quick stats showing linked/unlinked counts (admin only)
-   - Added countLinked/countUnlinked backend queries
-   - Enriched list/search queries with user email/name for tooltips
-2. **Next:** Task 16.6 - Settings > Account Page
-3. Ready for commit after pre-commit checks
+1. ✅ Task 16.6: Settings > Account Page - COMPLETE
+   - Created backend queries/mutations (convex/account.ts)
+   - Created account settings page (src/routes/settings.account.tsx)
+   - Added navigation links (src/lib/navigation.ts, settings.index.tsx)
+   - Features: Attendee profile card, auth methods list, unlink with safety checks
+2. **Next:** Start dev server for manual testing
+3. **After testing:** Update docs, run quality checks, commit
 
 ---
 
@@ -83,14 +81,12 @@ Phase 16: Task 16.5 Complete - Attendee List Link Status
 
 ## 📝 Session Notes
 
-- Task 16.5 implementation complete:
-  - LinkStatusBadge: Green Link icon for linked, gray LinkOff for unlinked
-  - Tooltip on linked badges shows "Linked to {userEmail}"
-  - Quick stats row at top shows "X linked, Y unlinked" (admin only)
-  - Filter dropdown: "All accounts", "Linked only", "Unlinked only"
-  - User Account column added between Join Date and Actions (admin only)
-  - Backend: countLinked/countUnlinked queries added
-  - Backend: list/search queries now include userEmail/userName for linked attendees
-  - Frontend: Client-side filtering for link status (works with pagination)
+- Task 16.6 implementation complete:
+  - Backend: getAccountInfo returns user profile, attendee profile, auth methods
+  - Backend: unlinkAccount with safety check (can't remove last method)
+  - Frontend: Account page with attendee profile card, auth methods list
+  - Frontend: Unlink confirmation dialog, safety warning card
+  - Frontend: Link new account section with placeholder buttons
+  - Navigation: Account link added to Settings menu and index page
 - All TypeScript errors are pre-existing (retreat components, events)
-- Ready for testing and commit
+- Ready for manual testing

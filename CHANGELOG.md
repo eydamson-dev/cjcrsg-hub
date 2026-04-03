@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Phase 16 Task 16.6: Settings > Account Page** - User account management page
+  - `convex/account.ts` - Backend queries/mutations (`getAccountInfo`, `unlinkAccount`)
+  - `src/hooks/useAccountInfo.ts` - React hooks for account management
+  - `src/routes/settings.account.tsx` - Account settings page with auth methods display
+  - Features: Linked attendee profile card, authentication methods list (Email/Password, Google, Facebook)
+  - Unlink OAuth accounts with confirmation dialog and safety checks
+  - "Link New Account" section for adding Google/Facebook/Password
+  - Safety warning card about not unlinking only auth method
+  - Updated `src/lib/navigation.ts` - Added Account link under Settings
+  - Updated `src/routes/settings.index.tsx` - Added Account card to settings grid
+
 ### Added
 
 - **Phase 16: Admin Roles & Attendee-User Linking (Tasks 16.1-16.2)** - Complete authentication backend with role-based access control

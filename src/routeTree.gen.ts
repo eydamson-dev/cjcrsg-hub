@@ -16,6 +16,7 @@ import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
 import { Route as SettingsAdminRouteImport } from './routes/settings.admin'
+import { Route as SettingsAccountRouteImport } from './routes/settings.account'
 import { Route as EventsTestRouteImport } from './routes/events.test'
 import { Route as EventsSundayServiceRouteImport } from './routes/events.sunday-service'
 import { Route as EventsSpiritualRetreatRouteImport } from './routes/events.spiritual-retreat'
@@ -63,6 +64,11 @@ const AttendeesIndexRoute = AttendeesIndexRouteImport.update({
 const SettingsAdminRoute = SettingsAdminRouteImport.update({
   id: '/settings/admin',
   path: '/settings/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/settings/account',
+  path: '/settings/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsTestRoute = EventsTestRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/account': typeof SettingsAccountRoute
   '/settings/admin': typeof SettingsAdminRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/account': typeof SettingsAccountRoute
   '/settings/admin': typeof SettingsAdminRoute
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/account': typeof SettingsAccountRoute
   '/settings/admin': typeof SettingsAdminRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/account'
     | '/settings/admin'
     | '/attendees/'
     | '/events/'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/account'
     | '/settings/admin'
     | '/attendees'
     | '/events'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/account'
     | '/settings/admin'
     | '/attendees/'
     | '/events/'
@@ -279,6 +291,7 @@ export interface RootRouteChildren {
   EventsSpiritualRetreatRoute: typeof EventsSpiritualRetreatRoute
   EventsSundayServiceRoute: typeof EventsSundayServiceRoute
   EventsTestRoute: typeof EventsTestRoute
+  SettingsAccountRoute: typeof SettingsAccountRoute
   SettingsAdminRoute: typeof SettingsAdminRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -334,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/admin'
       fullPath: '/settings/admin'
       preLoaderRoute: typeof SettingsAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/settings/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/test': {
@@ -470,6 +490,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsSpiritualRetreatRoute: EventsSpiritualRetreatRoute,
   EventsSundayServiceRoute: EventsSundayServiceRoute,
   EventsTestRoute: EventsTestRoute,
+  SettingsAccountRoute: SettingsAccountRoute,
   SettingsAdminRoute: SettingsAdminRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
   EventsIndexRoute: EventsIndexRoute,

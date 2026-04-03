@@ -9,6 +9,7 @@ import {
   List,
   Mountain,
   Shield,
+  UserCircle,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -82,6 +83,12 @@ export const navItems: NavItem[] = [
         href: '/settings',
         icon: Settings,
         description: 'General settings',
+      },
+      {
+        title: 'Account',
+        href: '/settings/account',
+        icon: UserCircle,
+        description: 'Manage your account and auth methods',
       },
       {
         title: 'Admin',

@@ -3,7 +3,7 @@ import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { Link } from '@tanstack/react-router'
-import { Shield } from 'lucide-react'
+import { Shield, UserCircle } from 'lucide-react'
 import {
   Card,
   CardDescription,
@@ -39,6 +39,20 @@ function SettingsContent() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <Link to="/settings/account">
+          <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center gap-4 pb-2">
+              <UserCircle className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>Account</CardTitle>
+                <CardDescription>
+                  Manage your profile and authentication methods
+                </CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+        </Link>
+
         <Link to="/settings/admin">
           <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
