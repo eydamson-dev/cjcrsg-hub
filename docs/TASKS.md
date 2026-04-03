@@ -4,12 +4,10 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-03  
 **Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
-**Status:** ⏳ Phase 16 Planned - Ready for Implementation
+**Status:** 🚧 Tasks 16.1-16.2 Complete, 16.3 In Progress
 
 **Next Up:**
 
-- Task 16.1: Admin Roles Schema & CLI Promotion
-- Task 16.2: Attendee-User Auto-Linking Backend
 - Task 16.3: Admin Dashboard UI
 - Task 16.4: Attendee Detail Admin Actions
 - Task 16.5: Attendee List Link Status
@@ -2208,6 +2206,26 @@ Save → RetreatDetails (normal with all tabs)
 - **Smart Redirection:** /events/new redirects to appropriate page
 - **Simplified Codebase:** EventFormFactory and forms deleted
 - **Extensible:** SundayServiceDetails ready for future enhancements
+
+---
+
+## Completed Tasks
+
+### Phase 16: Admin Roles & Account Linking (Tasks 16.1-16.2)
+
+- ✅ **Task 16.1: Admin Roles Schema & CLI Promotion** - Custom users table with role field, CLI promotion functions
+- ✅ **Task 16.2: Attendee-User Auto-Linking Backend** - Auto-linking on registration, admin linking mutations
+
+**Implementation Details:**
+
+- Custom `users` table extending Convex Auth with `role` field (super_admin, admin, moderator, user)
+- `convex/lib/authHelpers.ts` - Role checking helpers with hierarchy
+- `convex/admin.ts` - CLI functions: `promoteUser`, `demoteUser`, `listUsersWithRoles`
+- `convex/lib/attendeeLinking.ts` - Auto-linking logic for attendee-user connection
+- `convex/auth.ts` - `afterUserCreatedOrUpdated` callback for automatic linking
+- `convex/attendees/admin.ts` - Admin mutations: `linkToUser`, `unlinkFromUser`, `listUnlinked`
+- `userId` field on attendees table with `by_user` index
+- Safety checks prevent unlinking if it's the only auth method
 
 ---
 

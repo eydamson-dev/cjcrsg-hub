@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Phase 16: Admin Roles & Attendee-User Linking (Tasks 16.1-16.2)** - Complete authentication backend with role-based access control
+  - Custom `users` table with `role` field (super_admin, admin, moderator, user) extending Convex Auth
+  - `convex/lib/authHelpers.ts` - Role checking helpers (`requireRole`, `requireAdmin`, `requireSuperAdmin`, `getCurrentUserRole`, `hasRole`)
+  - `convex/admin.ts` - CLI admin functions (`promoteUser`, `demoteUser`, `listUsersWithRoles`)
+  - `convex/lib/attendeeLinking.ts` - Auto-linking logic for attendee-user connection on registration
+  - `convex/auth.ts` - `afterUserCreatedOrUpdated` callback for automatic attendee creation/linking
+  - `convex/attendees/admin.ts` - Admin mutations for manual linking (`linkToUser`, `unlinkFromUser`, `listUnlinked`, `listLinked`, `getAttendeeUserLink`)
+  - `userId` field on `attendees` table with `by_user` index for tracking linked accounts
+  - Safety checks: Prevent unlinking if it's the user's only authentication method
+  - Role hierarchy: super_admin (4) → admin (3) → moderator (2) → user (1)
+
 ### Removed
 
 - **Deprecated event form components** - Cleaned up after Phase 15 architecture change

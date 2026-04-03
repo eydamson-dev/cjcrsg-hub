@@ -58,6 +58,10 @@ The system is fully functional for core church operations:
 
 - Multi-provider authentication (Email, Google, Facebook)
 - Protected routes with role-based access
+- **Role system with 4 levels:** super_admin, admin, moderator, user
+- **Attendee-User account linking:** Auto-link on registration by email
+- **CLI admin promotion:** `npx convex run admin:promoteUser`
+- Admin-only attendee linking/unlinking with safety checks
 - Secure session management
 
 ✅ **Data Management**
@@ -96,39 +100,35 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Status:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Last Updated:** 2026-04-02
+**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
+**Last Updated:** 2026-04-03
 
-**Phase 14 Progress:** (Complete)
+**Phase 15 Progress:** (Complete)
 
-- ✅ Phase 14.1: Schema Cleanup & Extension Table Creation
-- ✅ Phase 14.2: Update Event Backend Mutations
-- ✅ Phase 14.3: Migrate Phase 13 Retreat Mutations to Extension Table
-- ✅ Phase 14.4: Create Reusable Form Field Components
-- ✅ Phase 14.5: Create Generic Event Form
-- ✅ Phase 14.6: Create Spiritual Retreat Form
-- ✅ Phase 14.7: Create Event Form Factory
-- ✅ Phase 14.8: Update Event Creation Route
-- ✅ Phase 14.9: Update Event Edit Route
-- ✅ Phase 14.10: Update Spiritual Retreat Dedicated Page
-- ⏳ Phase 14.11: Wipe Event Data and Test (pending data wipe)
+- ✅ Phase 15.1: Create EventPageHeader Component
+- ✅ Phase 15.2: Rename EventDetails to GenericEventDetails
+- ✅ Phase 15.3: Create SundayServiceDetails Component
+- ✅ Phase 15.4: Update Sunday Service Page
+- ✅ Phase 15.5: Update RetreatDetails with isCreating Mode
+- ✅ Phase 15.6: Update Spiritual Retreat Page
+- ✅ Phase 15.7: Update /events/new Route
+- ✅ Phase 15.8: Delete Deprecated Components
+- ✅ Phase 15.9: Testing & Validation
+- ✅ Phase 15.10: Documentation Update
 
-**Phase 15 Progress:** (In Progress)
+**Phase 16 Progress:** (In Progress)
 
-- ✅ Task 15.1: Create EventPageHeader Component
-- ✅ Task 15.2: Rename EventDetails to GenericEventDetails
-- ✅ Task 15.3: Create SundayServiceDetails Component
-- ⏳ Task 15.4: Update Sunday Service Page
-- ⏳ Task 15.5: Update RetreatDetails with isCreating Mode
-- ⏳ Task 15.6: Update Spiritual Retreat Page
-- ⏳ Task 15.7: Update /events/new Route
-- ⏳ Task 15.8: Delete Deprecated Components
-- ⏳ Task 15.9: Testing & Validation
-- ⏳ Task 15.10: Documentation Update
+- ✅ Task 16.1: Admin Roles Schema & CLI Promotion
+- ✅ Task 16.2: Attendee-User Auto-Linking Backend
+- ⏳ Task 16.3: Admin Dashboard UI
+- ⏳ Task 16.4: Attendee Detail Admin Actions
+- ⏳ Task 16.5: Attendee List Link Status
+- ⏳ Task 16.6: Settings > Account Page
+- ⏳ Task 16.7: OAuth Setup & E2E Testing
 
 **Next Up:**
 
-- Task 15.4: Update Sunday Service Page
+- Task 16.3: Admin Dashboard UI
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 
