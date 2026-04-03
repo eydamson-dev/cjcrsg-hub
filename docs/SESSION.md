@@ -2,59 +2,71 @@
 
 **Session Started:** 2026-04-03  
 **Last Updated:** 2026-04-03  
-**Branch:** feature/phase16-complete-auth-module
+**Branch:** feature/phase16-complete-auth-module  
+**Status:** Task 16.6 Complete - Ready for Manual Testing
 
 ---
 
 ## 🎯 Current Micro-Task
 
-Phase 16: Complete Auth Module with Admin Roles & Account Linking
+Phase 16: Task 16.6 Complete - Settings > Account Page
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                         |
-| ------------------ | ---------------------------------------------- |
-| **Just completed** | Phase 15 - Unified Event Creation Architecture |
-| **In progress**    | Planning Phase 16                              |
-| **Next up**        | Task 16.1: Admin Roles Schema & CLI Promotion  |
+| Item               | Status                               |
+| ------------------ | ------------------------------------ |
+| **Just completed** | Task 16.6: Settings > Account Page   |
+| **In progress**    | Ready for manual testing             |
+| **Next up**        | Task 16.7: OAuth Setup & E2E Testing |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                         | Status     | Notes                                        |
-| ---------------------------- | ---------- | -------------------------------------------- |
-| `docs/TASKS.md`              | ✅ Updated | Added Phase 16 detailed plan                 |
-| `convex/schema.ts`           | ⏳ Pending | Add role field to users, userId to attendees |
-| `convex/admin.ts`            | ⏳ Pending | Create promoteUser function                  |
-| `convex/lib/auth-helpers.ts` | ⏳ Pending | Role checking helpers                        |
+| File                              | Status      | Notes                                                   |
+| --------------------------------- | ----------- | ------------------------------------------------------- |
+| `convex/account.ts`               | ✅ Complete | New file - getAccountInfo query, unlinkAccount mutation |
+| `src/hooks/useAccountInfo.ts`     | ✅ Complete | New file - useAccountInfo, useUnlinkAccount hooks       |
+| `src/routes/settings.account.tsx` | ✅ Complete | New file - Account settings page with auth methods      |
+| `src/lib/navigation.ts`           | ✅ Complete | Added Account link under Settings                       |
+| `src/routes/settings.index.tsx`   | ✅ Complete | Added Account card to settings grid                     |
+| `docs/TASKS.md`                   | ✅ Complete | Updated Task 16.6 status to complete                    |
+| `CHANGELOG.md`                    | ✅ Complete | Added Task 16.6 entry                                   |
 
 ---
 
 ## 📊 Quality Status
 
-- **Tests:** 591 passing
-- **TypeScript:** 0 new errors (only pre-existing)
-- **Lint:** Clean
-- **Build:** Successful
+- **TypeScript:** Pre-existing errors only (retreat components, events) - 0 new errors
+- **New files:** All compile successfully
+- **Lint:** Not yet run
 
 ---
 
 ## 🚧 Blockers / Decisions
 
-None
+**Decisions Made:**
+
+- ✅ Account page accessible to all authenticated users (no role restriction)
+- ✅ Auth methods displayed with provider-specific icons (KeyRound for password, Mail for Google, Shield for Facebook)
+- ✅ Unlink button disabled when only one auth method exists
+- ✅ Confirmation dialog before unlinking OAuth accounts
+- ✅ Placeholder buttons for "Change Password", "Link Google", "Link Facebook", "Set Password"
+- ✅ Safety warning card displayed at bottom of page
 
 ---
 
 ## ⚡ Immediate Next Actions
 
-1. ✅ Update TASKS.md with Phase 16 plan (DONE)
-2. Update convex/schema.ts - Add role field to users table
-3. Update convex/schema.ts - Add userId field to attendees table
-4. Create convex/admin.ts with promoteUser function
-5. Create convex/lib/auth-helpers.ts with role helpers
+1. ✅ Task 16.6: Settings > Account Page - COMPLETE
+   - Created backend queries/mutations (convex/account.ts)
+   - Created account settings page (src/routes/settings.account.tsx)
+   - Added navigation links (src/lib/navigation.ts, settings.index.tsx)
+   - Features: Attendee profile card, auth methods list, unlink with safety checks
+2. **Next:** Start dev server for manual testing
+3. **After testing:** Update docs, run quality checks, commit
 
 ---
 
@@ -69,7 +81,12 @@ None
 
 ## 📝 Session Notes
 
-- Phase 15 complete and merged to main
-- Phase 16 planning complete with 7 tasks totaling 13 hours
-- Ready to begin Task 16.1: Admin Roles Schema & CLI Promotion
-- Key features: Admin roles (super_admin → user), CLI promotion, attendee-user linking, OAuth completion
+- Task 16.6 implementation complete:
+  - Backend: getAccountInfo returns user profile, attendee profile, auth methods
+  - Backend: unlinkAccount with safety check (can't remove last method)
+  - Frontend: Account page with attendee profile card, auth methods list
+  - Frontend: Unlink confirmation dialog, safety warning card
+  - Frontend: Link new account section with placeholder buttons
+  - Navigation: Account link added to Settings menu and index page
+- All TypeScript errors are pre-existing (retreat components, events)
+- Ready for manual testing

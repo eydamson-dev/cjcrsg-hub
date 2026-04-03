@@ -19,13 +19,13 @@ Guidelines for updating project documentation files.
 
 ## Documentation Separation
 
-| File                | Purpose                   | Update When...                                | Granularity          |
-| ------------------- | ------------------------- | --------------------------------------------- | -------------------- |
-| `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    | Phase/Task level     |
-| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  | Testing tasks        |
-| `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know | Release notes        |
-| `AGENTS.md`         | Project overview & status | Completing phases, adding new capabilities    | High-level status    |
-| **`SESSION.md`**    | **Session continuity**    | **Every session start/end**                   | **Micro-task level** |
+| File                | Purpose                   | Update When...                                | Granularity          | Required?        |
+| ------------------- | ------------------------- | --------------------------------------------- | -------------------- | ---------------- |
+| `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    | Phase/Task level     | ✅ YES           |
+| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  | Testing tasks        | ✅ YES           |
+| `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know | Release notes        | ✅ YES           |
+| `AGENTS.md`         | Project overview & status | **EVERY TASK** - All features, fixes, changes | High-level status    | ✅ **MANDATORY** |
+| **`SESSION.md`**    | **Session continuity**    | **Every session start/end**                   | **Micro-task level** | ✅ **MANDATORY** |
 
 ---
 
@@ -48,25 +48,48 @@ Guidelines for updating project documentation files.
 
 ---
 
-## AGENTS.md Updates
+## AGENTS.md Updates (MANDATORY - EVERY TASK)
+
+**⚠️ HARD REQUIREMENT: Update AGENTS.md for EVERY task, feature, fix, or change. No exceptions.**
 
 **When to update:**
 
-- Completing a phase or major feature
-- Adding new capabilities that should be highlighted
-- Changing project status
+- ✅ **EVERY task** - Even small features
+- ✅ **EVERY bug fix** - Even minor fixes
+- ✅ **EVERY change** - Even refactoring
+- ✅ **EVERY time** - No "I'll update later"
+
+**Why mandatory?**
+
+- AGENTS.md is the project overview for all AI agents
+- Keeps project state current and accurate
+- Prevents lost context between sessions
+- Required for workflow compliance
 
 **What to update:**
 
-- Status line (top of file): `Phase X - Complete (Feature Name)`
-- Current Capabilities section: Add bullet points for new features
-- Next Up section: Update if priorities change
+- **Current Capabilities section:** Add bullet point for new capability
+- **Status line:** If phase completes
+- **Next Up section:** If priorities change
+
+**Format:**
+
+```markdown
+- **Capability name:** Brief description of what it does
+```
+
+**Example:**
+
+```markdown
+- **Attendee list link status:** User Account column with linked/unlinked badge, filter dropdown, quick stats (admin only)
+```
 
 **What NOT to include:**
 
 - ❌ "Recently Completed" list (belongs in TASKS.md)
 - ❌ Detailed task breakdown (belongs in TASKS.md)
 - ❌ Testing details (belongs in TDD_TASKS.md)
+- ❌ File-level details (too granular)
 
 **Keep AGENTS.md focused on:**
 
@@ -173,28 +196,40 @@ Use `[WIP]` prefix for incomplete features:
 
 ---
 
-## Workflow Summary
+## Workflow Summary (HARD ENFORCEMENT)
 
 **For task management (starting, completing, planning tasks), use `cjcrsg-task-manager` skill.**
 
-**For documentation formatting and updates:**
+**For documentation formatting and updates (ALL MANDATORY):**
 
-1. **TASKS.md updates** (required for feature work)
-   - Use `cjcrsg-task-manager` to update "Current Session" section
-   - Follow naming convention: `Task X.Y: Name`
-   - Use standardized status emojis: ⏳ 🚧 ✅
+1. **AGENTS.md updates** (REQUIRED for **EVERY** task - NO EXCEPTIONS)
+   - Add capability to "Current Capabilities" section
+   - Even small changes need documentation
+   - Never skip this file
 
-2. **CHANGELOG.md** (required for user-facing changes)
+2. **CHANGELOG.md** (REQUIRED for user-facing changes)
    - Add to [Unreleased] section
    - Follow category rules
+   - Be specific and detailed
 
-3. **AGENTS.md** (update if needed)
-   - Status line (always update on phase completion)
-   - Current Capabilities (only if new capability added)
-   - Next Up (only if roadmap changes)
+3. **SESSION.md** (REQUIRED every session)
+   - Update at start and end
+   - Track current micro-task
+   - Note blockers and decisions
 
-**Only update files that NEED updating** - not every file every time.
+4. **TASKS.md** (REQUIRED for feature/bug work)
+   - Use `cjcrsg-task-manager` to update "Current Session"
+   - Mark tasks complete with ✅
+   - Follow naming convention: `Task X.Y: Name`
+
+5. **TDD_TASKS.md** (REQUIRED for testing work)
+   - Update "Current Progress" section
+   - Track test counts and status
+
+**ALL documentation must be updated BEFORE committing.**
+
+**NO EXCEPTIONS. NO "SMALL CHANGES". NO "I'LL UPDATE LATER".**
 
 ---
 
-\_Last Updated: 2026-03-30
+\_Last Updated: 2026-04-03

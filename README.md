@@ -14,31 +14,41 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
   - Search by name, email, or phone
   - Track membership status and personal details
   - View attendance history per attendee
+  - Admin actions: Link/unlink user accounts, change attendee status
 
 - **Event Management** 📅
   - Create and manage church events
   - Dynamic event types (Sunday Service, Retreat, Youth Events, etc.)
   - Schedule events with dates, times, and locations
   - Color-coded event types for easy visual identification
+  - Event lifecycle: Upcoming → Active → Completed/Cancelled
+  - Media galleries with image upload support
 
 - **Attendance Tracking** ✓
   - Real-time attendance recording
-  - Quick check-in interface
-  - Search and select attendees rapidly
-  - View attendance statistics and reports
-  - Export attendance data
+  - Quick check-in interface with attendee search
+  - Bulk check-in functionality
+  - Attendance statistics and reporting
+  - Inviter tracking per event
 
-### Additional Features
+### Authentication & Admin
 
-- **Admin Authentication** 🔐
-  - Secure login with Convex Auth (Password + Google + Facebook)
-  - Protected routes for admin-only access
-  - Session management
+- **Multi-Provider Auth** 🔐
+  - Email & Password (built-in)
+  - Google OAuth
+  - Facebook OAuth
+  - Account linking and management
 
-- **Responsive Design** 📱
-  - Mobile-friendly interface
-  - Works on tablets and desktops
-  - Optimized for church check-in workflows
+- **Role-Based Access Control** 👑
+  - super_admin: Full access, can create other admins
+  - admin: Can link/unlink accounts, change attendee status
+  - moderator: Can view admin features (read-only)
+  - user: Regular user access
+
+- **Attendee-User Account Linking** 🔗
+  - Auto-linking on registration by email
+  - Admin manual linking for edge cases
+  - Safety checks prevent unlinking only auth method
 
 ## Tech Stack
 
@@ -50,234 +60,371 @@ A modern church management system built with TanStack Start, Convex, and shadcn/
 | **UI Components**    | shadcn/ui                            |
 | **Styling**          | Tailwind CSS v4                      |
 | **State Management** | TanStack Query + Convex React Query  |
+| **Testing**          | Vitest + convex-test + Playwright    |
 | **Package Manager**  | pnpm                                 |
 
-### Development Tools & AI
+## Table of Contents
 
-This project uses **OpenCode** with AI-assisted development tools:
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Complete Setup Guide](#complete-setup-guide)
+- [Convex Commands Reference](#convex-commands-reference)
+- [Development Workflow](#development-workflow)
+- [Testing](#testing)
+- [Production Deployment](#production-deployment)
+- [Troubleshooting](#troubleshooting)
+- [Project Status](#project-status)
+- [License](#license)
 
-- **shadcn MCP** - AI assistant for shadcn/ui component management
-- **shadcn/ui Skill** - Comprehensive shadcn/ui knowledge base (`.agents/skills/shadcn/`)
+## Prerequisites
 
-See [AGENTS.md](AGENTS.md) for detailed configuration.
+- **Node.js** 18+ (check with `node -v`)
+- **pnpm** (install with `npm install -g pnpm`)
+- **Git**
+- **Convex CLI** (auto-installed with project dependencies)
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js 18+
-- pnpm (npm install -g pnpm)
-- Git
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone git@github.com:eydamson-dev/cjcrsg-hub.git
-   cd cjcrsg-hub
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Setup environment variables**
-
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your values
-   ```
-
-4. **Start the development server**
-
-   ```bash
-   pnpm dev
-   ```
-
-5. **Open your browser**
-   Navigate to http://localhost:3000
-
-## Development
-
-### Local Development with Convex
-
-We use Convex's local development mode for rapid prototyping:
+For experienced developers who want to get started quickly:
 
 ```bash
-# Start Convex in local mode
+# 1. Clone and install
+git clone git@github.com:eydamson-dev/cjcrsg-hub.git
+cd cjcrsg-hub
+pnpm install
+
+# 2. Setup environment
+cp .env.example .env.local
+# Edit .env.local with your values
+
+# 3. Start development
+pnpm dev
+
+# 4. Open browser
+# Navigate to http://localhost:3000
+```
+
+## Complete Setup Guide
+
+### 1. Installation
+
+```bash
+# Clone the repository
+git clone git@github.com:eydamson-dev/cjcrsg-hub.git
+cd cjcrsg-hub
+
+# Install dependencies
+pnpm install
+```
+
+### 2. Environment Setup
+
+```bash
+# Copy the environment template
+cp .env.example .env.local
+```
+
+**Required Environment Variables:**
+
+```env
+# Convex WebSocket connection (for real-time sync)
+VITE_CONVEX_URL=http://127.0.0.1:3210
+
+# Your frontend URL (used for OAuth callbacks)
+# Change this in production to your actual domain
+CONVEX_SITE_URL=http://localhost:3000
+```
+
+**Optional (for OAuth authentication):**
+
+```env
+# Google OAuth credentials
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+
+# Facebook OAuth credentials
+AUTH_FACEBOOK_ID=your-facebook-app-id
+AUTH_FACEBOOK_SECRET=your-facebook-app-secret
+```
+
+> **Note:** OAuth credentials are server-side only and configured via Convex environment variables. See [OAuth Setup Guide](#oauth-setup-optional) below.
+
+### 3. Database Setup (Convex)
+
+**Note:** Convex Auth tables are pre-configured in `convex/schema.ts` via `authTables`. For new projects, you would run `npx @convex-dev/auth`, but this project already includes the setup.
+
+**Start Development Servers:**
+
+```bash
+# Terminal 1: Start Convex backend
 pnpm dlx convex dev
 
-# The dev server runs both Vite and Convex
+# Terminal 2: Start the application
 pnpm dev
 ```
+
+**Access the Dashboard:**
+
+```bash
+# Open Convex dashboard in browser
+pnpm dlx convex dashboard
+# Or visit: http://localhost:3210
+```
+
+### 4. Authentication Setup
+
+**Convex Auth is Pre-Configured**
+
+The project includes Convex Auth with Password, Google, and Facebook providers. The authentication tables are automatically created via `authTables` in `convex/schema.ts`.
+
+**For New Projects Only:**
+
+If you're setting up Convex Auth from scratch on a new project, run:
+
+```bash
+npx @convex-dev/auth
+```
+
+**Create First Admin User:**
+
+1. **Sign up** with email/password at `http://localhost:3000/login`
+2. **Promote to super_admin** via CLI:
+
+```bash
+pnpm dlx convex run admin:promoteUser --arg '{"email":"admin@church.com","role":"super_admin"}'
+```
+
+**Promote Additional Admins:**
+
+```bash
+# Promote to admin role
+pnpm dlx convex run admin:promoteUser --arg '{"email":"user@church.com","role":"admin"}'
+
+# Promote to moderator role
+pnpm dlx convex run admin:promoteUser --arg '{"email":"helper@church.com","role":"moderator"}'
+
+# Reset to regular user
+pnpm dlx convex run admin:demoteUser --arg '{"email":"user@church.com"}'
+```
+
+**Check Current User Role:**
+
+```bash
+pnpm dlx convex run lib/authHelpers:getCurrentUserRole
+```
+
+### 5. OAuth Setup (Optional)
+
+For detailed Google and Facebook OAuth setup instructions, see [docs/OAUTH_SETUP.md](./docs/OAUTH_SETUP.md).
+
+**Quick Setup Summary:**
+
+1. **Create OAuth apps** in Google Cloud Console and/or Facebook Developers
+2. **Add redirect URIs:**
+   - `http://localhost:3000/api/auth/callback/google` (for Google)
+   - `http://localhost:3000/api/auth/callback/facebook` (for Facebook)
+3. **Set environment variables in Convex:**
+
+```bash
+# Google OAuth
+pnpm dlx convex env set AUTH_GOOGLE_ID your-google-client-id
+pnpm dlx convex env set AUTH_GOOGLE_SECRET your-google-client-secret
+
+# Facebook OAuth
+pnpm dlx convex env set AUTH_FACEBOOK_ID your-facebook-app-id
+pnpm dlx convex env set AUTH_FACEBOOK_SECRET your-facebook-app-secret
+```
+
+4. **Restart the dev server** for changes to take effect
+
+## Convex Commands Reference
+
+| Command                        | Description                    | Example                                                   |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------- |
+| `convex dev`                   | Start local development server | `pnpm dlx convex dev`                                     |
+| `convex dev --once`            | Generate types and exit        | `pnpm dlx convex dev --once`                              |
+| `convex deploy`                | Deploy to production           | `pnpm dlx convex deploy`                                  |
+| `convex dashboard`             | Open dashboard in browser      | `pnpm dlx convex dashboard`                               |
+| `convex env set`               | Set environment variable       | `pnpm dlx convex env set SITE_URL http://localhost:3000`  |
+| `convex env list`              | List all environment variables | `pnpm dlx convex env list`                                |
+| `convex env get`               | Get specific variable          | `pnpm dlx convex env get SITE_URL`                        |
+| `convex env remove`            | Remove environment variable    | `pnpm dlx convex env remove OLD_VAR`                      |
+| `convex run`                   | Run a query or mutation        | `pnpm dlx convex run attendees/list --arg '{"count":10}'` |
+| `convex logs`                  | View function logs             | `pnpm dlx convex logs`                                    |
+| `convex logs --status failure` | View error logs only           | `pnpm dlx convex logs --status failure`                   |
+
+## Development Workflow
+
+### Available Scripts
+
+| Command              | Description                              |
+| -------------------- | ---------------------------------------- |
+| `pnpm dev`           | Start development server (Vite + Convex) |
+| `pnpm build`         | Build for production                     |
+| `pnpm dev:ts`        | Type check in watch mode                 |
+| `pnpm lint`          | Run ESLint                               |
+| `pnpm format`        | Format code with Prettier                |
+| `pnpm test`          | Run unit and component tests             |
+| `pnpm test:watch`    | Run tests in watch mode                  |
+| `pnpm test:coverage` | Run tests with coverage report           |
+| `pnpm test:e2e`      | Run E2E tests                            |
 
 ### Project Structure
 
 ```
 cjcrsg-hub/
-├── src/
-│   ├── features/           # Feature-based modules
-│   │   ├── attendees/     # Attendee management
-│   │   ├── events/        # Event management
-│   │   ├── attendance/    # Attendance tracking
-│   │   └── auth/          # Authentication
-│   ├── components/        # Shared UI components
-│   ├── lib/              # Utilities
-│   └── routes/           # TanStack Router routes
-├── convex/               # Convex backend
-│   ├── schema.ts        # Database schema
-│   ├── attendees/       # Attendee queries/mutations
-│   ├── events/          # Event queries/mutations
-│   └── attendance/      # Attendance queries/mutations
-└── public/              # Static assets
+├── src/                          # Frontend source code
+│   ├── components/              # Shared UI components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── layout/             # Layout components (Header, Sidebar)
+│   │   └── auth/               # Auth-related components
+│   ├── features/                # Feature-based modules
+│   │   ├── attendees/          # Attendee management
+│   │   ├── events/             # Event management
+│   │   └── attendance/         # Attendance tracking
+│   ├── hooks/                   # Shared React hooks
+│   ├── lib/                     # Utilities and helpers
+│   ├── routes/                  # TanStack Router routes
+│   └── styles/                  # Global styles
+├── convex/                      # Convex backend
+│   ├── schema.ts               # Database schema
+│   ├── auth.ts                 # Auth configuration
+│   ├── account.ts              # Account management
+│   ├── admin.ts                # Admin functions
+│   ├── users.ts                # User queries
+│   ├── attendees/              # Attendee queries/mutations
+│   ├── events/                 # Event queries/mutations
+│   ├── attendance/             # Attendance queries/mutations
+│   └── retreat/                # Spiritual retreat extension
+├── docs/                        # Documentation
+├── tests/                       # Test files
+│   ├── unit/                   # Unit and component tests
+│   └── e2e/                    # E2E tests
+├── .agents/                     # AI assistant skills and configuration
+└── public/                      # Static assets
 ```
 
-### Adding shadcn Components
+## Testing
+
+### Running Tests
 
 ```bash
-pnpm dlx shadcn@canary add button
-pnpm dlx shadcn@canary add table
-# etc...
+# Run all unit and component tests
+pnpm test
+
+# Run tests in watch mode (for development)
+pnpm test:watch
+
+# Run tests with coverage report
+pnpm test:coverage
+
+# Run E2E tests
+pnpm test:e2e
+
+# Run E2E tests with UI mode
+pnpm test:e2e:ui
 ```
 
-### Convex Commands
+### Test Structure
+
+- **Unit Tests:** Located in `tests/unit/convex/` for backend and `tests/unit/components/` for frontend
+- **E2E Tests:** Located in `tests/e2e/specs/` using Playwright
+- **Test Utilities:** `tests/setup/` contains test configuration
+
+### Writing Tests
+
+For testing guidelines and patterns, see [docs/TDD_TASKS.md](./docs/TDD_TASKS.md) and [docs/TESTING.md](./docs/TESTING.md).
+
+## Production Deployment
+
+### 1. Build the Application
 
 ```bash
-# Start local dev server
-pnpm dlx convex dev
+pnpm build
+```
 
-# Open dashboard
-pnpm dlx convex dashboard
+### 2. Deploy Convex to Production
 
-# Deploy to production
+```bash
 pnpm dlx convex deploy
-
-# Run a specific query
-pnpm dlx convex run attendees/list
 ```
 
-## Database Schema
+### 3. Set Production Environment Variables
 
-### Core Tables
+```bash
+# Site URL (your production domain)
+pnpm dlx convex env set SITE_URL https://your-domain.com
 
-#### attendees
-
-```typescript
-{
-  _id: string
-  firstName: string
-  lastName: string
-  email?: string
-  phone?: string
-  dateOfBirth?: number
-  address?: string
-  status: 'member' | 'visitor' | 'inactive'
-  joinDate?: number
-  notes?: string
-  createdAt: number
-  updatedAt: number
-}
+# OAuth credentials (production values)
+pnpm dlx convex env set AUTH_GOOGLE_ID your-production-google-id
+pnpm dlx convex env set AUTH_GOOGLE_SECRET your-production-google-secret
+pnpm dlx convex env set AUTH_FACEBOOK_ID your-production-facebook-id
+pnpm dlx convex env set AUTH_FACEBOOK_SECRET your-production-facebook-secret
 ```
 
-#### events
+**Note:** Update redirect URIs in Google Cloud Console and Facebook Developers to use your production domain:
 
-```typescript
-{
-  _id: string
-  name: string
-  eventTypeId: string
-  description?: string
-  date: number
-  startTime?: string
-  endTime?: string
-  location?: string
-  isActive: boolean
-  createdAt: number
-}
+- `https://your-domain.com/api/auth/callback/google`
+- `https://your-domain.com/api/auth/callback/facebook`
+
+### 4. Create First Production Admin
+
+```bash
+pnpm dlx convex run admin:promoteUser --arg '{"email":"admin@your-church.com","role":"super_admin"}'
 ```
 
-#### attendance_records
+### Post-Deployment Checklist
 
-```typescript
-{
-  _id: string
-  eventId: string
-  attendeeId: string
-  checkedInAt: number
-  checkedInBy: string
-  notes?: string
-}
+- [ ] Application loads at production URL
+- [ ] Login works with email/password
+- [ ] OAuth sign-in works (if configured)
+- [ ] Database is accessible
+- [ ] Admin dashboard is functional
+- [ ] Attendee and event management works
+
+## Troubleshooting
+
+For common issues and solutions, see [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md).
+
+### Quick Fixes
+
+**Convex connection errors:**
+
+- Ensure `VITE_CONVEX_URL` is set correctly in `.env.local`
+- Verify Convex dev server is running (`pnpm dlx convex dev`)
+
+**OAuth redirect errors:**
+
+- Check `CONVEX_SITE_URL` matches your actual frontend URL
+- Verify redirect URIs in Google/Facebook consoles match exactly
+- Remember: `http://` vs `https://`, trailing slashes matter
+
+**TypeScript errors after schema changes:**
+
+```bash
+pnpm dlx convex dev --once
 ```
 
-## Scripts
+## Project Status
 
-| Command       | Description               |
-| ------------- | ------------------------- |
-| `pnpm dev`    | Start development server  |
-| `pnpm build`  | Build for production      |
-| `pnpm dev:ts` | Type check in watch mode  |
-| `pnpm format` | Format code with Prettier |
-| `pnpm lint`   | Run ESLint                |
+For current development status, completed features, and roadmap, see [docs/TASKS.md](./docs/TASKS.md).
 
-## Roadmap
+**Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking
 
-### Phase 1: Foundation ✓
+### Completed Features:
 
-- [x] Project setup
-- [x] Documentation (AGENTS.md)
-- [ ] shadcn/ui initialization
-- [ ] Convex Auth setup (Password + Google + Facebook)
-- [ ] Base layout and navigation
-
-### Phase 2: Attendee Management
-
-- [ ] Attendee CRUD operations
-- [ ] Search and filter functionality
-- [ ] Attendee profile pages
-
-### Phase 3: Events
-
-- [ ] Event types management
-- [ ] Event creation and scheduling
-- [ ] Event list and detail views
-
-### Phase 4: Attendance Tracking
-
-- [ ] Real-time check-in interface
-- [ ] Attendance reporting
-- [ ] Export functionality
-
-### Phase 5: Dashboard & Polish
-
-- [ ] Admin dashboard with statistics
-- [ ] Toast notifications
-- [ ] Mobile optimization
-
-## Contributing
-
-We use a branch-based workflow with pull requests:
-
-1. Create a feature branch: `git checkout -b feature/name`
-2. Make your changes
-3. Test locally: `pnpm dev`
-4. Create a PR on GitHub
-5. Wait for review and approval
-
-See [AGENTS.md](./AGENTS.md) for detailed workflow documentation.
+- ✅ Multi-provider authentication (Email, Google, Facebook)
+- ✅ Role-based access control (super_admin, admin, moderator, user)
+- ✅ Attendee-user account linking (auto and manual)
+- ✅ Admin dashboard for user management
+- ✅ Account settings page for auth method management
+- ✅ Event management with media uploads
+- ✅ Attendance tracking with real-time updates
+- ✅ Spiritual retreat event type with teachers, schedule, and staff
 
 ## License
 
 MIT License - feel free to use for your church!
-
-## Support
-
-- 📖 [TanStack Start Docs](https://tanstack.com/start/latest)
-- 📖 [Convex Docs](https://docs.convex.dev)
-- 📖 [shadcn/ui Docs](https://ui.shadcn.com)
-- 💬 Create an issue for bugs or feature requests
 
 ---
 

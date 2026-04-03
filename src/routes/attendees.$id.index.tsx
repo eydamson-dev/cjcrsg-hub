@@ -5,6 +5,7 @@ import {
   AttendeeNotFound,
 } from '~/features/attendees/components/AttendeeDetails'
 import { useAttendee } from '~/features/attendees/hooks/useAttendees'
+import { useAttendeeUserLink } from '~/features/attendees/hooks/useAttendeeAdmin'
 import { requireAuth } from '~/lib/auth-guard'
 
 export const Route = createFileRoute('/attendees/$id/')({
@@ -19,6 +20,7 @@ function AttendeeDetailPage() {
   const router = useRouter()
   const { id } = Route.useParams()
   const { data: attendee, isPending, error } = useAttendee(id)
+  const { data: userLink } = useAttendeeUserLink(id)
 
   const handleEdit = () => {
     navigate({ to: `/attendees/${id}/edit` })
@@ -30,6 +32,10 @@ function AttendeeDetailPage() {
   }
 
   const handleRetry = () => {
+    window.location.reload()
+  }
+
+  const handleRefresh = () => {
     window.location.reload()
   }
 
@@ -50,8 +56,10 @@ function AttendeeDetailPage() {
   return (
     <AttendeeDetails
       attendee={attendee}
+      userLink={userLink}
       onEdit={handleEdit}
       onBack={handleBack}
+      onRefresh={handleRefresh}
     />
   )
 }

@@ -27,6 +27,8 @@ export default defineSchema({
     // Only relevant for visitors; undefined for founding members
     // Stays on their profile even after they become a member
     invitedBy: v.optional(v.id('attendees')),
+    // Links attendee to a Convex Auth user account (auto-linked on registration by email)
+    userId: v.optional(v.id('users')),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -35,6 +37,8 @@ export default defineSchema({
     .index('by_phone', ['phone'])
     // Use case: "Show all people originally invited by John"
     .index('by_invited_by', ['invitedBy'])
+    // Use case: "Find attendee linked to a specific user account"
+    .index('by_user', ['userId'])
     .searchIndex('search_attendees', {
       searchField: 'searchField',
       filterFields: ['status'],
@@ -160,4 +164,28 @@ export default defineSchema({
     .index('by_event_attendee', ['eventId', 'attendeeId'])
     // Use case: "Top inviters leaderboard", "How many people did Peter invite this month?"
     .index('by_invited_by', ['invitedBy', 'checkedInAt']),
+
+  // Custom users table extending Convex Auth with role field
+  // This overrides the default users table from authTables
+  users: defineTable({
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    // Role-based access control
+    role: v.optional(
+      v.union(
+        v.literal('super_admin'), // Full access, can create other admins
+        v.literal('admin'), // Can link/unlink accounts, change attendee status
+        v.literal('moderator'), // Can view admin features, read-only
+        v.literal('user'), // Default role, regular user
+      ),
+    ),
+  })
+    .index('email', ['email'])
+    .index('phone', ['phone'])
+    .index('by_role', ['role']),
 })

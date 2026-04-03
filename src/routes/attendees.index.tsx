@@ -1,5 +1,5 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { AttendeeList } from '~/features/attendees/components/AttendeeList'
@@ -8,6 +8,8 @@ import {
   useSearchAttendees,
   useArchiveAttendee,
   useAttendeeCount,
+  useLinkedCount,
+  useUnlinkedCount,
 } from '~/features/attendees/hooks/useAttendees'
 import type { Id } from '../../convex/_generated/dataModel'
 import { useDebounce } from '~/hooks/useDebounce'
@@ -17,11 +19,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { requireAuth } from '~/lib/auth-guard'
 import { ErrorState } from '~/components/ui/error-state'
+import { useCurrentUserRole } from '~/hooks/useCurrentUserRole'
 
 const searchSchema = z.object({
   q: z.string().optional(),
   status: z.enum(['member', 'visitor', 'inactive']).optional(),
   page: z.coerce.number().optional().default(1),
+  link: z.enum(['linked', 'unlinked', 'all']).optional().default('all'),
 })
 
 type SearchParams = z.infer<typeof searchSchema>
@@ -61,6 +65,9 @@ function AttendeesContent() {
   const [localStatusFilter, setLocalStatusFilter] = useState<
     string | undefined
   >(searchParams.status)
+  const [localLinkFilter, setLocalLinkFilter] = useState<
+    'linked' | 'unlinked' | 'all'
+  >(searchParams.link || 'all')
 
   // Pagination state
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
@@ -90,6 +97,13 @@ function AttendeesContent() {
   )
   const countQuery = useAttendeeCount(localStatusFilter)
 
+  // Fetch link counts and user role
+  const linkedCountQuery = useLinkedCount()
+  const unlinkedCountQuery = useUnlinkedCount()
+  const { data: currentUser } = useCurrentUserRole()
+  const isRoleAdmin =
+    currentUser?.role === 'admin' || currentUser?.role === 'super_admin'
+
   // Use search results when there's a valid query, otherwise use list
   const isSearching = hasValidSearchQuery && searchQuery.isPending
   const isPending =
@@ -100,10 +114,22 @@ function AttendeesContent() {
   const hasError = listQuery.error || searchQuery.error || countQuery.error
   const queryError = listQuery.error || searchQuery.error || countQuery.error
 
-  const attendees =
-    hasValidSearchQuery && searchQuery.data
+  // Filter attendees by link status (client-side since list query doesn't support it)
+  const allAttendees = useMemo(() => {
+    return hasValidSearchQuery && searchQuery.data
       ? searchQuery.data
       : (listQuery.data as any)?.page || []
+  }, [hasValidSearchQuery, searchQuery.data, listQuery.data])
+
+  const attendees = useMemo(() => {
+    if (!isRoleAdmin || localLinkFilter === 'all') return allAttendees
+
+    return allAttendees.filter((attendee: any) => {
+      if (localLinkFilter === 'linked') return !!attendee.userId
+      if (localLinkFilter === 'unlinked') return !attendee.userId
+      return true
+    })
+  }, [allAttendees, localLinkFilter, isRoleAdmin])
 
   const archiveAttendee = useArchiveAttendee()
 
@@ -133,6 +159,10 @@ function AttendeesContent() {
       params.status = localStatusFilter as any
     }
 
+    if (isRoleAdmin && localLinkFilter !== 'all') {
+      params.link = localLinkFilter
+    }
+
     // Keep current page if no filters changed, otherwise reset to page 1
     params.page = 1
 
@@ -145,7 +175,13 @@ function AttendeesContent() {
       search: params,
       replace: true,
     })
-  }, [debouncedSearchQuery, localStatusFilter, navigate])
+  }, [
+    debouncedSearchQuery,
+    localStatusFilter,
+    localLinkFilter,
+    isRoleAdmin,
+    navigate,
+  ])
 
   // Update cursor history when we get new data
   useEffect(() => {
@@ -230,6 +266,13 @@ function AttendeesContent() {
   const handleClearSearch = () => {
     setLocalSearchQuery('')
     setLocalStatusFilter(undefined)
+    setLocalLinkFilter('all')
+  }
+
+  const handleLinkFilterChange = (
+    linkFilter: 'linked' | 'unlinked' | 'all',
+  ) => {
+    setLocalLinkFilter(linkFilter)
   }
 
   // Show error state if any query failed
@@ -266,13 +309,18 @@ function AttendeesContent() {
         isSearching={isSearching}
         searchQuery={localSearchQuery}
         statusFilter={localStatusFilter}
+        linkFilter={localLinkFilter}
         isPaginated={!hasValidSearchQuery}
         paginationInfo={paginationInfo}
         availablePageSizes={AVAILABLE_PAGE_SIZES}
+        linkedCount={linkedCountQuery.data || 0}
+        unlinkedCount={unlinkedCountQuery.data || 0}
+        isRoleAdmin={isRoleAdmin}
         onNavigate={(path) => navigate({ to: path as any })}
         onArchive={handleArchive}
         onSearchChange={handleSearchChange}
         onStatusFilterChange={handleStatusFilterChange}
+        onLinkFilterChange={handleLinkFilterChange}
         onClearSearch={handleClearSearch}
         onNextPage={handleNextPage}
         onPreviousPage={handlePreviousPage}

@@ -6,20 +6,30 @@ import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import { ErrorState } from '~/components/ui/error-state'
 import { Edit, Archive, ArrowLeft } from 'lucide-react'
+import { AdminSection } from './AdminSection'
 import type { AttendeeStatus } from '../types'
 
 interface AttendeeDetailsProps {
   attendee: any
+  userLink?: {
+    linked: boolean
+    userId?: string
+    userEmail?: string
+    userName?: string
+  } | null
   onEdit?: () => void
   onArchive?: () => void
   onBack?: () => void
+  onRefresh?: () => void
 }
 
 export function AttendeeDetails({
   attendee,
+  userLink,
   onEdit,
   onArchive,
   onBack,
+  onRefresh,
 }: AttendeeDetailsProps) {
   const getStatusBadgeVariant = (status: AttendeeStatus) => {
     switch (status) {
@@ -145,6 +155,15 @@ export function AttendeeDetails({
         <p>Created: {formatDate(attendee.createdAt)}</p>
         <p>Last Updated: {formatDate(attendee.updatedAt)}</p>
       </div>
+
+      {/* Admin Section */}
+      <AdminSection
+        attendeeId={attendee._id}
+        attendeeName={`${attendee.firstName} ${attendee.lastName}`}
+        currentStatus={attendee.status}
+        userLink={userLink}
+        onRefresh={onRefresh || (() => window.location.reload())}
+      />
     </div>
   )
 }

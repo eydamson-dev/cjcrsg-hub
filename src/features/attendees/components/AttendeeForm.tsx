@@ -7,19 +7,13 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
-import {
   Field,
   FieldLabel,
   FieldError,
   FieldGroup,
 } from '~/components/ui/field'
 import { DatePicker } from '~/components/ui/date-picker'
+import { AttendeeStatusSelect } from './AttendeeStatusSelect'
 
 const attendeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -185,22 +179,15 @@ export function AttendeeForm({
             name="status"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="status">Status *</FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="status" aria-invalid={fieldState.invalid}>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="visitor">Visitor</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
+              <AttendeeStatusSelect
+                mode="form"
+                name="status"
+                label="Status"
+                required
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error}
+              />
             )}
           />
 

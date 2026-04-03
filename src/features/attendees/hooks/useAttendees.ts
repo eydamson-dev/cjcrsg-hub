@@ -60,3 +60,11 @@ export function useArchiveAttendee() {
   const mutationFn = useConvexMutation(api.attendees.mutations.archive)
   return useMutation({ mutationFn })
 }
+
+export function useLinkedCount() {
+  return useQuery(convexQuery(api.attendees.admin.countLinked, {}))
+}
+
+export function useUnlinkedCount() {
+  return useQuery(convexQuery(api.attendees.admin.countUnlinked, {}))
+}

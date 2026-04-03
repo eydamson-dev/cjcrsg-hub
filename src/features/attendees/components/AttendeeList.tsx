@@ -27,6 +27,8 @@ import {
   Users,
   SearchX,
   FilterX,
+  Link as LinkIcon,
+  Link2Off,
 } from 'lucide-react'
 import {
   Select,
@@ -41,6 +43,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
+import { AttendeeStatusSelect } from './AttendeeStatusSelect'
+import { LinkStatusBadge } from './LinkStatusBadge'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,13 +84,18 @@ interface AttendeeListProps {
   isSearching?: boolean
   searchQuery?: string
   statusFilter?: string
+  linkFilter?: 'linked' | 'unlinked' | 'all'
   isPaginated?: boolean
   paginationInfo?: PaginationInfo
   availablePageSizes?: number[]
+  linkedCount?: number
+  unlinkedCount?: number
+  isRoleAdmin?: boolean
   onNavigate?: (path: string) => void
   onArchive?: (id: string) => void
   onSearchChange?: (query: string) => void
   onStatusFilterChange?: (status: string | undefined) => void
+  onLinkFilterChange?: (linkFilter: 'linked' | 'unlinked' | 'all') => void
   onClearSearch?: () => void
   onNextPage?: () => void
   onPreviousPage?: () => void
@@ -99,13 +108,18 @@ export function AttendeeList({
   isSearching = false,
   searchQuery = '',
   statusFilter,
+  linkFilter = 'all',
   isPaginated = true,
   paginationInfo,
   availablePageSizes = [10, 25, 50],
+  linkedCount = 0,
+  unlinkedCount = 0,
+  isRoleAdmin = false,
   onNavigate,
   onArchive,
   onSearchChange,
   onStatusFilterChange,
+  onLinkFilterChange,
   onClearSearch,
   onNextPage,
   onPreviousPage,
@@ -151,7 +165,8 @@ export function AttendeeList({
     }
   }
 
-  const hasActiveFilters = searchQuery || statusFilter
+  const hasActiveFilters =
+    searchQuery || statusFilter || (linkFilter !== 'all' && isRoleAdmin)
 
   const renderResultsInfo = () => {
     if (isSearching) {
@@ -263,6 +278,24 @@ export function AttendeeList({
 
   return (
     <div className="space-y-6">
+      {/* Quick stats for admins */}
+      {isRoleAdmin && (
+        <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-1.5">
+            <LinkIcon className="h-4 w-4 text-green-600" />
+            <span className="text-green-600 font-medium">{linkedCount}</span>
+            <span className="text-muted-foreground">linked</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Link2Off className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground font-medium">
+              {unlinkedCount}
+            </span>
+            <span className="text-muted-foreground">unlinked</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex-1 w-full sm:min-w-50 sm:max-w-md">
           <div className="relative">
@@ -299,22 +332,30 @@ export function AttendeeList({
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Select
-            value={statusFilter || ''}
-            onValueChange={(value) =>
-              onStatusFilterChange?.(value || undefined)
-            }
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent className="w-[140px] min-w-0">
-              <SelectItem value="">All Status</SelectItem>
-              <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="visitor">Visitor</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <AttendeeStatusSelect
+            mode="filter"
+            value={statusFilter as any}
+            onChange={(value) => onStatusFilterChange?.(value || undefined)}
+            showAllOption
+            className="w-[160px]"
+          />
+          {isRoleAdmin && (
+            <Select
+              value={linkFilter}
+              onValueChange={(value) =>
+                onLinkFilterChange?.(value as 'linked' | 'unlinked' | 'all')
+              }
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Link status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All accounts</SelectItem>
+                <SelectItem value="linked">Linked only</SelectItem>
+                <SelectItem value="unlinked">Unlinked only</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <Button
             onClick={() => onNavigate?.('/attendees/new')}
             className="flex-1 sm:flex-none"
@@ -401,6 +442,7 @@ export function AttendeeList({
                     <TableHead>Phone</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Join Date</TableHead>
+                    {isRoleAdmin && <TableHead>User Account</TableHead>}
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -424,6 +466,15 @@ export function AttendeeList({
                         </Badge>
                       </TableCell>
                       <TableCell>{formatDate(attendee.joinDate)}</TableCell>
+                      {isRoleAdmin && (
+                        <TableCell>
+                          <LinkStatusBadge
+                            isLinked={!!attendee.userId}
+                            userEmail={attendee.userEmail}
+                            userName={attendee.userName}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger

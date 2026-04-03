@@ -25,9 +25,7 @@ import { convexQuery } from '@convex-dev/react-query'
 import { api } from '../../../convex/_generated/api'
 
 function UserDisplay() {
-  const { data, isPending } = useQuery(
-    convexQuery(api.myFunctions.getCurrentUser),
-  )
+  const { data, isPending } = useQuery(convexQuery(api.users.getCurrentUser))
 
   return (
     <div className="flex flex-col items-start text-left">

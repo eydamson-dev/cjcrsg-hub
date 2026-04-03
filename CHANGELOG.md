@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Phase 16 Task 16.6: Settings > Account Page** - User account management page
+  - `convex/account.ts` - Backend queries/mutations (`getAccountInfo`, `unlinkAccount`)
+  - `src/hooks/useAccountInfo.ts` - React hooks for account management
+  - `src/routes/settings.account.tsx` - Account settings page with auth methods display
+  - Features: Linked attendee profile card, authentication methods list (Email/Password, Google, Facebook)
+  - Unlink OAuth accounts with confirmation dialog and safety checks
+  - "Link New Account" section for adding Google/Facebook/Password
+  - Safety warning card about not unlinking only auth method
+  - Updated `src/lib/navigation.ts` - Added Account link under Settings
+  - Updated `src/routes/settings.index.tsx` - Added Account card to settings grid
+
+### Added
+
+- **Phase 16: Admin Roles & Attendee-User Linking (Tasks 16.1-16.2)** - Complete authentication backend with role-based access control
+  - Custom `users` table with `role` field (super_admin, admin, moderator, user) extending Convex Auth
+  - `convex/lib/authHelpers.ts` - Role checking helpers (`requireRole`, `requireAdmin`, `requireSuperAdmin`, `getCurrentUserRole`, `hasRole`)
+  - `convex/admin.ts` - CLI admin functions (`promoteUser`, `demoteUser`, `listUsersWithRoles`, `wipeNonAdminUsers`)
+  - `convex/lib/attendeeLinking.ts` - Auto-linking logic for attendee-user connection on registration
+  - `convex/auth.ts` - `afterUserCreatedOrUpdated` callback for automatic attendee creation/linking
+  - `convex/attendees/admin.ts` - Admin mutations for manual linking (`linkToUser`, `unlinkFromUser`, `listUnlinked`, `listLinked`, `getAttendeeUserLink`)
+  - `userId` field on `attendees` table with `by_user` index for tracking linked accounts
+  - Safety checks: Prevent unlinking if it's the user's only authentication method
+  - Role hierarchy: super_admin (4) → admin (3) → moderator (2) → user (1)
+
+- **Phase 16 Task 16.3: Admin Dashboard UI** - Settings page for managing user roles
+  - `convex/users.ts` - User queries with `getCurrentUser` (includes role), `getById`, `deleteUser`
+  - `src/hooks/useCurrentUserRole.ts` - React hooks for role management
+  - `src/routes/settings.admin.tsx` - Admin dashboard (Super Admin only access)
+  - `src/routes/settings.index.tsx` - Settings main page with navigation
+  - Features: Role stats cards, searchable user table, role badges with icons (Crown, Shield, ShieldAlert, User)
+  - Promote/demote functionality with toast notifications
+  - Refactored: Deleted `convex/myFunctions.ts`, moved functions to `convex/users.ts`
+  - Cleaned database: Removed 1,565 non-admin test users
+
+- **Phase 16 Task 16.4: Attendee Detail Admin Actions** - Admin controls on attendee profile pages
+  - `src/features/attendees/components/AdminSection.tsx` - Admin-only section with Shield icon
+  - `src/features/attendees/components/LinkAccountDialog.tsx` - Searchable user list to link attendee to user account
+  - `src/features/attendees/components/UnlinkAccountDialog.tsx` - Confirmation dialog with safety warning about auth methods
+  - `src/features/attendees/components/ChangeStatusDialog.tsx` - Status change dialog with current/new status display
+  - `src/features/attendees/hooks/useAttendeeAdmin.ts` - Hooks for attendee-user linking operations
+  - `convex/users.ts` - Added `listAll` query for searching users by name/email
+  - Features: Link/unlink attendee-user accounts, change attendee status, view user profile (placeholder)
+  - Role-based visibility: Admin section only visible to admins/moderators/super_admins
+  - Safety checks: Prevent unlinking if user has only one authentication method
+
+- **Reusable AttendeeStatusSelect component** - Standardized status selection across all pages
+  - `src/features/attendees/components/AttendeeStatusSelect.tsx` - Reusable component with three modes (form, filter, simple)
+  - Colored badge indicators for each status (Member: green, Visitor: blue, Inactive: gray)
+  - Helper exports: `getStatusBadgeClass()` and `getStatusLabel()` for consistent styling
+  - Replaced hardcoded status selects in: `AttendeeForm.tsx`, `AttendeeList.tsx`, `ChangeStatusDialog.tsx`, `AdminSection.tsx`
+
+- **Phase 16 Task 16.5: Attendee List Link Status** - Show attendee-user link status in attendee list
+  - `src/features/attendees/components/LinkStatusBadge.tsx` - Reusable badge component showing linked/unlinked status with tooltip
+  - `convex/attendees/admin.ts` - Added `countLinked` and `countUnlinked` queries for admin stats
+  - `convex/attendees/queries.ts` - Enriched `list` and `search` queries with user email/name for linked attendees
+  - `src/features/attendees/hooks/useAttendees.ts` - Added `useLinkedCount` and `useUnlinkedCount` hooks
+  - Features:
+    - User Account column in attendee table (admin/super_admin only) showing link status with tooltip
+    - Link filter dropdown: "All accounts", "Linked only", "Unlinked only" (admin/super_admin only)
+    - Quick stats row showing linked/unlinked counts at top of page (admin/super_admin only)
+    - Client-side filtering for link status (compatible with server-side pagination)
+    - Tooltip on linked badges shows "Linked to {userEmail}"
+
 ### Removed
 
 - **Deprecated event form components** - Cleaned up after Phase 15 architecture change
@@ -15,6 +78,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Form schemas and utilities (`eventSchemas`, `timeOptions`)
   - All form test files (70 tests removed, 591 tests passing)
   - Updated edit route to use `GenericEventDetails` with smart redirection
+
+### Removed
+
+- **Non-admin user accounts** - Database cleanup using `admin:wipeNonAdminUsers`
+  - Deleted 1,565 non-admin test users
+  - Preserved 1 admin user (eydamson@gmail.com as super_admin)
+  - Created CLI utility `wipeNonAdminUsers` for future database cleanup
 
 ### Added
 
