@@ -24,9 +24,17 @@ Development methodology and **MANDATORY WORKFLOWS** with hard enforcement on doc
 ### The Workflow
 
 ```
-IMPLEMENT → MANUAL TEST → USER APPROVAL → UPDATE DOCS → COMMIT
-     ↑___________________________|
+IMPLEMENT → UPDATE DOCS → MANUAL TEST → WAIT APPROVAL → COMMIT
+     ↑_________________________________________|
 ```
+
+**Workflow Steps:**
+
+1. **IMPLEMENT** - Write the code
+2. **UPDATE DOCS** - Update ALL documentation (AGENTS.md mandatory)
+3. **MANUAL TEST** - Test with `pnpm dev`
+4. **WAIT APPROVAL** - I notify you and wait for explicit approval
+5. **COMMIT** - Only after your approval
 
 **I will NOT commit until you explicitly approve using one of these commands:**
 
@@ -105,29 +113,9 @@ Build the feature first:
 - Don't write tests yet
 - Focus on requirements
 
-### Step 2: MANUAL TEST
+### Step 2: UPDATE DOCUMENTATION (HARD STOP)
 
-Verify it works:
-
-- Run `pnpm dev`
-- Test the feature manually
-- Confirm requirements are met
-- **Wait for user to test**
-
-### Step 3: REQUEST APPROVAL (HARD STOP)
-
-**I MUST say:**
-
-```
-"Task complete. I've tested it and it works. Ready for your manual testing.
-Please test and confirm with: 'tested, good to commit' or 'LGTM'"
-```
-
-**Then I WAIT. No commit until you approve.**
-
-### Step 4: UPDATE DOCUMENTATION (HARD STOP)
-
-After your approval:
+**Update ALL docs BEFORE testing:**
 
 1. **Update AGENTS.md** (MANDATORY):
 
@@ -144,15 +132,36 @@ After your approval:
    ```
 
 3. **Update SESSION.md**:
-   - Mark completed
+   - Mark in progress
    - Update status
 
 4. **Update TASKS.md**:
-   - Mark task ✅ Complete
+   - Mark task 🚧 In Progress
+
+### Step 3: MANUAL TEST
+
+Verify it works:
+
+- Run `pnpm dev`
+- Test the feature manually
+- Confirm requirements are met
+- **Wait for user to test**
+
+### Step 4: REQUEST APPROVAL (HARD STOP)
+
+**I MUST say:**
+
+```
+"Implementation and documentation complete. I've tested it and it works.
+Ready for your manual testing. Please test and confirm with:
+'tested, good to commit' or 'LGTM'"
+```
+
+**Then I WAIT. No commit until you approve.**
 
 ### Step 5: QUALITY CHECKS
 
-Run all checks:
+After your approval, run all checks:
 
 ```bash
 pnpm lint        # ESLint - must pass
@@ -188,19 +197,18 @@ git checkout -b feature/event-types
 
 # 2. Implement
 # Write code in convex/, src/features/
-pnpm dev
 
-# 3. Manual testing
-# Verify in browser
-# → WAIT FOR USER APPROVAL ←
-
-# 4. Update docs (ALL REQUIRED)
+# 3. Update docs (ALL REQUIRED - BEFORE testing)
 # AGENTS.md - Add capability
 # CHANGELOG.md - Add entry
 # SESSION.md - Update state
-# TASKS.md - Mark complete
+# TASKS.md - Mark in progress
 
-# 5. Quality checks
+# 4. Manual testing
+pnpm dev
+# → WAIT FOR USER APPROVAL ←
+
+# 5. Quality checks (after approval)
 pnpm lint && pnpm dev:ts && pnpm test
 
 # 6. Commit (ONLY after approval)
@@ -227,15 +235,15 @@ git checkout -b fix/attendee-search
 # 2. Implement fix
 # Fix the code
 
-# 3. Manual testing
-pnpm dev
-# → WAIT FOR USER APPROVAL ←
-
-# 4. Update docs
+# 3. Update docs (BEFORE testing)
 # CHANGELOG.md under ### Fixed
 # AGENTS.md (if needed)
 
-# 5. Quality checks
+# 4. Manual testing
+pnpm dev
+# → WAIT FOR USER APPROVAL ←
+
+# 5. Quality checks (after approval)
 pnpm lint && pnpm dev:ts && pnpm test
 
 # 6. Commit (ONLY after approval)
@@ -296,10 +304,10 @@ pnpm dlx convex dashboard       # Open dashboard
 **I will:**
 
 1. ✅ **Implement** the feature
-2. ✅ **Test** manually (`pnpm dev`)
-3. ✅ **Notify you** and wait for approval
-4. ✅ **Update ALL docs** (AGENTS.md mandatory)
-5. ✅ **Run quality checks**
+2. ✅ **Update ALL docs** (AGENTS.md mandatory) - BEFORE testing
+3. ✅ **Test** manually (`pnpm dev`)
+4. ✅ **Notify you** and wait for approval
+5. ✅ **Run quality checks** (after approval)
 6. ✅ **Only commit after your explicit approval**
 
 **I will NOT:**
@@ -309,6 +317,7 @@ pnpm dlx convex dashboard       # Open dashboard
 - ❌ Commit "small changes" without docs
 - ❌ Assume "looks good" means approval
 - ❌ Rush to commit before testing
+- ❌ Test before updating docs
 
 ---
 

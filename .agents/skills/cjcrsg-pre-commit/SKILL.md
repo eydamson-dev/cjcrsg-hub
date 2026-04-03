@@ -21,41 +21,25 @@ Quality gates and **HARD ENFORCEMENT** rules before every commit. **Commits will
 
 **The following MUST be completed before ANY commit. No exceptions.**
 
-### 1. Manual Testing Approval (HARD BLOCK)
+### 1. Documentation Updates (HARD BLOCK - DO FIRST)
 
-**⚠️ YOU MUST WAIT FOR USER APPROVAL BEFORE COMMITTING ⚠️**
+**ALL documentation files MUST be updated BEFORE testing and committing.**
 
-After implementing and testing a task:
+**Order: IMPLEMENT → UPDATE DOCS → MANUAL TEST → WAIT APPROVAL → COMMIT**
 
-1. **Notify user:** "Task complete. Ready for manual testing."
-2. **Wait for explicit approval** using one of these commands:
-   - `tested, good to commit`
-   - `LGTM`
-   - `approved`
-   - `commit it`
-   - `looks good`
-   - `works, commit`
-3. **Only then proceed** with commit workflow
+The following files must be checked and updated if applicable:
 
-**DO NOT COMMIT without user approval.** This is a **HARD BLOCK**.
-
----
-
-### 2. Documentation Updates (HARD BLOCK)
-
-**ALL documentation files MUST be updated before commit.** The following files must be checked and updated if applicable:
-
-| File             | When to Update         | Required?        |
-| ---------------- | ---------------------- | ---------------- |
-| **AGENTS.md**    | EVERY task/feature/bug | ✅ **MANDATORY** |
-| **CHANGELOG.md** | User-facing changes    | ✅ **MANDATORY** |
-| **SESSION.md**   | Every session          | ✅ **MANDATORY** |
-| **TASKS.md**     | Feature/bug work       | ✅ **MANDATORY** |
-| **TDD_TASKS.md** | Testing work           | ✅ **MANDATORY** |
+| File             | When to Update                         | Required?        |
+| ---------------- | -------------------------------------- | ---------------- |
+| **AGENTS.md**    | **AFTER implementing, BEFORE testing** | ✅ **MANDATORY** |
+| **CHANGELOG.md** | AFTER implementing, BEFORE testing     | ✅ **MANDATORY** |
+| **SESSION.md**   | Every session                          | ✅ **MANDATORY** |
+| **TASKS.md**     | Feature/bug work                       | ✅ **MANDATORY** |
+| **TDD_TASKS.md** | Testing work                           | ✅ **MANDATORY** |
 
 #### Documentation Update Rules:
 
-1. **AGENTS.md** - Update for **EVERY** task:
+1. **AGENTS.md** - Update for **EVERY** task (AFTER implement, BEFORE test):
    - Add new capability to "Current Capabilities" section
    - Update "Next Up" section if priorities change
    - Update status line if phase completes
@@ -78,33 +62,58 @@ After implementing and testing a task:
 
 ---
 
+### 2. Manual Testing Approval (HARD BLOCK)
+
+**⚠️ YOU MUST WAIT FOR USER APPROVAL BEFORE COMMITTING ⚠️**
+
+After implementing AND updating documentation:
+
+1. **Test manually:** `pnpm dev` and verify it works
+2. **Notify user:** "Implementation and documentation complete. I've tested it and it works. Ready for your manual testing."
+3. **Wait for explicit approval** using one of these commands:
+   - `tested, good to commit`
+   - `LGTM`
+   - `approved`
+   - `commit it`
+   - `looks good`
+   - `works, commit`
+4. **Only then proceed** with commit workflow
+
+**DO NOT COMMIT without user approval.** This is a **HARD BLOCK**.
+
+---
+
 ## Pre-Commit Verification Script
 
-**BEFORE committing, verify ALL of these:**
+**BEFORE committing, verify ALL of these (IN ORDER):**
 
 ```markdown
 ## 🚨 PRE-COMMIT CHECKLIST (All must be ✅)
 
-### Quality Gates
+### Step 1: Implementation
 
-- [ ] `pnpm lint` - no errors
-- [ ] `pnpm dev:ts` - no TypeScript errors
-- [ ] `pnpm test` - all tests passing
-- [ ] No console.log statements (unless debugging)
+- [ ] Code implemented and functional
 
-### Documentation (HARD BLOCK - ALL REQUIRED)
+### Step 2: Documentation (DO BEFORE TESTING)
 
 - [ ] **AGENTS.md updated** - New capability documented
 - [ ] **CHANGELOG.md updated** - Entry under [Unreleased]
 - [ ] **SESSION.md updated** - Session state current
 - [ ] **TASKS.md updated** - Task marked complete
 
-### Testing (HARD BLOCK - MUST HAVE APPROVAL)
+### Step 3: Manual Testing
 
 - [ ] **Code manually tested** (`pnpm dev`)
 - [ ] **User approval received** (see approval commands below)
 
-### Code Quality
+### Step 4: Quality Checks (After Approval)
+
+- [ ] `pnpm lint` - no errors
+- [ ] `pnpm dev:ts` - no TypeScript errors
+- [ ] `pnpm test` - all tests passing
+- [ ] No console.log statements (unless debugging)
+
+### Step 5: Code Quality
 
 - [ ] New mutations have tests (if applicable)
 - [ ] New queries have tests (if applicable)
@@ -113,6 +122,8 @@ After implementing and testing a task:
 ```
 
 **IF ANY CHECKBOX IS NOT ✅, DO NOT COMMIT.**
+
+**ORDER MATTERS: Implement → Update Docs → Manual Test → Wait Approval → Quality Checks → Commit**
 
 ---
 
