@@ -67,6 +67,7 @@ The system is fully functional for core church operations:
 - **Attendee list link status:** User Account column, link filter, quick stats (admin only)
 - **Settings > Account page:** Users can view linked attendee profile, manage auth methods (unlink OAuth, placeholders for linking new providers)
 - **Safety checks:** Cannot unlink only authentication method, confirmation dialog before unlinking
+- **OAuth account linking:** When signing in with Google/Facebook, existing email/password accounts are automatically linked (no duplicate users)
 - **OAuth E2E testing:** 14 tests covering OAuth UI flows (login buttons, account page auth methods, safety checks)
 - Secure session management
 

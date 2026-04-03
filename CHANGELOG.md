@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **OAuth account linking:** Google/Facebook OAuth now correctly links to existing email/password accounts instead of creating duplicate users. Added `allowDangerousEmailAccountLinking: true` to OAuth providers.
+
+### Added
+
 - **Phase 16 Task 16.7: OAuth Setup & E2E Testing** - OAuth E2E tests and documentation
   - `tests/e2e/specs/oauth.spec.ts` - 14 E2E tests (Chromium + Mobile Chrome)
   - Tests cover: OAuth button visibility/clickability, account page auth methods display,
