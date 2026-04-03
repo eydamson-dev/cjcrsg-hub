@@ -3,12 +3,11 @@
 Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-03  
-**Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
-**Status:** 🚧 Tasks 16.1-16.6 Complete, 16.7 In Progress
+**Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - Complete  
+**Status:** ✅ All Tasks 16.1-16.7 Complete
 
 **Next Up:**
 
-- Task 16.7: OAuth Setup & E2E Testing
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -2624,7 +2623,31 @@ Created `src/routes/settings.account.tsx`:
 ### Task 16.7: OAuth Setup & E2E Testing
 
 **Time:** 2 hours  
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
+
+#### OAuth Configuration
+
+Google OAuth is configured. Facebook OAuth skipped for now.
+
+**E2E Tests Created:** `tests/e2e/specs/oauth.spec.ts` (14 tests, 2 browsers)
+
+**Test Coverage:**
+
+- ✅ OAuth buttons visible and clickable on login page
+- ✅ Account page shows authentication methods section
+- ✅ Account page shows attendee profile card
+- ✅ Account page shows safety warning card
+- ✅ Unlink button disabled when only one auth method
+- ✅ Link New Account section shows available providers
+
+**Acceptance Criteria:**
+
+- [x] OAuth setup documentation complete
+- [x] Google OAuth configured and tested
+- [x] Facebook OAuth skipped (documented)
+- [x] Environment variables documented
+- [x] E2E tests created (14 tests passing)
+- [x] Manual testing checklist completed
 
 #### OAuth Configuration
 

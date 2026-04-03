@@ -2,7 +2,7 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
+**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - Complete  
 **Last Updated:** 2026-04-03
 
 ---
@@ -67,6 +67,7 @@ The system is fully functional for core church operations:
 - **Attendee list link status:** User Account column, link filter, quick stats (admin only)
 - **Settings > Account page:** Users can view linked attendee profile, manage auth methods (unlink OAuth, placeholders for linking new providers)
 - **Safety checks:** Cannot unlink only authentication method, confirmation dialog before unlinking
+- **OAuth E2E testing:** 14 tests covering OAuth UI flows (login buttons, account page auth methods, safety checks)
 - Secure session management
 
 ✅ **Data Management**
@@ -105,7 +106,7 @@ The system is fully functional for core church operations:
 
 ## Current Status
 
-**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
+**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - Complete  
 **Last Updated:** 2026-04-03
 
 **Phase 15 Progress:** (Complete)
@@ -121,19 +122,20 @@ The system is fully functional for core church operations:
 - ✅ Phase 15.9: Testing & Validation
 - ✅ Phase 15.10: Documentation Update
 
-**Phase 16 Progress:** (In Progress)
+**Phase 16 Progress:** (Complete)
 
 - ✅ Task 16.1: Admin Roles Schema & CLI Promotion
 - ✅ Task 16.2: Attendee-User Auto-Linking Backend
 - ✅ Task 16.3: Admin Dashboard UI
-- ⏳ Task 16.4: Attendee Detail Admin Actions
-- ⏳ Task 16.5: Attendee List Link Status
-- ⏳ Task 16.6: Settings > Account Page
-- ⏳ Task 16.7: OAuth Setup & E2E Testing
+- ✅ Task 16.4: Attendee Detail Admin Actions
+- ✅ Task 16.5: Attendee List Link Status
+- ✅ Task 16.6: Settings > Account Page
+- ✅ Task 16.7: OAuth Setup & E2E Testing
 
 **Next Up:**
 
-- Task 16.4: Attendee Detail Admin Actions
+- Future: Attendance reporting & analytics
+- Future: Dashboard statistics widgets
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 

@@ -9,10 +9,31 @@ Complete guide for configuring Google and Facebook OAuth authentication in CJCRS
 CJCRSG-Hub supports three authentication methods:
 
 - **Email & Password** (built-in, works immediately)
-- **Google OAuth** (requires setup)
-- **Facebook OAuth** (requires setup)
+- **Google OAuth** (✅ Configured)
+- **Facebook OAuth** (⏳ Skipped for now)
 
 OAuth credentials are configured as **server-side environment variables** in your Convex deployment. They are never stored in `.env.local` or client-side code.
+
+---
+
+## Current Status
+
+| Provider             | Status     | Configured | E2E Tested       |
+| -------------------- | ---------- | ---------- | ---------------- |
+| **Email & Password** | ✅ Active  | N/A        | ✅ Yes           |
+| **Google OAuth**     | ✅ Active  | ✅ Yes     | ✅ UI tests pass |
+| **Facebook OAuth**   | ⏳ Skipped | ❌ No      | ❌ Skipped       |
+
+**Last Updated:** 2026-04-03
+
+**E2E Tests:** `tests/e2e/specs/oauth.spec.ts` - 14 tests passing (Chromium + Mobile Chrome)
+
+- OAuth buttons visible and clickable on login page
+- Account page shows authentication methods section
+- Account page shows attendee profile card
+- Account page shows safety warning card
+- Unlink button disabled when only one auth method
+- Link New Account section shows available providers
 
 ---
 

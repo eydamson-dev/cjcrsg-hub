@@ -73,7 +73,10 @@ export function AttendeeStatusSelect({
       onValueChange={(val) => fieldOnChange(val as AttendeeStatus | '')}
       disabled={disabled}
     >
-      <SelectTrigger className={className}>
+      <SelectTrigger
+        className={className}
+        id={mode === 'form' ? name : undefined}
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

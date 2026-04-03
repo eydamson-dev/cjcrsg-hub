@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Phase 16 Task 16.7: OAuth Setup & E2E Testing** - OAuth E2E tests and documentation
+  - `tests/e2e/specs/oauth.spec.ts` - 14 E2E tests (Chromium + Mobile Chrome)
+  - Tests cover: OAuth button visibility/clickability, account page auth methods display,
+    attendee profile card, safety warning card, unlink button disabled state, link new account section
+  - Google OAuth configured, Facebook OAuth skipped for now
+  - Updated `docs/OAUTH_SETUP.md` with current status and E2E test results
+
 - **Phase 16 Task 16.6: Settings > Account Page** - User account management page
   - `convex/account.ts` - Backend queries/mutations (`getAccountInfo`, `unlinkAccount`)
   - `src/hooks/useAccountInfo.ts` - React hooks for account management
