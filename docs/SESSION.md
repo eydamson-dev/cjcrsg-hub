@@ -1,47 +1,41 @@
 # Current Session
 
-**Session Started:** 2026-04-02  
-**Last Updated:** 2026-04-02  
-**Branch:** feature/phase15-unified-event-creation
+**Session Started:** 2026-04-03  
+**Last Updated:** 2026-04-03  
+**Branch:** feature/phase16-complete-auth-module
 
 ---
 
 ## 🎯 Current Micro-Task
 
-Phase 15 Complete - Ready for final commit
+Phase 16: Complete Auth Module with Admin Roles & Account Linking
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                            |
-| ------------------ | --------------------------------- |
-| **Just completed** | Task 15.10 - Documentation Update |
-| **In progress**    | All Phase 15 tasks complete       |
-| **Next up**        | Final commit and push             |
+| Item               | Status                                         |
+| ------------------ | ---------------------------------------------- |
+| **Just completed** | Phase 15 - Unified Event Creation Architecture |
+| **In progress**    | Planning Phase 16                              |
+| **Next up**        | Task 16.1: Admin Roles Schema & CLI Promotion  |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                                                | Status  | Notes                          |
-| --------------------------------------------------- | ------- | ------------------------------ |
-| `src/routes/events.sunday-service.tsx`              | ✅ Done | Task 15.4 complete             |
-| `src/features/events/components/RetreatDetails.tsx` | ✅ Done | Task 15.5 complete             |
-| `src/routes/events.spiritual-retreat.tsx`           | ✅ Done | Task 15.6 complete             |
-| `src/routes/events.new.tsx`                         | ✅ Done | Task 15.7 complete             |
-| `src/features/events/forms/`                        | ✅ Done | Deleted deprecated files       |
-| `src/routes/events.$id.edit.tsx`                    | ✅ Done | Updated to GenericEventDetails |
-| `tests/unit/events/forms/`                          | ✅ Done | Deleted deprecated tests       |
-| `docs/TASKS.md`                                     | ✅ Done | Phase 15 marked complete       |
-| `docs/SESSION.md`                                   | ✅ Done | Session updated                |
-| `CHANGELOG.md`                                      | ✅ Done | Phase 15 changes documented    |
+| File                         | Status     | Notes                                        |
+| ---------------------------- | ---------- | -------------------------------------------- |
+| `docs/TASKS.md`              | ✅ Updated | Added Phase 16 detailed plan                 |
+| `convex/schema.ts`           | ⏳ Pending | Add role field to users, userId to attendees |
+| `convex/admin.ts`            | ⏳ Pending | Create promoteUser function                  |
+| `convex/lib/auth-helpers.ts` | ⏳ Pending | Role checking helpers                        |
 
 ---
 
 ## 📊 Quality Status
 
-- **Tests:** 591 passing (70 deprecated form tests removed)
+- **Tests:** 591 passing
 - **TypeScript:** 0 new errors (only pre-existing)
 - **Lint:** Clean
 - **Build:** Successful
@@ -56,15 +50,17 @@ None
 
 ## ⚡ Immediate Next Actions
 
-1. Commit all Phase 15 changes (Tasks 15.1-15.10)
-2. Push to remote
-3. Create PR
+1. ✅ Update TASKS.md with Phase 16 plan (DONE)
+2. Update convex/schema.ts - Add role field to users table
+3. Update convex/schema.ts - Add userId field to attendees table
+4. Create convex/admin.ts with promoteUser function
+5. Create convex/lib/auth-helpers.ts with role helpers
 
 ---
 
 ## 🔗 Context Links
 
-- [Phase 15 Tasks](docs/TASKS.md#phase-15-unified-event-creation-architecture)
+- [Phase 16 Tasks](docs/TASKS.md#phase-16-complete-auth-module-with-admin-roles--account-linking)
 - [Development Workflow](.agents/skills/cjcrsg-dev-workflow/SKILL.md)
 - [Pre-Commit Checklist](.agents/skills/cjcrsg-pre-commit/SKILL.md)
 - [Project Skill](.agents/skills/cjcrsg-hub/SKILL.md)
@@ -73,9 +69,7 @@ None
 
 ## 📝 Session Notes
 
-- Phase 15 complete - all 10 tasks done
-- Unified event creation architecture implemented
-- All deprecated forms deleted
-- Toast error handling added for duplicate/active events
-- 591 tests passing
-- Ready for final commit and PR
+- Phase 15 complete and merged to main
+- Phase 16 planning complete with 7 tasks totaling 13 hours
+- Ready to begin Task 16.1: Admin Roles Schema & CLI Promotion
+- Key features: Admin roles (super_admin → user), CLI promotion, attendee-user linking, OAuth completion

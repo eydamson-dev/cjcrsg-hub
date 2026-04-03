@@ -2,14 +2,19 @@
 
 Complete feature catalog for the church management system.
 
-**Last Updated:** 2026-04-02  
-**Current Phase:** Phase 15 - Unified Event Creation Architecture - Complete  
-**Status:** ✅ Phase 15 Complete
+**Last Updated:** 2026-04-03  
+**Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
+**Status:** ⏳ Phase 16 Planned - Ready for Implementation
 
 **Next Up:**
 
-- Future: Attendance reporting & analytics
-- Future: Dashboard statistics widgets
+- Task 16.1: Admin Roles Schema & CLI Promotion
+- Task 16.2: Attendee-User Auto-Linking Backend
+- Task 16.3: Admin Dashboard UI
+- Task 16.4: Attendee Detail Admin Actions
+- Task 16.5: Attendee List Link Status
+- Task 16.6: Settings > Account Page
+- Task 16.7: OAuth Setup & E2E Testing
 - Future: Attendance reporting & analytics
 - Future: Dashboard statistics widgets
 
@@ -2206,9 +2211,548 @@ Save → RetreatDetails (normal with all tabs)
 
 ---
 
-1. **IMPLEMENT** - Build the feature first
-2. **MANUAL TEST** - Verify it works in the browser
-3. **ADD TESTS** - After confirmation, add unit/component tests
+## Phase 16: Complete Auth Module with Admin Roles & Account Linking
+
+**Status:** ⏳ Planned - Ready for Implementation  
+**Goal:** Complete OAuth implementation with Google/Facebook, enable account linking for email-registered users, add admin roles with attendee-user linking capabilities  
+**Estimated Time:** 13 hours  
+**Priority:** HIGH
+
+### Overview
+
+This phase completes the authentication system by:
+
+1. **Admin Role System** - Super Admin, Admin, Moderator roles with CLI-based promotion
+2. **Account Linking** - Users can link Google/Facebook to existing email accounts
+3. **Attendee-User Linking** - Connect attendee records to user accounts (auto & manual)
+4. **Admin UI** - Dashboard for managing user roles and linking attendee accounts
+5. **OAuth Completion** - Full Google/Facebook OAuth setup and E2E testing
+
+**Key Design Decisions:**
+
+- **CLI Promotion:** Admins promoted via `npx convex run admin/promoteUser` (CLI access = authorization)
+- **Auto-Linking (Option A):** On registration, automatically link attendee by matching email
+- **Manual Linking (Option B):** Admins can manually link/unlink attendee-user accounts via UI
+- **Role Hierarchy:** super_admin → admin → moderator → user
+- **Safety:** Prevent unlinking if it's the user's only authentication method
+- **Attendee Status:** Preserved independently (visitor/member/inactive) - NOT changed by linking
+
+---
+
+### Task 16.1: Admin Roles Schema & CLI Promotion
+
+**Time:** 2 hours  
+**Status:** ⏳ Pending
+
+#### Schema Changes
+
+Add to `users` table (via custom fields in auth configuration):
+
+```typescript
+role: v.optional(
+  v.union(
+    v.literal('super_admin'), // Can create other admins, full access
+    v.literal('admin'), // Can link/unlink accounts, change attendee status
+    v.literal('moderator'), // Can view admin features, read-only
+    v.literal('user'), // Default role, regular user
+  ),
+)
+```
+
+Add to `attendees` table:
+
+```typescript
+userId: v.optional(v.id('users')) // Links to Convex Auth user account
+// Add index: .index('by_user', ['userId'])
+```
+
+#### CLI Function
+
+Create `convex/admin.ts`:
+
+```typescript
+export const promoteUser = mutation({
+  args: {
+    email: v.string(),
+    role: v.union(
+      v.literal('super_admin'),
+      v.literal('admin'),
+      v.literal('moderator'),
+      v.literal('user'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .first()
+
+    if (!user) throw new Error('User not found')
+
+    await ctx.db.patch(user._id, { role: args.role })
+
+    return { success: true, userId: user._id, newRole: args.role }
+  },
+})
+```
+
+**CLI Usage:**
+
+```bash
+# First user signs up via app, then promote:
+npx convex run admin/promoteUser --arg '{"email": "pastor@church.com", "role": "super_admin"}'
+
+# Promote others:
+npx convex run admin/promoteUser --arg '{"email": "assistant@church.com", "role": "admin"}'
+```
+
+#### Role Helpers
+
+Create `convex/lib/auth-helpers.ts`:
+
+```typescript
+export async function requireRole(ctx, minRole: string) { ... }
+export async function requireAdmin(ctx) { ... }
+export async function requireSuperAdmin(ctx) { ... }
+```
+
+**Acceptance Criteria:**
+
+- [ ] Schema updated with `role` field on users
+- [ ] Schema updated with `userId` field on attendees
+- [ ] `promoteUser` function created and tested via CLI
+- [ ] Role checking helpers implemented
+- [ ] Convex types regenerated
+
+---
+
+### Task 16.2: Attendee-User Auto-Linking Backend
+
+**Time:** 2 hours  
+**Status:** ⏳ Pending
+
+#### Auto-Linking on Registration
+
+Update `convex/auth.ts` with `createUser` callback:
+
+```typescript
+createUser: async (ctx, { user, profile }) => {
+  // 1. Check for existing attendee with same email
+  const existingAttendee = await ctx.db
+    .query('attendees')
+    .withIndex('by_email', (q) => q.eq('email', user.email))
+    .first()
+
+  if (existingAttendee) {
+    // 2. Link existing attendee (Option A)
+    await ctx.db.patch(existingAttendee._id, {
+      userId: user._id,
+      updatedAt: Date.now(),
+      // Use OAuth profile pic if attendee has none
+      // photoUrl: existingAttendee.photoUrl || profile.picture
+    })
+  } else {
+    // 3. Create new attendee with OAuth data
+    await ctx.db.insert('attendees', {
+      firstName: profile.given_name || user.name?.split(' ')[0] || 'New',
+      lastName: profile.family_name || user.name?.split(' ')[1] || 'User',
+      email: user.email,
+      phone: profile.phone_number, // if available
+      status: 'visitor',
+      userId: user._id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    })
+  }
+}
+```
+
+#### Admin Linking Mutations
+
+Create `convex/attendees/admin.ts`:
+
+```typescript
+// Link attendee to user (admin only)
+export const linkToUser = mutation({
+  args: { attendeeId: v.id('attendees'), userId: v.id('users') },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx)
+    // ... validation and linking logic
+  },
+})
+
+// Unlink attendee from user (admin only, with safety check)
+export const unlinkFromUser = mutation({
+  args: { attendeeId: v.id('attendees') },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx)
+
+    const attendee = await ctx.db.get(args.attendeeId)
+    if (!attendee?.userId) throw new Error('Not linked')
+
+    // SAFETY CHECK: Ensure user has other auth methods
+    const userAccounts = await ctx.db
+      .query('accounts')
+      .withIndex('by_user', (q) => q.eq('userId', attendee.userId))
+      .collect()
+
+    if (userAccounts.length <= 1) {
+      throw new Error('Cannot unlink: user needs at least one sign-in method')
+    }
+
+    await ctx.db.patch(args.attendeeId, {
+      userId: undefined,
+      updatedAt: Date.now(),
+    })
+  },
+})
+
+// Admin-only status change
+export const updateStatus = mutation({
+  args: { attendeeId: v.id('attendees'), status: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx)
+    // ... validation logic
+    await ctx.db.patch(args.attendeeId, {
+      status: args.status,
+      updatedAt: Date.now(),
+    })
+  },
+})
+```
+
+#### Query Unlinked Attendees
+
+Add to `convex/attendees/queries.ts`:
+
+```typescript
+export const listUnlinked = query({
+  args: { count: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx)
+
+    return await ctx.db
+      .query('attendees')
+      .filter((q) => q.eq(q.field('userId'), undefined))
+      .take(args.count || 50)
+  },
+})
+```
+
+**Acceptance Criteria:**
+
+- [ ] Auto-linking works on registration (existing attendee by email)
+- [ ] New attendee created if no email match
+- [ ] OAuth profile data used for new attendees
+- [ ] Admin linking/unlinking mutations implemented
+- [ ] Safety check prevents unlinking only auth method
+- [ ] Only admins can change attendee status
+- [ ] Query to list unlinked attendees
+
+---
+
+### Task 16.3: Admin Dashboard UI
+
+**Time:** 2.5 hours  
+**Status:** ⏳ Pending
+
+#### Settings > Admin Management Page
+
+Create `src/routes/settings/admin.tsx` (Super Admin only):
+
+```
+Admin Management
+┌─────────────────────────────────────────────────────────────┐
+│ Current Admins                                              │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 👑 Super Admin: pastor@church.com         [Demote]    │ │
+│ │ 🛡️ Admin: assistant@church.com          [Demote]    │ │
+│ │ 👁️ Moderator: volunteer@church.com        [Demote]   │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Add New Admin                                               │
+│ Search users...                                           │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ john@church.com (John Smith)                             │ │
+│ │   [Make Moderator] [Make Admin] [Make Super Admin]    │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Stats: 1 Super Admin, 2 Admins, 1 Moderator, 45 Users       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Features:**
+
+- List all users with role badges
+- Search users by email/name
+- Promote buttons for each role level
+- Demote/Remove buttons (with confirmation)
+- Stats summary
+- Activity log (who promoted whom, when)
+
+**Acceptance Criteria:**
+
+- [ ] Page accessible only to Super Admin
+- [ ] Lists all users with current roles
+- [ ] Search functionality works
+- [ ] Can promote users to any role
+- [ ] Can demote/remove admin privileges
+- [ ] Confirmation dialogs for destructive actions
+- [ ] Shows stats summary
+
+---
+
+### Task 16.4: Attendee Detail Admin Actions
+
+**Time:** 2 hours  
+**Status:** ⏳ Pending
+
+#### Admin Section in Attendee Detail
+
+Update `src/routes/attendees.$id.tsx` with admin-only section:
+
+```
+Attendee Profile: John Smith
+┌─────────────────────────────────────────────────────────────┐
+│ Personal Info                             [Edit] [Archive] │
+│ Name: John Smith                                            │
+│ Email: john@example.com                                       │
+│ Status: Visitor                    [Change Status - Admin]  │
+│                                                             │
+│ User Account (Admin Only)                                   │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ Status: ⚠️ Not Linked                                   │ │
+│ │                                                         │ │
+│ │ [Search & Link User]                                    │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ OR (if linked):                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ Status: ✅ Linked to: john@gmail.com                    │ │
+│ │ User: John Doe (registered 2 days ago)                  │ │
+│ │ Linked: 3 days ago                                      │ │
+│ │                                                         │ │
+│ │ [View User Profile] [Unlink Account - Safety Check]     │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Components to Create:**
+
+- `LinkAccountDialog.tsx` - Search and select user to link
+- `UnlinkAccountDialog.tsx` - Confirmation with safety warning
+- `ChangeStatusDialog.tsx` - Status dropdown (admin only)
+
+**Acceptance Criteria:**
+
+- [ ] Admin section visible only to admins
+- [ ] Shows link status (linked/unlinked)
+- [ ] "Link Account" button opens user search dialog
+- [ ] "Unlink" button shows confirmation with safety check
+- [ ] "Change Status" button opens status selector
+- [ ] View linked user profile button
+
+---
+
+### Task 16.5: Attendee List Link Status
+
+**Time:** 1 hour  
+**Status:** ⏳ Pending
+
+#### Link Status in Attendee Table
+
+Update attendee list/table:
+
+```
+Name            Email                Status      User Account
+─────────────────────────────────────────────────────────────────
+John Smith      john@email.com       Visitor     ✅ Linked
+Jane Doe        jane@email.com       Member      ⚠️ Not Linked
+Bob Wilson      bob@email.com        Visitor     ✅ Linked
+```
+
+**Features:**
+
+- Link status icon/badge (✅/⚠️)
+- Filter: "Show unlinked only" (admin convenience)
+- Quick stats: "45 linked, 12 unlinked"
+- Tooltip on hover: "Linked to user@email.com" or "Not linked to any account"
+
+**Acceptance Criteria:**
+
+- [ ] Link status icon shows in table
+- [ ] Filter dropdown for linked/unlinked
+- [ ] Quick stats visible to admins
+- [ ] Tooltips show link details
+
+---
+
+### Task 16.6: Settings > Account Page
+
+**Time:** 2.5 hours  
+**Status:** ⏳ Pending
+
+#### User Account Management
+
+Create `src/routes/settings/account.tsx`:
+
+```
+Settings > Account
+┌─────────────────────────────────────────────────────────────┐
+│ Your Attendee Profile                                       │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ Avatar │ John Smith                                     │ │
+│ │        │ Status: Visitor                              │ │
+│ │        │ Member since: March 15, 2024                   │ │
+│ │        │ [View Full Profile] [Edit Profile]             │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Authentication Methods                                      │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ ✉️ Email & Password                       [Change Pass] │ │
+│ │    john@example.com                                     │ │
+│ ├─────────────────────────────────────────────────────────┤ │
+│ │ 🔗 Google                                  [Unlink]     │ │
+│ │    john@gmail.com (linked 2 days ago)                   │ │
+│ ├─────────────────────────────────────────────────────────┤ │
+│ │ 🔗 Facebook                                [Unlink]     │ │
+│ │    john.doe@facebook.com (linked 1 week ago)            │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Link New Account                                            │
+│ [Link Google] [Link Facebook] [Set Password]              │
+│                                                             │
+│ ⚠️ Note: You cannot unlink your only authentication method │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Features:**
+
+- Linked attendee profile card
+- List of authentication methods
+- "Change Password" for email accounts
+- "Unlink" for OAuth accounts (disabled if only method)
+- "Link" buttons for unlinked providers
+- "Set Password" button for OAuth-only users
+
+**Acceptance Criteria:**
+
+- [ ] Shows linked attendee profile
+- [ ] Lists all auth methods with icons
+- [ ] Can add password to OAuth account
+- [ ] Can link additional OAuth providers
+- [ ] Cannot unlink if it's the only method
+- [ ] Change password functionality
+
+---
+
+### Task 16.7: OAuth Setup & E2E Testing
+
+**Time:** 2 hours  
+**Status:** ⏳ Pending
+
+#### OAuth Configuration
+
+**Files to Create:**
+
+- `docs/OAUTH_SETUP.md` - Step-by-step guide
+- `.env.example` - Environment variable template
+
+**Google OAuth Setup:**
+
+1. Create project in Google Cloud Console
+2. Enable Google+ API
+3. Create OAuth 2.0 credentials
+4. Add authorized redirect URIs:
+   - `http://localhost:3000/api/auth/callback/google` (dev)
+   - `https://your-domain.com/api/auth/callback/google` (prod)
+5. Copy Client ID and Secret to Convex dashboard
+
+**Facebook OAuth Setup:**
+
+1. Create app in Facebook Developers
+2. Add Facebook Login product
+3. Configure OAuth redirect URIs
+4. Copy App ID and Secret to Convex dashboard
+
+#### Convex Environment Variables
+
+Set in Convex dashboard:
+
+```
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+AUTH_FACEBOOK_ID=your-facebook-app-id
+AUTH_FACEBOOK_SECRET=your-facebook-app-secret
+```
+
+#### E2E Tests
+
+Create `tests/e2e/specs/oauth.spec.ts`:
+
+```typescript
+describe('OAuth Authentication', () => {
+  test('user can sign in with Google')
+  test('user can sign in with Facebook')
+  test('OAuth user can add password')
+  test('user can link Google to existing email account')
+  test('user can unlink OAuth account if has password')
+})
+```
+
+**Note:** OAuth E2E tests may be skipped in CI if credentials not available.
+
+**Acceptance Criteria:**
+
+- [ ] OAuth setup documentation complete
+- [ ] Google OAuth configured and tested
+- [ ] Facebook OAuth configured and tested
+- [ ] Environment variables documented
+- [ ] E2E tests created (with skip conditions)
+- [ ] Manual testing checklist completed
+
+---
+
+## Phase 16 Summary Table
+
+| Task      | Time       | Description                   | Dependencies |
+| --------- | ---------- | ----------------------------- | ------------ |
+| 16.1      | 2 hrs      | Admin Roles Schema & CLI      | None         |
+| 16.2      | 2 hrs      | Attendee-User Linking Backend | 16.1         |
+| 16.3      | 2.5 hrs    | Admin Dashboard UI            | 16.1         |
+| 16.4      | 2 hrs      | Attendee Detail Admin Actions | 16.2         |
+| 16.5      | 1 hr       | Attendee List Link Status     | 16.2         |
+| 16.6      | 2.5 hrs    | Settings > Account Page       | 16.2         |
+| 16.7      | 2 hrs      | OAuth Setup & Testing         | All above    |
+| **Total** | **13 hrs** |                               |              |
+
+---
+
+## Phase 16 Key Features
+
+✅ **Role System:** 4 levels (super_admin, admin, moderator, user)  
+✅ **CLI Promotion:** `npx convex run admin/promoteUser`  
+✅ **First Admin:** Sign up → CLI promote  
+✅ **Auto-Linking:** By email on registration (Option A)  
+✅ **Manual Linking:** Admin UI for edge cases (Option B)  
+✅ **Permissions:** Only admins link/unlink/change status  
+✅ **Safety:** Prevent unlinking only auth method  
+✅ **OAuth Data:** Used for new attendee profiles  
+✅ **Admin Dashboard:** Settings > Admin Management  
+✅ **Account Page:** Users manage auth methods
+
+---
+
+## Next Up After Phase 16
+
+- Future: Attendance reporting & analytics
+- Future: Dashboard statistics widgets
+- Future: Event analytics per type
+- Future: Multi-campus support
+
+---
+
+**Ready to start Phase 16 implementation!** 2. **MANUAL TEST** - Verify it works in the browser 3. **ADD TESTS** - After confirmation, add unit/component tests
 
 **Tech Stack:** TanStack Start + React, Convex (backend), shadcn/ui (components), TypeScript
 
