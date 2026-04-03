@@ -4,12 +4,10 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-03  
 **Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
-**Status:** 🚧 Tasks 16.1-16.3 Complete, 16.4 In Progress
+**Status:** 🚧 Tasks 16.1-16.4 Complete, 16.5 In Progress
 
 **Next Up:**
 
-- Task 16.4: Attendee Detail Admin Actions
-- Task 16.4: Attendee Detail Admin Actions
 - Task 16.5: Attendee List Link Status
 - Task 16.6: Settings > Account Page
 - Task 16.7: OAuth Setup & E2E Testing
@@ -2506,52 +2504,43 @@ Created `src/routes/settings/admin.tsx` (Super Admin only):
 ### Task 16.4: Attendee Detail Admin Actions
 
 **Time:** 2 hours  
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
 #### Admin Section in Attendee Detail
 
-Update `src/routes/attendees.$id.tsx` with admin-only section:
+✅ **Completed:** Updated attendee detail page with admin-only section
 
-```
-Attendee Profile: John Smith
-┌─────────────────────────────────────────────────────────────┐
-│ Personal Info                             [Edit] [Archive] │
-│ Name: John Smith                                            │
-│ Email: john@example.com                                       │
-│ Status: Visitor                    [Change Status - Admin]  │
-│                                                             │
-│ User Account (Admin Only)                                   │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Status: ⚠️ Not Linked                                   │ │
-│ │                                                         │ │
-│ │ [Search & Link User]                                    │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                                                             │
-│ OR (if linked):                                             │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Status: ✅ Linked to: john@gmail.com                    │ │
-│ │ User: John Doe (registered 2 days ago)                  │ │
-│ │ Linked: 3 days ago                                      │ │
-│ │                                                         │ │
-│ │ [View User Profile] [Unlink Account - Safety Check]     │ │
-│ └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+**Components Created:**
 
-**Components to Create:**
+- ✅ `AdminSection.tsx` - Main admin section with Shield icon, role-based visibility (admin/moderator/super_admin)
+- ✅ `LinkAccountDialog.tsx` - Searchable user list to link attendee to user account
+- ✅ `UnlinkAccountDialog.tsx` - Confirmation dialog with safety warning about auth methods
+- ✅ `ChangeStatusDialog.tsx` - Status change dialog with current/new status display
 
-- `LinkAccountDialog.tsx` - Search and select user to link
-- `UnlinkAccountDialog.tsx` - Confirmation with safety warning
-- `ChangeStatusDialog.tsx` - Status dropdown (admin only)
+**Backend Integration:**
+
+- ✅ `useAttendeeAdmin.ts` - Hooks for attendee-user linking (useAttendeeUserLink, useLinkToUser, useUnlinkFromUser)
+- ✅ `listAll` query added to `convex/users.ts` - Search users by name/email
+- ✅ `useListAllUsers` hook added to `useCurrentUserRole.ts`
+
+**Features:**
+
+- ✅ Admin section visible only to admins/moderators/super_admins
+- ✅ Shows link status (linked/unlinked) with appropriate icons
+- ✅ "Search & Link User" opens searchable user list
+- ✅ "Unlink" button shows confirmation with safety warning
+- ✅ "Change Status" button opens status selector
+- ✅ "View User Profile" button (placeholder for future)
+- ✅ All dialogs show loading states and toast notifications
 
 **Acceptance Criteria:**
 
-- [ ] Admin section visible only to admins
-- [ ] Shows link status (linked/unlinked)
-- [ ] "Link Account" button opens user search dialog
-- [ ] "Unlink" button shows confirmation with safety check
-- [ ] "Change Status" button opens status selector
-- [ ] View linked user profile button
+- [x] Admin section visible only to admins
+- [x] Shows link status (linked/unlinked)
+- [x] "Link Account" button opens user search dialog
+- [x] "Unlink" button shows confirmation with safety check
+- [x] "Change Status" button opens status selector
+- [x] View linked user profile button
 
 ---
 

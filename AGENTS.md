@@ -62,6 +62,8 @@ The system is fully functional for core church operations:
 - **Attendee-User account linking:** Auto-link on registration by email
 - **CLI admin promotion:** `npx convex run admin:promoteUser`
 - Admin-only attendee linking/unlinking with safety checks
+- **Admin actions on attendee profiles:** Link/unlink accounts, change status
+- **Reusable AttendeeStatusSelect:** Standardized status selection with colored badges
 - Secure session management
 
 ✅ **Data Management**

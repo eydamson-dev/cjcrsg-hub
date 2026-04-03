@@ -69,3 +69,32 @@ export const getById = query({
     }
   },
 })
+
+// List all users (for admin linking)
+export const listAll = query({
+  args: {
+    search: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const users = await ctx.db.query('users').collect()
+
+    const filtered = users.filter((user) => {
+      if (args.search) {
+        const search = args.search.toLowerCase()
+        return (
+          user.email?.toLowerCase().includes(search) ||
+          user.name?.toLowerCase().includes(search)
+        )
+      }
+      return true
+    })
+
+    return filtered.map((user) => ({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      role: (user.role || 'user') as UserRole,
+    }))
+  },
+})

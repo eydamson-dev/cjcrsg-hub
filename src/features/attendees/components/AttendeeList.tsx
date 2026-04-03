@@ -41,6 +41,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
+import { AttendeeStatusSelect } from './AttendeeStatusSelect'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -299,22 +300,13 @@ export function AttendeeList({
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Select
-            value={statusFilter || ''}
-            onValueChange={(value) =>
-              onStatusFilterChange?.(value || undefined)
-            }
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent className="w-[140px] min-w-0">
-              <SelectItem value="">All Status</SelectItem>
-              <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="visitor">Visitor</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <AttendeeStatusSelect
+            mode="filter"
+            value={statusFilter as any}
+            onChange={(value) => onStatusFilterChange?.(value || undefined)}
+            showAllOption
+            className="w-[160px]"
+          />
           <Button
             onClick={() => onNavigate?.('/attendees/new')}
             className="flex-1 sm:flex-none"

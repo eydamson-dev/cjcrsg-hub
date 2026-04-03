@@ -12,6 +12,12 @@ export function useListUsersWithRoles() {
   return useQuery(convexQuery(api.admin.listUsersWithRoles, {}))
 }
 
+export function useListAllUsers(search?: string) {
+  return useQuery(
+    convexQuery(api.users.listAll, { search: search || undefined }),
+  )
+}
+
 export function usePromoteUser() {
   const mutationFn = useConvexMutation(api.admin.promoteUser)
   return mutationFn

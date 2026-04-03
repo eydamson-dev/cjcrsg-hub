@@ -9,44 +9,47 @@
 
 ## 🎯 Current Micro-Task
 
-Phase 16: Task 16.3 Complete - Admin Dashboard UI
+Phase 16: Task 16.4 Complete - Attendee Detail Admin Actions + AttendeeStatusSelect Component
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                   |
-| ------------------ | ---------------------------------------- |
-| **Just completed** | Task 16.3: Admin Dashboard UI            |
-| **In progress**    | Ready for commit                         |
-| **Next up**        | Task 16.4: Attendee Detail Admin Actions |
+| Item               | Status                                                          |
+| ------------------ | --------------------------------------------------------------- |
+| **Just completed** | Task 16.4: Attendee Detail Admin Actions + AttendeeStatusSelect |
+| **In progress**    | Ready for commit                                                |
+| **Next up**        | Task 16.5: Attendee List Link Status                            |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                              | Status      | Notes                                                           |
-| --------------------------------- | ----------- | --------------------------------------------------------------- |
-| `convex/schema.ts`                | ✅ Complete | Added userId to attendees, role to users                        |
-| `convex/lib/authHelpers.ts`       | ✅ Complete | Role checking helpers (requireRole, etc.)                       |
-| `convex/admin.ts`                 | ✅ Complete | promoteUser, demoteUser, listUsersWithRoles, getCurrentUserRole |
-| `convex/lib/attendeeLinking.ts`   | ✅ Complete | createOrLinkAttendee function                                   |
-| `convex/auth.ts`                  | ✅ Complete | afterUserCreatedOrUpdated callback added                        |
-| `convex/attendees/admin.ts`       | ✅ Complete | linkToUser, unlinkFromUser, listUnlinked                        |
-| `CHANGELOG.md`                    | ✅ Complete | Updated with Phase 16 changes                                   |
-| `src/hooks/useCurrentUserRole.ts` | ✅ Complete | Hook for role management                                        |
-| `src/routes/settings.admin.tsx`   | ✅ Complete | Admin Dashboard UI                                              |
-| `src/routes/settings.index.tsx`   | ✅ Complete | Settings main page                                              |
-| `src/lib/navigation.ts`           | ✅ Complete | Updated with Admin child link                                   |
+| File                                                         | Status      | Notes                                                |
+| ------------------------------------------------------------ | ----------- | ---------------------------------------------------- |
+| `src/features/attendees/hooks/useAttendeeAdmin.ts`           | ✅ Complete | Hooks for attendee-user linking                      |
+| `src/features/attendees/components/LinkAccountDialog.tsx`    | ✅ Complete | Search and link user dialog                          |
+| `src/features/attendees/components/UnlinkAccountDialog.tsx`  | ✅ Complete | Confirmation dialog with safety warning              |
+| `src/features/attendees/components/ChangeStatusDialog.tsx`   | ✅ Complete | Status change dialog                                 |
+| `src/features/attendees/components/AdminSection.tsx`         | ✅ Complete | Main admin section component                         |
+| `src/features/attendees/components/AttendeeStatusSelect.tsx` | ✅ Complete | Reusable status select with badge colors             |
+| `src/features/attendees/components/AttendeeDetails.tsx`      | ✅ Complete | Added AdminSection integration                       |
+| `src/features/attendees/components/AttendeeForm.tsx`         | ✅ Complete | Updated to use AttendeeStatusSelect                  |
+| `src/features/attendees/components/AttendeeList.tsx`         | ✅ Complete | Updated to use AttendeeStatusSelect                  |
+| `src/routes/attendees.$id.index.tsx`                         | ✅ Complete | Added user link data fetching                        |
+| `src/hooks/useCurrentUserRole.ts`                            | ✅ Complete | Added useListAllUsers hook                           |
+| `convex/users.ts`                                            | ✅ Complete | Added listAll query                                  |
+| `docs/TASKS.md`                                              | ✅ Complete | Updated Task 16.4 status                             |
+| `CHANGELOG.md`                                               | ✅ Complete | Added entries for Task 16.4 and AttendeeStatusSelect |
 
 ---
 
 ## 📊 Quality Status
 
 - **Tests:** 591 passing (baseline, not yet updated for new features)
-- **TypeScript:** Convex compilation successful (2.08s)
-- **Lint:** Pre-existing errors only (retreat components, tests)
-- **Build:** Route files created successfully
+- **TypeScript:** Pre-existing errors only (retreat components, events)
+- **Lint:** Pre-existing errors only
+- **Build:** All new files compile successfully
 
 ---
 
@@ -54,26 +57,26 @@ Phase 16: Task 16.3 Complete - Admin Dashboard UI
 
 **Decisions Made:**
 
-- ✅ **Refactored:** Added `role` field directly to `users` table (per Convex Auth docs recommendation)
-- Used `afterUserCreatedOrUpdated` callback instead of `createOrUpdateUser` (correct signature)
-- Renamed files to remove hyphens (Convex module naming requirement)
-- Used `authAccounts` table name (not `accounts`) for Convex Auth compatibility
-- Deleted old `userProfiles` table approach
+- ✅ Created reusable AttendeeStatusSelect component with 3 modes (form, filter, simple)
+- ✅ Added colored badge indicators to status options (green/blue/gray)
+- ✅ Replaced all hardcoded status selects across the codebase
+- ✅ Used `getStatusBadgeClass()` helper for consistent badge styling
+- ✅ Admin section visible to admin/moderator/super_admin roles
 
 ---
 
 ## ⚡ Immediate Next Actions
 
-1. ✅ Task 16.3: Admin Dashboard UI - COMPLETE
-   - Created `/settings/admin` route page
-   - Added stats cards for each role type
-   - Search and filter users
-   - Promote/demote buttons per user
-   - Role badges with icons
-2. **Next:** Task 16.4 - Attendee Detail Admin Actions
-   - Add role-based UI to attendee detail page
-   - Link/unlink attendee to user account
-3. Ready for commit after pre-commit checks
+1. ✅ Task 16.4: Attendee Detail Admin Actions - COMPLETE
+   - Created 4 new components (AdminSection, LinkAccountDialog, UnlinkAccountDialog, ChangeStatusDialog)
+   - Created useAttendeeAdmin hooks for linking operations
+   - Added listAll query to users.ts
+   - Updated attendee detail page with admin section
+2. ✅ AttendeeStatusSelect Component - COMPLETE
+   - Created reusable component with badge colors
+   - Updated AttendeeForm, AttendeeList, ChangeStatusDialog, AdminSection
+3. **Next:** Task 16.5 - Attendee List Link Status
+4. Ready for commit after pre-commit checks
 
 ---
 
@@ -88,14 +91,16 @@ Phase 16: Task 16.3 Complete - Admin Dashboard UI
 
 ## 📝 Session Notes
 
-- Task 16.3 implementation complete:
-  - Created `useCurrentUserRole.ts` hook
-  - Created route `/settings/admin` with:
-    - Role stats cards (Super Admin, Admin, Moderator, User counts)
-    - User table with search/filter
-    - Role badges with icons (Crown, Shield, ShieldAlert, User)
-    - Promote buttons (Mod, Admin) per user
-    - Demote button to reset to user
-  - Added `/settings` main page with link to admin
-  - Updated navigation with Admin child item under Settings
+- Task 16.4 implementation complete:
+  - Admin section with Shield icon on attendee detail pages
+  - Link/unlink attendee to user account functionality
+  - Status change dialog with validation
+  - Safety checks for unlinking (prevents if only auth method)
+  - View User Profile button (placeholder for future)
+- AttendeeStatusSelect component created:
+  - Three modes: form (with validation), filter (with "All Status"), simple
+  - Colored badge indicators for each status
+  - Helper exports for consistent styling
+  - Replaced all hardcoded status selects
+- All TypeScript errors are pre-existing (retreat components, events)
 - Ready for testing and commit

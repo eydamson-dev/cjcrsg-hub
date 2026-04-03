@@ -30,6 +30,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Refactored: Deleted `convex/myFunctions.ts`, moved functions to `convex/users.ts`
   - Cleaned database: Removed 1,565 non-admin test users
 
+- **Phase 16 Task 16.4: Attendee Detail Admin Actions** - Admin controls on attendee profile pages
+  - `src/features/attendees/components/AdminSection.tsx` - Admin-only section with Shield icon
+  - `src/features/attendees/components/LinkAccountDialog.tsx` - Searchable user list to link attendee to user account
+  - `src/features/attendees/components/UnlinkAccountDialog.tsx` - Confirmation dialog with safety warning about auth methods
+  - `src/features/attendees/components/ChangeStatusDialog.tsx` - Status change dialog with current/new status display
+  - `src/features/attendees/hooks/useAttendeeAdmin.ts` - Hooks for attendee-user linking operations
+  - `convex/users.ts` - Added `listAll` query for searching users by name/email
+  - Features: Link/unlink attendee-user accounts, change attendee status, view user profile (placeholder)
+  - Role-based visibility: Admin section only visible to admins/moderators/super_admins
+  - Safety checks: Prevent unlinking if user has only one authentication method
+
+- **Reusable AttendeeStatusSelect component** - Standardized status selection across all pages
+  - `src/features/attendees/components/AttendeeStatusSelect.tsx` - Reusable component with three modes (form, filter, simple)
+  - Colored badge indicators for each status (Member: green, Visitor: blue, Inactive: gray)
+  - Helper exports: `getStatusBadgeClass()` and `getStatusLabel()` for consistent styling
+  - Replaced hardcoded status selects in: `AttendeeForm.tsx`, `AttendeeList.tsx`, `ChangeStatusDialog.tsx`, `AdminSection.tsx`
+
 ### Removed
 
 - **Deprecated event form components** - Cleaned up after Phase 15 architecture change
