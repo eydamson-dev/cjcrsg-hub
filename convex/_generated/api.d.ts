@@ -28,9 +28,9 @@ import type * as events_validators from "../events/validators.js";
 import type * as http from "../http.js";
 import type * as lib_attendeeLinking from "../lib/attendeeLinking.js";
 import type * as lib_authHelpers from "../lib/authHelpers.js";
-import type * as myFunctions from "../myFunctions.js";
 import type * as retreat_mutations from "../retreat/mutations.js";
 import type * as retreat_queries from "../retreat/queries.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -59,9 +59,9 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/attendeeLinking": typeof lib_attendeeLinking;
   "lib/authHelpers": typeof lib_authHelpers;
-  myFunctions: typeof myFunctions;
   "retreat/mutations": typeof retreat_mutations;
   "retreat/queries": typeof retreat_queries;
+  users: typeof users;
 }>;
 
 /**

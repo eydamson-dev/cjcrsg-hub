@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EventTypesRouteImport } from './routes/event-types'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as AttendeesIndexRouteImport } from './routes/attendees.index'
+import { Route as SettingsAdminRouteImport } from './routes/settings.admin'
 import { Route as EventsTestRouteImport } from './routes/events.test'
 import { Route as EventsSundayServiceRouteImport } from './routes/events.sunday-service'
 import { Route as EventsSpiritualRetreatRouteImport } from './routes/events.spiritual-retreat'
@@ -43,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/events/',
   path: '/events/',
@@ -51,6 +58,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
 const AttendeesIndexRoute = AttendeesIndexRouteImport.update({
   id: '/attendees/',
   path: '/attendees/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsAdminRoute = SettingsAdminRouteImport.update({
+  id: '/settings/admin',
+  path: '/settings/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsTestRoute = EventsTestRouteImport.update({
@@ -133,8 +145,10 @@ export interface FileRoutesByFullPath {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/admin': typeof SettingsAdminRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id/': typeof AttendeesIdIndexRoute
@@ -152,8 +166,10 @@ export interface FileRoutesByTo {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/admin': typeof SettingsAdminRoute
   '/attendees': typeof AttendeesIndexRoute
   '/events': typeof EventsIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id': typeof AttendeesIdIndexRoute
@@ -173,8 +189,10 @@ export interface FileRoutesById {
   '/events/spiritual-retreat': typeof EventsSpiritualRetreatRoute
   '/events/sunday-service': typeof EventsSundayServiceRoute
   '/events/test': typeof EventsTestRoute
+  '/settings/admin': typeof SettingsAdminRoute
   '/attendees/': typeof AttendeesIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/attendees/$id/edit': typeof AttendeesIdEditRoute
   '/events/$id/edit': typeof EventsIdEditRoute
   '/attendees/$id/': typeof AttendeesIdIndexRoute
@@ -195,8 +213,10 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/admin'
     | '/attendees/'
     | '/events/'
+    | '/settings/'
     | '/attendees/$id/edit'
     | '/events/$id/edit'
     | '/attendees/$id/'
@@ -214,8 +234,10 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/admin'
     | '/attendees'
     | '/events'
+    | '/settings'
     | '/attendees/$id/edit'
     | '/events/$id/edit'
     | '/attendees/$id'
@@ -234,8 +256,10 @@ export interface FileRouteTypes {
     | '/events/spiritual-retreat'
     | '/events/sunday-service'
     | '/events/test'
+    | '/settings/admin'
     | '/attendees/'
     | '/events/'
+    | '/settings/'
     | '/attendees/$id/edit'
     | '/events/$id/edit'
     | '/attendees/$id/'
@@ -255,8 +279,10 @@ export interface RootRouteChildren {
   EventsSpiritualRetreatRoute: typeof EventsSpiritualRetreatRoute
   EventsSundayServiceRoute: typeof EventsSundayServiceRoute
   EventsTestRoute: typeof EventsTestRoute
+  SettingsAdminRoute: typeof SettingsAdminRoute
   AttendeesIndexRoute: typeof AttendeesIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -282,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/': {
       id: '/events/'
       path: '/events'
@@ -294,6 +327,13 @@ declare module '@tanstack/react-router' {
       path: '/attendees'
       fullPath: '/attendees/'
       preLoaderRoute: typeof AttendeesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/admin': {
+      id: '/settings/admin'
+      path: '/settings/admin'
+      fullPath: '/settings/admin'
+      preLoaderRoute: typeof SettingsAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/test': {
@@ -430,8 +470,10 @@ const rootRouteChildren: RootRouteChildren = {
   EventsSpiritualRetreatRoute: EventsSpiritualRetreatRoute,
   EventsSundayServiceRoute: EventsSundayServiceRoute,
   EventsTestRoute: EventsTestRoute,
+  SettingsAdminRoute: SettingsAdminRoute,
   AttendeesIndexRoute: AttendeesIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

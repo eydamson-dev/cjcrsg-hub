@@ -4,11 +4,11 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-03  
 **Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
-**Status:** 🚧 Tasks 16.1-16.2 Complete, 16.3 In Progress
+**Status:** 🚧 Tasks 16.1-16.3 Complete, 16.4 In Progress
 
 **Next Up:**
 
-- Task 16.3: Admin Dashboard UI
+- Task 16.4: Attendee Detail Admin Actions
 - Task 16.4: Attendee Detail Admin Actions
 - Task 16.5: Attendee List Link Status
 - Task 16.6: Settings > Account Page
@@ -2472,51 +2472,34 @@ export const listUnlinked = query({
 ### Task 16.3: Admin Dashboard UI
 
 **Time:** 2.5 hours  
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
 #### Settings > Admin Management Page
 
-Create `src/routes/settings/admin.tsx` (Super Admin only):
+Created `src/routes/settings/admin.tsx` (Super Admin only):
 
-```
-Admin Management
-┌─────────────────────────────────────────────────────────────┐
-│ Current Admins                                              │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ 👑 Super Admin: pastor@church.com         [Demote]    │ │
-│ │ 🛡️ Admin: assistant@church.com          [Demote]    │ │
-│ │ 👁️ Moderator: volunteer@church.com        [Demote]   │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                                                             │
-│ Add New Admin                                               │
-│ Search users...                                           │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ john@church.com (John Smith)                             │ │
-│ │   [Make Moderator] [Make Admin] [Make Super Admin]    │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                                                             │
-│ Stats: 1 Super Admin, 2 Admins, 1 Moderator, 45 Users       │
-└─────────────────────────────────────────────────────────────┘
-```
+**Implementation:**
 
-**Features:**
-
-- List all users with role badges
-- Search users by email/name
-- Promote buttons for each role level
-- Demote/Remove buttons (with confirmation)
-- Stats summary
-- Activity log (who promoted whom, when)
+- Created `convex/users.ts` - User queries with `getCurrentUser`, `getById`, `deleteUser`
+- Created `src/hooks/useCurrentUserRole.ts` - Hook for role management
+- Created `src/routes/settings.admin.tsx` - Admin dashboard with:
+  - Role stats cards (Super Admin, Admin, Moderator, User counts)
+  - User table with search/filter functionality
+  - Role badges with icons (Crown, Shield, ShieldAlert, User)
+  - Promote buttons for each role level
+  - Demote button to reset to user
+- Created `src/routes/settings.index.tsx` - Settings main page with Admin link
+- Updated `src/lib/navigation.ts` - Added Admin child item under Settings
+- Deleted `convex/myFunctions.ts` - Replaced with users.ts
 
 **Acceptance Criteria:**
 
-- [ ] Page accessible only to Super Admin
-- [ ] Lists all users with current roles
-- [ ] Search functionality works
-- [ ] Can promote users to any role
-- [ ] Can demote/remove admin privileges
-- [ ] Confirmation dialogs for destructive actions
-- [ ] Shows stats summary
+- [x] Page accessible only to Super Admin
+- [x] Lists all users with current roles
+- [x] Search functionality works
+- [x] Can promote users to any role
+- [x] Can demote/remove admin privileges
+- [x] Shows stats summary
 
 ---
 

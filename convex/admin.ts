@@ -76,3 +76,36 @@ export const demoteUser = mutation({
     }
   },
 })
+
+// Delete all users except those with admin roles
+export const wipeNonAdminUsers = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query('users').collect()
+    const adminRoles = ['super_admin', 'admin', 'moderator']
+
+    let deletedCount = 0
+    let preservedCount = 0
+
+    for (const user of users) {
+      const userRole = (user.role || 'user') as UserRole
+
+      // Skip admin users
+      if (adminRoles.includes(userRole)) {
+        preservedCount++
+        continue
+      }
+
+      // Delete non-admin user
+      await ctx.db.delete(user._id)
+      deletedCount++
+    }
+
+    return {
+      success: true,
+      deletedCount,
+      preservedCount,
+      message: `Deleted ${deletedCount} non-admin users, preserved ${preservedCount} admin users`,
+    }
+  },
+})

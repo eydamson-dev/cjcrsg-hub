@@ -2,38 +2,42 @@
 
 **Session Started:** 2026-04-03  
 **Last Updated:** 2026-04-03  
-**Branch:** feature/phase16-complete-auth-module
+**Branch:** feature/phase16-complete-auth-module  
+**Status:** Documentation Updated - Ready for Commit
 
 ---
 
 ## 🎯 Current Micro-Task
 
-Phase 16: Tasks 16.1 + 16.2 Complete - Admin Roles Schema & Attendee-User Linking Backend
+Phase 16: Task 16.3 Complete - Admin Dashboard UI
 
 ---
 
 ## 📝 Session State
 
-| Item               | Status                                     |
-| ------------------ | ------------------------------------------ |
-| **Just completed** | Tasks 16.1 + 16.2 Implementation & Testing |
-| **In progress**    | Ready for commit                           |
-| **Next up**        | Task 16.3: Admin Dashboard UI              |
+| Item               | Status                                   |
+| ------------------ | ---------------------------------------- |
+| **Just completed** | Task 16.3: Admin Dashboard UI            |
+| **In progress**    | Ready for commit                         |
+| **Next up**        | Task 16.4: Attendee Detail Admin Actions |
 
 ---
 
 ## 🛠️ Working Files
 
-| File                            | Status      | Notes                                       |
-| ------------------------------- | ----------- | ------------------------------------------- |
-| `convex/schema.ts`              | ✅ Complete | Added userId to attendees, role to users    |
-| `convex/lib/authHelpers.ts`     | ✅ Complete | Role checking helpers (requireRole, etc.)   |
-| `convex/admin.ts`               | ✅ Complete | promoteUser, demoteUser, listUsersWithRoles |
-| `convex/lib/attendeeLinking.ts` | ✅ Complete | createOrLinkAttendee function               |
-| `convex/auth.ts`                | ✅ Complete | afterUserCreatedOrUpdated callback added    |
-| `convex/attendees/admin.ts`     | ✅ Complete | linkToUser, unlinkFromUser, listUnlinked    |
-| `CHANGELOG.md`                  | ✅ Complete | Updated with Phase 16 changes               |
-| `convex/_generated/`            | ✅ Complete | Types regenerated successfully              |
+| File                              | Status      | Notes                                                           |
+| --------------------------------- | ----------- | --------------------------------------------------------------- |
+| `convex/schema.ts`                | ✅ Complete | Added userId to attendees, role to users                        |
+| `convex/lib/authHelpers.ts`       | ✅ Complete | Role checking helpers (requireRole, etc.)                       |
+| `convex/admin.ts`                 | ✅ Complete | promoteUser, demoteUser, listUsersWithRoles, getCurrentUserRole |
+| `convex/lib/attendeeLinking.ts`   | ✅ Complete | createOrLinkAttendee function                                   |
+| `convex/auth.ts`                  | ✅ Complete | afterUserCreatedOrUpdated callback added                        |
+| `convex/attendees/admin.ts`       | ✅ Complete | linkToUser, unlinkFromUser, listUnlinked                        |
+| `CHANGELOG.md`                    | ✅ Complete | Updated with Phase 16 changes                                   |
+| `src/hooks/useCurrentUserRole.ts` | ✅ Complete | Hook for role management                                        |
+| `src/routes/settings.admin.tsx`   | ✅ Complete | Admin Dashboard UI                                              |
+| `src/routes/settings.index.tsx`   | ✅ Complete | Settings main page                                              |
+| `src/lib/navigation.ts`           | ✅ Complete | Updated with Admin child link                                   |
 
 ---
 
@@ -42,8 +46,7 @@ Phase 16: Tasks 16.1 + 16.2 Complete - Admin Roles Schema & Attendee-User Linkin
 - **Tests:** 591 passing (baseline, not yet updated for new features)
 - **TypeScript:** Convex compilation successful (2.08s)
 - **Lint:** Pre-existing errors only (retreat components, tests)
-- **Build:** Convex functions ready
-- **Documentation:** CHANGELOG.md and SESSION.md updated
+- **Build:** Route files created successfully
 
 ---
 
@@ -61,10 +64,16 @@ Phase 16: Tasks 16.1 + 16.2 Complete - Admin Roles Schema & Attendee-User Linkin
 
 ## ⚡ Immediate Next Actions
 
-1. ✅ Tasks 16.1 + 16.2 implementation complete (with refactor to direct users table)
-2. ✅ Documentation updated (CHANGELOG.md, SESSION.md)
-3. **Ready to commit:** All changes staged
-4. **Next:** Task 16.3 - Admin Dashboard UI (Settings > Admin Management page)
+1. ✅ Task 16.3: Admin Dashboard UI - COMPLETE
+   - Created `/settings/admin` route page
+   - Added stats cards for each role type
+   - Search and filter users
+   - Promote/demote buttons per user
+   - Role badges with icons
+2. **Next:** Task 16.4 - Attendee Detail Admin Actions
+   - Add role-based UI to attendee detail page
+   - Link/unlink attendee to user account
+3. Ready for commit after pre-commit checks
 
 ---
 
@@ -79,13 +88,14 @@ Phase 16: Tasks 16.1 + 16.2 Complete - Admin Roles Schema & Attendee-User Linkin
 
 ## 📝 Session Notes
 
-- Tasks 16.1 + 16.2 combined and implemented together
-- **Refactored implementation:** Added `role` field directly to `users` table (cleaner approach per Convex Auth docs)
-- Schema changes: `userId` field on attendees, custom `users` table with `role` field
-- Auto-linking works via `afterUserCreatedOrUpdated` callback in auth.ts
-- CLI promotion function ready for testing
-- Admin linking mutations (link/unlink/list) implemented with role-based access control
-- All Convex types regenerated successfully (2.08s)
-- Old `userProfiles` table indexes automatically cleaned up by Convex
-- Documentation updated in CHANGELOG.md under [Unreleased]
-- Ready for commit
+- Task 16.3 implementation complete:
+  - Created `useCurrentUserRole.ts` hook
+  - Created route `/settings/admin` with:
+    - Role stats cards (Super Admin, Admin, Moderator, User counts)
+    - User table with search/filter
+    - Role badges with icons (Crown, Shield, ShieldAlert, User)
+    - Promote buttons (Mod, Admin) per user
+    - Demote button to reset to user
+  - Added `/settings` main page with link to admin
+  - Updated navigation with Admin child item under Settings
+- Ready for testing and commit

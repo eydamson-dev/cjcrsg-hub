@@ -2,8 +2,8 @@
 
 A modern church management system built with TanStack Start, Convex, and shadcn/ui.
 
-**Status:** Phase 15 - Unified Event Creation Architecture - In Progress  
-**Last Updated:** 2026-04-02
+**Status:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
+**Last Updated:** 2026-04-03
 
 ---
 
@@ -120,7 +120,7 @@ The system is fully functional for core church operations:
 
 - ✅ Task 16.1: Admin Roles Schema & CLI Promotion
 - ✅ Task 16.2: Attendee-User Auto-Linking Backend
-- ⏳ Task 16.3: Admin Dashboard UI
+- ✅ Task 16.3: Admin Dashboard UI
 - ⏳ Task 16.4: Attendee Detail Admin Actions
 - ⏳ Task 16.5: Attendee List Link Status
 - ⏳ Task 16.6: Settings > Account Page
@@ -128,7 +128,7 @@ The system is fully functional for core church operations:
 
 **Next Up:**
 
-- Task 16.3: Admin Dashboard UI
+- Task 16.4: Attendee Detail Admin Actions
 
 **See [docs/TASKS.md](docs/TASKS.md) for complete feature catalog.**
 

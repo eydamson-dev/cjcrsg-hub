@@ -1,8 +1,9 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import type { Id } from './_generated/dataModel'
+import type { UserRole } from './lib/authHelpers'
 
-// Query to get current authenticated user
+// Query to get current authenticated user with role
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
@@ -11,7 +12,7 @@ export const getCurrentUser = query({
       return null
     }
 
-    // The subject field contains "userId|accountId", extract just the userId
+    // Parse userId from subject (format: "userId|accountId")
     const userId = identity.subject.split('|')[0] as Id<'users'>
     const user = await ctx.db.get(userId)
 
@@ -20,9 +21,11 @@ export const getCurrentUser = query({
     }
 
     return {
+      _id: user._id,
       name: user.name,
       email: user.email,
       image: user.image,
+      role: (user.role || 'user') as UserRole,
     }
   },
 })
@@ -43,5 +46,26 @@ export const deleteUser = mutation({
     await ctx.db.delete(args.id)
 
     console.log('Deleted user with id:', args.id)
+  },
+})
+
+// Get user by ID
+export const getById = query({
+  args: {
+    id: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.id)
+    if (!user) {
+      return null
+    }
+
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      role: (user.role || 'user') as UserRole,
+    }
   },
 })

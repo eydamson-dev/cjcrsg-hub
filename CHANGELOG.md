@@ -12,13 +12,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 16: Admin Roles & Attendee-User Linking (Tasks 16.1-16.2)** - Complete authentication backend with role-based access control
   - Custom `users` table with `role` field (super_admin, admin, moderator, user) extending Convex Auth
   - `convex/lib/authHelpers.ts` - Role checking helpers (`requireRole`, `requireAdmin`, `requireSuperAdmin`, `getCurrentUserRole`, `hasRole`)
-  - `convex/admin.ts` - CLI admin functions (`promoteUser`, `demoteUser`, `listUsersWithRoles`)
+  - `convex/admin.ts` - CLI admin functions (`promoteUser`, `demoteUser`, `listUsersWithRoles`, `wipeNonAdminUsers`)
   - `convex/lib/attendeeLinking.ts` - Auto-linking logic for attendee-user connection on registration
   - `convex/auth.ts` - `afterUserCreatedOrUpdated` callback for automatic attendee creation/linking
   - `convex/attendees/admin.ts` - Admin mutations for manual linking (`linkToUser`, `unlinkFromUser`, `listUnlinked`, `listLinked`, `getAttendeeUserLink`)
   - `userId` field on `attendees` table with `by_user` index for tracking linked accounts
   - Safety checks: Prevent unlinking if it's the user's only authentication method
   - Role hierarchy: super_admin (4) → admin (3) → moderator (2) → user (1)
+
+- **Phase 16 Task 16.3: Admin Dashboard UI** - Settings page for managing user roles
+  - `convex/users.ts` - User queries with `getCurrentUser` (includes role), `getById`, `deleteUser`
+  - `src/hooks/useCurrentUserRole.ts` - React hooks for role management
+  - `src/routes/settings.admin.tsx` - Admin dashboard (Super Admin only access)
+  - `src/routes/settings.index.tsx` - Settings main page with navigation
+  - Features: Role stats cards, searchable user table, role badges with icons (Crown, Shield, ShieldAlert, User)
+  - Promote/demote functionality with toast notifications
+  - Refactored: Deleted `convex/myFunctions.ts`, moved functions to `convex/users.ts`
+  - Cleaned database: Removed 1,565 non-admin test users
 
 ### Removed
 
@@ -28,6 +38,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Form schemas and utilities (`eventSchemas`, `timeOptions`)
   - All form test files (70 tests removed, 591 tests passing)
   - Updated edit route to use `GenericEventDetails` with smart redirection
+
+### Removed
+
+- **Non-admin user accounts** - Database cleanup using `admin:wipeNonAdminUsers`
+  - Deleted 1,565 non-admin test users
+  - Preserved 1 admin user (eydamson@gmail.com as super_admin)
+  - Created CLI utility `wipeNonAdminUsers` for future database cleanup
 
 ### Added
 

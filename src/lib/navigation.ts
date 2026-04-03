@@ -8,6 +8,7 @@ import {
   Church,
   List,
   Mountain,
+  Shield,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -75,6 +76,20 @@ export const navItems: NavItem[] = [
     href: '/settings',
     icon: Settings,
     description: 'Configure app settings',
+    children: [
+      {
+        title: 'General',
+        href: '/settings',
+        icon: Settings,
+        description: 'General settings',
+      },
+      {
+        title: 'Admin',
+        href: '/settings/admin',
+        icon: Shield,
+        description: 'Manage admin users',
+      },
+    ],
   },
 ]
 
