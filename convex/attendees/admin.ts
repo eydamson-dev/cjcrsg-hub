@@ -135,3 +135,19 @@ export const getAttendeeUserLink = query({
     }
   },
 })
+
+export const countLinked = query({
+  args: {},
+  handler: async (ctx) => {
+    const attendees = await ctx.db.query('attendees').collect()
+    return attendees.filter((a) => a.userId !== undefined).length
+  },
+})
+
+export const countUnlinked = query({
+  args: {},
+  handler: async (ctx) => {
+    const attendees = await ctx.db.query('attendees').collect()
+    return attendees.filter((a) => a.userId === undefined).length
+  },
+})

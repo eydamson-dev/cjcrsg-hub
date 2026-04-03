@@ -47,6 +47,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Helper exports: `getStatusBadgeClass()` and `getStatusLabel()` for consistent styling
   - Replaced hardcoded status selects in: `AttendeeForm.tsx`, `AttendeeList.tsx`, `ChangeStatusDialog.tsx`, `AdminSection.tsx`
 
+- **Phase 16 Task 16.5: Attendee List Link Status** - Show attendee-user link status in attendee list
+  - `src/features/attendees/components/LinkStatusBadge.tsx` - Reusable badge component showing linked/unlinked status with tooltip
+  - `convex/attendees/admin.ts` - Added `countLinked` and `countUnlinked` queries for admin stats
+  - `convex/attendees/queries.ts` - Enriched `list` and `search` queries with user email/name for linked attendees
+  - `src/features/attendees/hooks/useAttendees.ts` - Added `useLinkedCount` and `useUnlinkedCount` hooks
+  - Features:
+    - User Account column in attendee table (admin/super_admin only) showing link status with tooltip
+    - Link filter dropdown: "All accounts", "Linked only", "Unlinked only" (admin/super_admin only)
+    - Quick stats row showing linked/unlinked counts at top of page (admin/super_admin only)
+    - Client-side filtering for link status (compatible with server-side pagination)
+    - Tooltip on linked badges shows "Linked to {userEmail}"
+
 ### Removed
 
 - **Deprecated event form components** - Cleaned up after Phase 15 architecture change

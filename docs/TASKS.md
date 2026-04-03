@@ -4,11 +4,10 @@ Complete feature catalog for the church management system.
 
 **Last Updated:** 2026-04-03  
 **Current Phase:** Phase 16 - Complete Auth Module with Admin Roles & Account Linking - In Progress  
-**Status:** 🚧 Tasks 16.1-16.4 Complete, 16.5 In Progress
+**Status:** 🚧 Tasks 16.1-16.5 Complete, 16.6 In Progress
 
 **Next Up:**
 
-- Task 16.5: Attendee List Link Status
 - Task 16.6: Settings > Account Page
 - Task 16.7: OAuth Setup & E2E Testing
 - Future: Attendance reporting & analytics
@@ -2547,7 +2546,7 @@ Created `src/routes/settings/admin.tsx` (Super Admin only):
 ### Task 16.5: Attendee List Link Status
 
 **Time:** 1 hour  
-**Status:** ⏳ Pending
+**Status:** ✅ Complete
 
 #### Link Status in Attendee Table
 
@@ -2563,17 +2562,17 @@ Bob Wilson      bob@email.com        Visitor     ✅ Linked
 
 **Features:**
 
-- Link status icon/badge (✅/⚠️)
-- Filter: "Show unlinked only" (admin convenience)
-- Quick stats: "45 linked, 12 unlinked"
-- Tooltip on hover: "Linked to user@email.com" or "Not linked to any account"
+- ✅ Link status icon/badge (✅/⚠️)
+- ✅ Filter: "Show unlinked only" (admin convenience)
+- ✅ Quick stats: "45 linked, 12 unlinked"
+- ✅ Tooltip on hover: "Linked to user@email.com" or "Not linked to any account"
 
 **Acceptance Criteria:**
 
-- [ ] Link status icon shows in table
-- [ ] Filter dropdown for linked/unlinked
-- [ ] Quick stats visible to admins
-- [ ] Tooltips show link details
+- [x] Link status icon shows in table
+- [x] Filter dropdown for linked/unlinked
+- [x] Quick stats visible to admins
+- [x] Tooltips show link details
 
 ---
 

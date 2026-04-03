@@ -64,6 +64,7 @@ The system is fully functional for core church operations:
 - Admin-only attendee linking/unlinking with safety checks
 - **Admin actions on attendee profiles:** Link/unlink accounts, change status
 - **Reusable AttendeeStatusSelect:** Standardized status selection with colored badges
+- **Attendee list link status:** User Account column, link filter, quick stats (admin only)
 - Secure session management
 
 ✅ **Data Management**
