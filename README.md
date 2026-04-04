@@ -267,7 +267,6 @@ pnpm dlx convex env set AUTH_FACEBOOK_SECRET your-facebook-app-secret
 | `pnpm test`          | Run unit and component tests             |
 | `pnpm test:watch`    | Run tests in watch mode                  |
 | `pnpm test:coverage` | Run tests with coverage report           |
-| `pnpm test:e2e`      | Run E2E tests                            |
 
 ### Project Structure
 
@@ -298,8 +297,7 @@ cjcrsg-hub/
 │   └── retreat/                # Spiritual retreat extension
 ├── docs/                        # Documentation
 ├── tests/                       # Test files
-│   ├── unit/                   # Unit and component tests
-│   └── e2e/                    # E2E tests
+│   └── unit/                   # Unit and component tests
 ├── .agents/                     # AI assistant skills and configuration
 └── public/                      # Static assets
 ```
@@ -317,18 +315,12 @@ pnpm test:watch
 
 # Run tests with coverage report
 pnpm test:coverage
-
-# Run E2E tests
-pnpm test:e2e
-
-# Run E2E tests with UI mode
-pnpm test:e2e:ui
 ```
 
 ### Test Structure
 
-- **Unit Tests:** Located in `tests/unit/convex/` for backend and `tests/unit/components/` for frontend
-- **E2E Tests:** Located in `tests/e2e/specs/` using Playwright
+- **Unit Tests:** Located in `tests/unit/convex/` for backend
+- **Component Tests:** Located in `tests/unit/components/` for frontend
 - **Test Utilities:** `tests/setup/` contains test configuration
 
 ### Writing Tests

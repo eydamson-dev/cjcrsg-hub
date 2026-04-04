@@ -130,11 +130,6 @@ tests/
 │       └── events/
 │           ├── EventTypeForm.test.tsx
 │           └── EventTypeList.test.tsx
-├── e2e/                       # E2E tests
-│   └── specs/
-│       ├── auth.spec.ts
-│       ├── attendees-crud.spec.ts
-│       └── event-types.spec.ts
 └── setup/                     # Test setup
     └── test.setup.ts
 ```

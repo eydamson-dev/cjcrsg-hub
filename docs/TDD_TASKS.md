@@ -12,7 +12,7 @@ Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 **Updated:** 2026-04-02
 
 **Phase:** Phase 14 - Event-Specific Forms & Extensions - Testing Phase  
-**Status:** ✅ All Unit Tests Passing (661 tests), E2E tests cleaned up
+**Status:** ✅ All Unit Tests Passing (591 tests)
 
 **Summary:**
 
@@ -21,11 +21,10 @@ Fixed 3 previously skipped tests in SpiritualRetreatForm:
 - Fixed tab switching tests by using `screen.getByRole('tab', { name: /tabname/i })` instead of `data-value` attribute
 - All SpiritualRetreatForm tests now passing (16/16)
 
-**Current Test Count:** 661 tests passing
+**Current Test Count:** 591 tests passing
 
 - Convex Unit: 94 tests
-- Component Tests: 410 tests
-- E2E Tests: 56 tests (0 skipped)
+- Component Tests: 497 tests
 
 **Next Testing Phase:** Phase 14.6 (Create Spiritual Retreat Form)
 
@@ -78,13 +77,8 @@ Added 37 new backend tests for Spiritual Retreat module:
 **Test Results:**
 
 - **New Tests Added:** 37 tests (Phase 13 retreat mutations)
-- **Total Tests:** 591 tests passing (554 Convex + Component + E2E)
+- **Total Tests:** 591 tests passing 
 
-2. **E2E Test Fixes:**
-   - ✅ Fixed `user can edit an existing event` - Changed to navigate to /events/history instead of /events/archive
-   - ✅ Fixed `user can view event details` - Changed to navigate to /events/history instead of /events/archive
-   - ✅ Fixed `user can archive an event` - Changed to navigate to /events/history, corrected expectation (archived event should appear in archive, not disappear)
-   - All 6 previously failing tests now passing (3 tests × 2 browsers = 6 test instances)
 
 3. **Test Infrastructure:**
    - ✅ Suppressed stderr warnings in test setup (hydration errors, convex-test warnings)
@@ -95,8 +89,6 @@ Added 37 new backend tests for Spiritual Retreat module:
 **Test Results:**
 
 - **Unit Tests:** 553 passing (33 test files)
-- **E2E Tests:** 42 passing (4 skipped by design)
-- **Total Tests:** 595 tests passing (114 Convex + 397 Component + 42 E2E + Skipped)
 
 **Summary:**
 
@@ -117,7 +109,7 @@ Completed comprehensive attendance backend tests for Phase 7:
 
 - **New Tests Added:** 40 tests (exceeded 16 estimated)
 - **Attendance Backend Tests:** 40 tests passing (19 mutations + 21 queries)
-- **Total Tests:** 580 tests passing (114 Convex + 410 Component + 56 E2E)
+- **Total Tests:** 580 tests passing 
 
 ---
 
@@ -146,7 +138,7 @@ Created comprehensive tests for Phase 9.3:
 **Test Results:**
 
 - **New Tests Added:** 25 tests
-- **Total Tests:** 560 tests passing (94 Convex + 410 Component + 56 E2E)
+- **Total Tests:** 560 tests passing 
 
 **Summary:**
 
@@ -168,7 +160,7 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
 - `tests/unit/events/components/EventTypeList.test.tsx` - Enabled and fixed 6 tests
 - `src/features/events/components/EventTypeList.tsx` - Added `data-testid` to delete button
 
-**Total Tests:** 459 tests passing (94 Convex + 309 Component + 56 E2E)
+**Total Tests:** 459 tests passing 
 
 **Summary:**
 
@@ -182,7 +174,6 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
   - ✅ Task 3.1: Test Form Component (15/15 tests passing)
   - ✅ Task 3.2: Test ErrorState Component (21/21 tests passing)
   - ✅ Task 3.3: Test Layout Component (6/6 tests passing)
-- ✅ Phase 4: E2E Critical Flows (2/2 tasks complete, 9 E2E tests)
   - ✅ Task 4.1: Create Auth Tests (3 tests - signup/login, invalid credentials, session persistence)
   - ✅ Task 4.2: Create Attendee CRUD Tests (4 tests - navigation, form submission, validation, list view)
   - ✅ Setup tests (2 tests - homepage loads, login page accessible)
@@ -191,9 +182,7 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
   - ✅ Task 4.7: Test useEventTypeMutations hooks (12 tests - create, update, delete with toast notifications)
   - ✅ Task 4.8: Test EventTypeForm component (15 tests - rendering, validation, color picker, submission)
   - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
-- ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
   - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
-  - ✅ Task 4.12: Test Event Types E2E (16 tests - navigation, CRUD, validation, color picker, 2 browsers)
 - ✅ Phase 6: Events Backend Tests (2/2 tasks complete, 57 tests added) [COMMITTED]
   - ✅ Task 6.1: Test Event Mutations (31 tests - create, update, start, complete, cancel, archive)
   - ✅ Task 6.2: Test Event Queries (26 tests - list, getById, getCurrentEvent, listArchive, getStats)
@@ -218,7 +207,6 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
   - ✅ Task 3.1: Test Form Component (15/15 tests passing)
   - ✅ Task 3.2: Test ErrorState Component (21/21 tests passing)
   - ✅ Task 3.3: Test Layout Component (6/6 tests passing)
-- ✅ Phase 4: E2E Critical Flows (2/2 tasks complete, 9 E2E tests)
   - ✅ Task 4.1: Create Auth Tests (3 tests - signup/login, invalid credentials, session persistence)
   - ✅ Task 4.2: Create Attendee CRUD Tests (4 tests - navigation, form submission, validation, list view)
   - ✅ Setup tests (2 tests - homepage loads, login page accessible)
@@ -227,9 +215,7 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
   - ✅ Task 4.7: Test useEventTypeMutations hooks (12 tests - create, update, delete with toast notifications)
   - ✅ Task 4.8: Test EventTypeForm component (15 tests - rendering, validation, color picker, submission)
   - ✅ Task 4.9: Test EventTypeList component (12 tests - loading, error, empty states, table rendering)
-- ✅ Phase 4c: Event Types Route & E2E Tests (2/2 tasks complete, 17 tests added)
   - ✅ Task 4.10: Test Event Types route page (8 tests - initial render, dialog management, form submission)
-  - ✅ Task 4.12: Test Event Types E2E (16 tests - navigation, CRUD, validation, color picker, 2 browsers)
 - ✅ Phase 6: Events Backend Tests (2/2 tasks complete, 57 tests added) [COMMITTED]
   - ✅ Task 6.1: Test Event Mutations (31 tests - create, update, start, complete, cancel, archive)
   - ✅ Task 6.2: Test Event Queries (26 tests - list, getById, getCurrentEvent, listArchive, getStats)
@@ -242,7 +228,7 @@ Fixed 6 skipped delete confirmation tests in EventTypeList.test.tsx:
   - ✅ Task 9.2: Test Archive Components (33 tests - EventArchive, EventFilters)
   - ✅ Task 9.3: Test Dashboard Components (25 tests - CurrentEventDashboard, QuickStats)
 
-**Total Tests:** 560 tests passing (94 Convex + 410 Component + 56 E2E) - 2026-03-26
+**Total Tests:** 560 tests passing 
 
 ---
 
@@ -256,7 +242,6 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 
 - Working on test infrastructure (Vitest, Playwright, convex-test)
 - Writing unit tests for Convex queries/mutations
-- Creating E2E test specs
 - Setting up test utilities or helpers
 
 **Do NOT update this file for:**
@@ -275,10 +260,8 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 4. [Phase 1: Infrastructure Setup](#phase-1-infrastructure-setup)
 5. [Phase 2: Critical Convex Unit Tests](#phase-2-critical-convex-unit-tests)
 6. [Phase 3: Shared Component Tests](#phase-3-shared-component-tests)
-7. [Phase 4: E2E Critical Flows](#phase-4-e2e-critical-flows)
-8. [Commands & Scripts](#commands--scripts)
-9. [Success Criteria](#success-criteria)
-10. [Phase 5: Future Testing](#phase-5-future-testing)
+7. [Commands & Scripts](#commands--scripts)
+8. [Success Criteria](#success-criteria)
 
 ---
 
@@ -301,7 +284,7 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 **Step 3: ADD TESTS** (After user confirmation)
 
 - Backend: Unit tests with convex-test
-- Frontend: Component tests OR E2E tests
+- Frontend: Component tests
 - Update documentation with test counts
 
 ### Testing Philosophy
@@ -314,9 +297,8 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 - Schema validation
 - Business logic
 
-**Frontend (E2E + Selective Unit Tests):**
+**Frontend (Selective Unit Tests):**
 
-- Critical user flows (via E2E)
 - Shared components (via unit tests)
 - Complex logic (via unit tests)
 
@@ -333,30 +315,27 @@ For feature implementation tasks (Event Types, Attendee management, etc.), see `
 - Backend queries and mutations (convex-test)
 - Form validation logic
 - Bug fixes (reproduce the bug first in implementation)
-- E2E tests for critical flows
 
 **Skip testing:**
 
 - Simple UI components (pure rendering)
-- Non-shared components (tested via E2E)
+- Non-shared components (tested manually)
 - Heavy-mocked component tests
 
 ---
 
 ## 🛠 Technology Stack
 
-| Category            | Tool                                    | Purpose                     | Speed              |
-| ------------------- | --------------------------------------- | --------------------------- | ------------------ |
-| **Unit Tests**      | Vitest + convex-test                    | Test Convex logic in memory | ⚡ Milliseconds    |
-| **Component Tests** | Vitest + @testing-library/react + jsdom | Test React components       | ⚡ Seconds         |
-| **E2E Tests**       | Playwright                              | Test full user workflows    | 🐢 Seconds-Minutes |
-| **Coverage**        | @vitest/coverage-v8                     | Code coverage reporting     | -                  |
+| Category            | Tool                                    | Purpose                     | Speed           |
+| ------------------- | --------------------------------------- | --------------------------- | --------------- |
+| **Unit Tests**      | Vitest + convex-test                    | Test Convex logic in memory | ⚡ Milliseconds |
+| **Component Tests** | Vitest + @testing-library/react + jsdom | Test React components       | ⚡ Seconds      |
+| **Coverage**        | @vitest/coverage-v8                     | Code coverage reporting     | -               |
 
 ### Why This Stack?
 
 - **convex-test**: Official Convex library for fast unit testing without running dev server
 - **Vitest**: Vite-native test runner, fast HMR, supports multiple projects
-- **Playwright**: Modern E2E testing with auto-waiting, trace viewer, mobile emulation
 - **@testing-library**: User-centric testing (test behavior, not implementation)
 
 ---
@@ -377,15 +356,8 @@ cjcrsg-hub/
 │   │           ├── form.test.tsx
 │   │           ├── error-state.test.tsx
 │   │           └── layout.test.tsx
-│   ├── e2e/
-│   │   ├── specs/
-│   │   │   ├── auth.spec.ts           # Login, session
-│   │   │   └── attendees-crud.spec.ts # Full workflows
-│   │   └── setup/
-│   │       └── auth.setup.ts
-│   └── README.md
+└── README.md
 ├── vitest.config.ts
-├── playwright.config.ts
 └── package.json
 ```
 
@@ -410,9 +382,6 @@ pnpm add -D convex-test @edge-runtime/vm
 
 # React component testing
 pnpm add -D @testing-library/react @testing-library/jest-dom jsdom
-
-# E2E testing
-pnpm add -D @playwright/test
 ```
 
 **Verification:** All packages installed successfully. Test folder structure created. Validation test passes (3/3 tests).
@@ -446,7 +415,7 @@ export default defineConfig({
 
 **Created files:**
 
-- `vitest.config.ts` - Vitest configuration (excludes e2e tests directory)
+- `vitest.config.ts` - Vitest configuration 
 - `tests/unit/setup.ts` - Test setup file with jest-dom matchers
 
 **Added npm scripts:**
@@ -457,88 +426,8 @@ export default defineConfig({
 
 **Verification:** All tests pass (3/3). Configuration supports React components and Convex backend tests.
 
-- Updated vitest.config.ts to exclude `tests/e2e/**/*` to prevent Vitest from running Playwright tests
 
-### ✅ Task 1.3: Configure Playwright
-
-**Time:** 20 minutes  
-**Status:** Completed ✓
-
-Created `playwright.config.ts`:
-
-```typescript
-import { defineConfig, devices } from '@playwright/test'
-
-export default defineConfig({
-  testDir: './tests/e2e/specs',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
-  use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-  ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
-})
-```
-
-**Installed browsers:**
-
-- Chromium (Chrome)
-- Firefox
-- WebKit (Safari)
-- Mobile Chrome (Pixel 5)
-- Mobile Safari (iPhone 12)
-
-**Created files:**
-
-- `playwright.config.ts` - Playwright configuration
-- `tests/e2e/specs/setup.spec.ts` - Example E2E validation test
-
-**Added npm scripts:**
-
-- `pnpm test:e2e` - Run E2E tests headless
-- `pnpm test:e2e:ui` - Run E2E tests with interactive UI
-
-**Configuration features:**
-
-- Parallel test execution
-- Automatic dev server management
-- Screenshot capture on failure
-- Trace recording for debugging
-- Multi-browser support (desktop + mobile)
-
-### ✅ Task 1.4: Create Test Folder Structure
+### ✅ Task 1.3: Create Test Folder Structure
 
 **Time:** 15 minutes  
 **Status:** Completed ✓
@@ -548,18 +437,14 @@ Created test directory structure:
 ```bash
 mkdir -p tests/unit/convex/attendees
 mkdir -p tests/unit/components/ui
-mkdir -p tests/e2e/specs
-mkdir -p tests/e2e/setup
 ```
 
 **Created directories:**
 
 - `tests/unit/convex/attendees/` - For Convex backend unit tests
 - `tests/unit/components/ui/` - For shared UI component tests
-- `tests/e2e/specs/` - For E2E test specifications
-- `tests/e2e/setup/` - For E2E test setup files
 
-### ✅ Task 1.5: Update package.json Scripts
+### ✅ Task 1.4: Update package.json Scripts
 
 **Time:** 5 minutes  
 **Status:** Completed ✓
@@ -571,9 +456,7 @@ Added test scripts to package.json:
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:coverage": "vitest run --coverage"
   }
 }
 ```
@@ -583,10 +466,8 @@ Added test scripts to package.json:
 - `pnpm test` - Run unit tests once
 - `pnpm test:watch` - Run unit tests in watch mode
 - `pnpm test:coverage` - Run unit tests with coverage report
-- `pnpm test:e2e` - Run E2E tests headless
-- `pnpm test:e2e:ui` - Run E2E tests with interactive UI
 
-### ✅ Task 1.6: Validate Setup
+### ✅ Task 1.5: Validate Setup
 
 **Time:** 15 minutes  
 **Status:** Completed ✓
@@ -614,7 +495,6 @@ describe('Setup', () => {
 **Verification:**
 
 - ✅ `pnpm test` passes (3/3 tests)
-- ✅ Vitest excludes e2e directory (configured in vitest.config.ts)
 - ✅ All test runners working correctly
 
 ---
@@ -917,130 +797,6 @@ Created `tests/unit/components/layout.test.tsx` with comprehensive tests:
 
 ---
 
-## Phase 4: E2E Critical Flows
-
-**Estimated Time:** 3 hours
-**Goal:** Test complete user workflows
-
-### ✅ Task 4.1: Create Auth Tests
-
-**Time:** 1 hour
-**Status:** Completed ✓
-
-Created `tests/e2e/specs/auth.spec.ts` with comprehensive authentication tests:
-
-**Test Coverage:**
-
-- ✅ **User can sign up and login with valid credentials** - Creates new user with unique email, submits form, verifies redirect to dashboard
-- ✅ **User sees error with invalid credentials** - Attempts login with non-existent credentials, verifies error message displays and stays on login page
-- ✅ **Session persists after page refresh** - Logs in, refreshes page, verifies still authenticated and on dashboard
-
-**Implementation Notes:**
-- Uses unique emails generated with timestamp to avoid conflicts
-- Tests both signup (new user) and login flows
-- Verifies URL redirects and page content
-- Includes TODO section for future OAuth tests (Google, Facebook)
-
-```typescript
-// Key test structure from auth.spec.ts
-const TEST_USER = {
-  email: 'e2e.test.user@cjcrsg.test',
-  password: 'E2ETestPass123!',
-}
-
-test('user can sign up and login with valid credentials', async ({ page }) => {
-  const uniqueEmail = `e2e.${Date.now()}@cjcrsg.test`
-  await page.goto('/login')
-  await page.fill('input[name="email"]', uniqueEmail)
-  await page.fill('input[name="password"]', TEST_USER.password)
-  await page.click('button[type="submit"]')
-  await expect(page).toHaveURL('/')
-  await expect(page.getByText(/dashboard|attendees|events/i)).toBeVisible()
-})
-```
-```
-
-### ✅ Task 4.2: Create Attendee CRUD Tests
-
-**Time:** 2 hours
-**Status:** Completed ✓
-
-Created `tests/e2e/specs/attendees-crud.spec.ts` with comprehensive attendee workflow tests:
-
-**Test Coverage (7 tests):**
-
-- ✅ **Create new attendee** - Fills form with unique data, submits, verifies success message and redirect
-- ✅ **Create attendee shows validation errors for required fields** - Submits empty form, verifies validation error displays
-- ✅ **Create attendee with invalid email shows error** - Enters invalid email format, verifies error message
-- ✅ **Edit existing attendee** - Creates attendee, navigates to edit, updates email, verifies changes
-- ✅ **Archive attendee** - Creates attendee, opens actions menu, clicks archive, confirms deletion
-- ✅ **Search for attendee by name** - Creates attendee, searches by name, verifies results; searches for non-existent, verifies empty state
-- ✅ **Filter attendees by status** - Creates member and visitor, filters by each status, verifies correct filtering
-- ✅ **View attendee details** - Creates attendee, clicks to view details, verifies all information displayed
-
-**Implementation Notes:**
-- Each test signs up a unique user before running (isolated tests)
-- Uses unique names/emails with timestamps to avoid conflicts
-- Tests cover full CRUD lifecycle plus search/filter functionality
-- Includes both positive and negative test cases (validation errors)
-
-```typescript
-// Example: Edit attendee test flow
-test('edit existing attendee', async ({ page }) => {
-  // Create attendee first
-  await page.goto('/attendees/new')
-  const uniqueName = `E2E Edit Test ${Date.now()}`
-  // ... fill and submit form ...
-
-  // Navigate to attendee and edit
-  await page.click(`text=${uniqueName}`)
-  await page.click('text=Edit')
-  await page.fill('input[name="email"]', updatedEmail)
-  await page.click('button[type="submit"]')
-
-  // Verify update
-  await expect(page.getByText(/updated|success/i)).toBeVisible()
-  await expect(page.getByText(updatedEmail)).toBeVisible()
-})
-```
-```
-
----
-
-## Commands & Scripts
-
-| Command              | Description                | Time        |
-| -------------------- | -------------------------- | ----------- |
-| `pnpm test`          | Run unit tests once        | ~5 seconds  |
-| `pnpm test:watch`    | Watch mode for development | Continuous  |
-| `pnpm test:coverage` | Run tests with coverage    | ~10 seconds |
-| `pnpm test:e2e`      | Run E2E tests headless     | ~1 minute   |
-| `pnpm test:e2e:ui`   | E2E with interactive UI    | Interactive |
-
----
-
-## Success Criteria
-
-### Quality Standards
-
-- ✅ All 18 tests pass before merging
-- ✅ No `test.only` or `test.skip` in main branch
-- ✅ Tests run in < 30 seconds (unit) and < 2 minutes (E2E)
-- ✅ Critical flows are covered:
-  - Authentication (login, session persistence)
-  - Attendee CRUD (create, edit, archive)
-  - Schema validation (duplicate emails, required fields)
-  - Shared components (form, error states)
-
-### What We Don't Test
-
-- Simple UI-only components
-- Non-shared components (tested via E2E)
-- Every edge case (focus on breaking points)
-- Visual regression (not critical for MVP)
-
----
-
 ## Phase 5: Future Testing
 
 Tests to add after core features are stable:
@@ -1081,7 +837,6 @@ Tests to add after core features are stable:
 | **Phase 1** | Infrastructure | 2 hours       | 1 validation test |
 | **Phase 2** | Convex Unit    | 2.5 hours     | 37 tests          |
 | **Phase 3** | Component Unit | 2 hours       | 44 tests          |
-| **Phase 4** | E2E Tests      | 3 hours       | 9 tests           |
 | **Phase 4b**| Event Types    | 1.5 hours     | 48 tests          |
 | **Total**   |                | **11 hours**  | **138 tests**     |
 
@@ -1285,198 +1040,3 @@ Tests to add after core features are stable:
 
 ---
 
-## Phase 10: Events E2E Tests (Chrome Only)
-
-**Estimated Time:** 3-4 hours
-**Location:** `tests/e2e/specs/events/`
-**Priority:** MEDIUM
-**Note:** Chrome browser only (as requested)
-
-### Task 10.1: Event CRUD Flows
-
-**File:** `events-crud.spec.ts`
-**Time:** 2 hours
-**Estimated Tests:** ~6
-**Status:** ✅ In Progress - 2/6 tests complete
-
-| Test | Steps | Status |
-|------|-------|--------|
-| Create event | Login → Navigate to events → Create form → Fill → Submit → Verify created | ✅ Complete |
-| Edit event | Create event → Click edit → Modify → Save → Verify changes | ✅ Complete |
-| View event detail | Create event → Click event → Verify all info displayed | ✅ Complete |
-
-**Note:** Archive, Event Lifecycle, and Cancel event tests were removed due to E2E infrastructure issues (Start Event/Complete Event mutations don't trigger in headless browser). These features work correctly when tested manually.
-
-#### ✅ Create Event Test (Complete)
-
-**Test:** `user can create a new event`
-
-**Implementation:**
-- File: `tests/e2e/specs/events-crud.spec.ts`
-- Authentication: Signs up unique user in `beforeEach`
-- Navigation: Goes to `/events/new`
-- Form filling:
-  - Event Name: Unique name with timestamp
-  - Event Type: Selects first available option from dropdown
-  - Date: Uses pre-filled today's date
-- Submission: Clicks submit button
-- Verification:
-  - Redirects to `/events`
-  - Shows success toast "Event created successfully"
-
-**Browsers:** Chrome + Mobile Chrome (2 tests passing)
-
-#### ✅ Edit Event Test (Complete)
-
-**Test:** `user can edit an existing event`
-
-**Implementation:**
-- File: `tests/e2e/specs/events-crud.spec.ts`
-- Authentication: Signs up unique user in `beforeEach`
-- Test flow:
-  1. Creates an event with unique name
-  2. Navigates to events archive page
-  3. Clicks on the event to view details
-  4. Clicks Edit button in Event Details card
-  5. Updates event name in the modal
-  6. Saves changes
-- Verification:
-  - Shows success toast "Event updated"
-  - Displays updated event name on page
-
-**Browsers:** Chrome + Mobile Chrome (2 tests passing)
-
-#### ✅ View Event Detail Test (Complete)
-
-**Test:** `user can view event details`
-
-**Implementation:**
-- File: `tests/e2e/specs/events-crud.spec.ts`
-- Authentication: Signs up unique user in `beforeEach`
-- Test flow:
-  1. Creates an event with unique name
-  2. Navigates to events archive page
-  3. Clicks on the event to view details
-- Verification:
-  - Event name is displayed in the header
-  - Status badge shows "Upcoming" (capitalized)
-  - Date label is visible
-  - Edit button is available in Event Details card
-  - Back to Events button is present
-
-**Browsers:** Chrome + Mobile Chrome (2 tests passing)
-
-### Task 10.2: Attendance Workflows
-
-**File:** `events-attendance.spec.ts`
-**Time:** 2 hours
-**Estimated Tests:** ~6
-
-| Test | Steps |
-|------|-------|
-| Check in attendee | Start event → Search attendee → Check in → Verify in list |
-| Check out attendee | Check in → Remove → Verify removed |
-| Bulk check-in | Start event → Select multiple → Bulk check-in → Verify all added |
-| Real-time updates | Open two windows → Check in from one → Verify appears in other |
-| Attendance stats | Check in members/visitors → Verify counts correct |
-| Invite tracking | Check in with inviter → Verify invite tracking |
-
----
-
-## Updated Test Summary
-
-| Phase | Tasks | Est. Time | Tests | Status |
-|-------|-------|-----------|-------|--------|
-| **Phase 1** | Infrastructure | 2 hours | 1 | ✅ Complete |
-| **Phase 2** | Attendee Convex | 2.5 hours | 37 | ✅ Complete |
-| **Phase 3** | Component Tests | 2 hours | 44 | ✅ Complete |
-| **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
-| **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
-| **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
-| **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
-| **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
-| **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **6** | ✅ Complete |
-| **Total** | | **11 + 14-19 hrs** | **590** | |
-
-**Current Status:** 590 tests passing (114 Convex + 410 Component + 66 E2E)
-**Test Breakdown:** All phases complete through Phase 10 (6 E2E tests)
-
----
-
-## Phase 13: Retreat Enhancement Tests
-
-**Status:** ⏳ Planned
-**Location:** `tests/unit/convex/retreat/`, `tests/unit/components/events/`
-**Estimated Time:** 2 hours
-**Total Tests:** 30 (18 Convex + 12 Component)
-
-### Phase 13.1: Convex Tests (18 tests)
-
-**File:** `tests/unit/convex/retreat/mutations.test.ts`
-
-#### Teacher Validation (6 tests)
-- ✅ Accepts Pastor as teacher
-- ✅ Accepts Leader as teacher
-- ✅ Accepts Elder as teacher
-- ✅ Accepts Deacon as teacher
-- ❌ Rejects Member as teacher
-- ❌ Rejects Visitor as teacher
-
-#### Overlap Detection (6 tests)
-- ✅ Allows non-overlapping lessons on same day
-- ❌ Rejects overlapping lessons on same day
-- ✅ Allows same time on different days
-- ✅ Handles edge cases (back-to-back sessions)
-- ✅ Detects partial overlaps
-- ✅ Allows updating lesson without conflict
-
-#### Teacher Removal Warnings (3 tests)
-- ✅ Allows removal when no lessons assigned
-- ⚠️ Returns warning when lessons assigned
-- ✅ Force removal unassigns lessons
-
-#### Staff CRUD (3 tests)
-- ✅ Allows any attendee as staff
-- ✅ Updates role/responsibilities
-- ✅ Removes staff member
-
-### Phase 13.2: Component Tests (12 tests)
-
-| File | Tests |
-|------|-------|
-| `RetreatTeachers.test.tsx` | Renders teacher list, Shows warning dialog on remove, Filters search to qualified attendees only, Handles empty state |
-| `RetreatSchedule.test.tsx` | Renders timeline with day tabs, Shows overlap warning, Disables save on conflict, Handles empty state |
-| `RetreatStaff.test.tsx` | Renders staff grid, Allows any attendee in search, Handles role text input, Handles empty state |
-
-**Acceptance Criteria:**
-- [ ] 18 Convex tests passing
-- [ ] 12 Component tests passing
-- [ ] All teacher validation scenarios covered
-- [ ] All overlap detection scenarios covered
-- [ ] Warning dialog behavior tested
-
----
-
-## Updated Test Summary
-
-| Phase | Tasks | Est. Time | Tests | Status |
-|-------|-------|-----------|-------|--------|
-| **Phase 1** | Infrastructure | 2 hours | 1 | ✅ Complete |
-| **Phase 2** | Attendee Convex | 2.5 hours | 37 | ✅ Complete |
-| **Phase 3** | Component Tests | 2 hours | 44 | ✅ Complete |
-| **Phase 4** | E2E Critical | 3 hours | 9 | ✅ Complete |
-| **Phase 4b** | Event Types | 1.5 hours | 48 | ✅ Complete |
-| **Phase 6** | Events Backend | 3-4 hours | 27 | ✅ Complete |
-| **Phase 7** | Attendance Backend | 2-3 hours | **40** | ✅ Complete |
-| **Phase 8** | Events Hooks | 2-3 hours | 65 | ✅ Complete |
-| **Phase 9** | Events Components | 4-5 hours | 78 | ✅ Complete |
-| **Phase 10** | Events E2E (Chrome) | 3-4 hours | **6** | ✅ Complete |
-| **Phase 13** | Retreat Enhancement | 2 hours | **30** | ⏳ Planned |
-| **Total** | | **13 + 14-19 hrs** | **659** | |
-
----
-
-**Last Updated:** 2026-04-02
-**Status:** ✅ Phase 1-10 Complete (6 E2E tests) | Phase 13 Planned | ✅ All Unit Tests Passing (661 tests)
-````

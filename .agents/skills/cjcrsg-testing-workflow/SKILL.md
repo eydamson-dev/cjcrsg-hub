@@ -39,13 +39,12 @@ Guidelines for test coverage, test locations, and test commands.
 
 ## Test Statistics
 
-**Current:** 138 tests passing
+**Current:** 591 tests passing
 
 | Category        | Count | Status         |
 | --------------- | ----- | -------------- |
-| Convex Unit     | 37    | ✅ All passing |
-| Component Tests | 92    | ✅ All passing |
-| E2E Tests       | 9     | ✅ All passing |
+| Convex Unit     | 94    | ✅ All passing |
+| Component Tests | 497   | ✅ All passing |
 
 ---
 
@@ -60,12 +59,6 @@ pnpm test:watch
 
 # Run tests with coverage
 pnpm test:coverage
-
-# Run E2E tests
-pnpm test:e2e
-
-# Run E2E with UI
-pnpm test:e2e:ui
 ```
 
 ---
@@ -95,7 +88,7 @@ Verify it works:
 After user confirmation ("works", "LGTM", etc.):
 
 - Backend: Add convex-test unit tests
-- Frontend: Add component tests OR rely on E2E tests
+- Frontend: Add component tests
 - Update test counts in documentation
 - Run all tests to verify
 
@@ -115,10 +108,6 @@ tests/
 │           ├── form.test.tsx
 │           ├── error-state.test.tsx
 │           └── layout.test.tsx
-├── e2e/
-│   └── specs/
-│       ├── auth.spec.ts
-│       └── attendees-crud.spec.ts
 └── setup/
     └── test.setup.ts
 ```

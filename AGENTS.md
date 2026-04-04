@@ -68,7 +68,6 @@ The system is fully functional for core church operations:
 - **Settings > Account page:** Users can view linked attendee profile, manage auth methods (unlink OAuth, placeholders for linking new providers)
 - **Safety checks:** Cannot unlink only authentication method, confirmation dialog before unlinking
 - **OAuth account linking:** When signing in with Google/Facebook, existing email/password accounts are automatically linked (no duplicate users)
-- **OAuth E2E testing:** 14 tests covering OAuth UI flows (login buttons, account page auth methods, safety checks)
 - Secure session management
 
 ✅ **Data Management**
@@ -131,7 +130,7 @@ The system is fully functional for core church operations:
 - ✅ Task 16.4: Attendee Detail Admin Actions
 - ✅ Task 16.5: Attendee List Link Status
 - ✅ Task 16.6: Settings > Account Page
-- ✅ Task 16.7: OAuth Setup & E2E Testing
+- ✅ Task 16.7: OAuth Setup & Configuration
 
 **Next Up:**
 
@@ -189,7 +188,6 @@ This project uses specialized AI skills and MCPs (Model Context Protocols):
 ### Available MCPs (Declared in opencode.json)
 
 - **convex** - Direct database operations, queries, mutations
-- **playwright** - E2E testing, browser automation
 - **vitest** - Unit testing, coverage analysis
 - **chrome-devtools** - Browser debugging, performance profiling
 - **shadcn** - Component registry operations
@@ -286,7 +284,6 @@ pnpm format           # Format with Prettier
 
 # Testing
 pnpm test             # Run unit tests
-pnpm test:e2e         # Run E2E tests
 
 # Convex
 pnpm dlx convex dev           # Start Convex local dev

@@ -16,7 +16,7 @@ Our development workflow has evolved to an **Implementation-First** approach:
 
 3. **ADD TESTS** - After confirmation
    - Backend: Add convex-test unit tests
-   - Frontend: Add component tests OR rely on E2E tests
+   - Frontend: Add component tests
    - Update test counts in documentation
 
 **Why this change?**
@@ -119,13 +119,12 @@ git commit -m "refactor: simplify attendee queries"
 
 ## Current Test Statistics
 
-**Total Tests:** 138 tests passing
+**Total Tests:** 591 tests passing
 
 | Category        | Count | Status         |
 | --------------- | ----- | -------------- |
-| Convex Unit     | 37    | ✅ All passing |
-| Component Tests | 92    | ✅ All passing |
-| E2E Tests       | 9     | ✅ All passing |
+| Convex Unit     | 94    | ✅ All passing |
+| Component Tests | 497   | ✅ All passing |
 
 ### Breakdown by Feature
 
@@ -146,12 +145,6 @@ git commit -m "refactor: simplify attendee queries"
 - Form: 15 tests
 - ErrorState: 21 tests
 - Layout: 6 tests
-
-**E2E:**
-
-- Auth: 3 tests
-- Attendee CRUD: 4 tests
-- Setup: 2 tests
 
 ---
 
@@ -308,12 +301,6 @@ pnpm test:watch
 # Run tests with coverage
 pnpm test:coverage
 
-# Run E2E tests
-pnpm test:e2e
-
-# Run E2E with UI
-pnpm test:e2e:ui
-
 # Check if tests pass (for hooks)
 pnpm test 2>&1 | grep -q "Test Files.*passed" && echo "✅ Tests pass" || echo "❌ Tests failed"
 ```
@@ -335,12 +322,11 @@ pnpm test 2>&1 | grep -q "Test Files.*passed" && echo "✅ Tests pass" || echo "
 | 4.7 Frontend mutations     | React          | ✅ Yes      | `useEventTypeMutations.test.ts` | ✅ Done        |
 | 4.8 EventTypeForm          | Component      | ✅ Yes      | `event-type-form.test.tsx`      | ✅ Done        |
 | 4.9 EventTypeList          | Component      | ✅ Yes      | `event-type-list.test.tsx`      | ✅ Done        |
-| 4.10 Route page            | React          | ❌ No       | E2E test instead                | 🚧 In Progress |
+| 4.10 Route page            | React          | ❌ No       | Manually tested                 | 🚧 In Progress |
 | 4.11 Navigation            | Config         | ❌ No       | -                               | ⏳ Pending     |
-| 4.12 E2E Testing           | Playwright     | ✅ Yes      | `event-types.spec.ts`           | ⏳ Pending     |
 
 **Total tests written: 48 new tests**
-**Total project tests: 138 tests passing**
+**Total project tests: 591 tests passing**
 
 ---
 
@@ -354,9 +340,8 @@ pnpm test 2>&1 | grep -q "Test Files.*passed" && echo "✅ Tests pass" || echo "
 - Schema validation
 - Business logic
 
-**Frontend (E2E + Selective Unit Tests):**
+**Frontend (Selective Unit Tests):**
 
-- Critical user flows (via E2E)
 - Shared components (via unit tests)
 - Complex logic (via unit tests)
 
@@ -372,11 +357,10 @@ pnpm test 2>&1 | grep -q "Test Files.*passed" && echo "✅ Tests pass" || echo "
 
 Current Status:
 
-- ✅ **138 total tests passing**
+- ✅ **591 total tests passing**
 - ✅ **All mutations tested**
 - ✅ **All queries tested**
 - ✅ **Shared components tested**
-- ✅ **E2E flows tested**
 - ✅ **Coverage maintained/improved**
 
 ---

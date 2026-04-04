@@ -339,7 +339,6 @@ Auto-suggest based on task keywords:
 | "component", "UI", "page", "modal"       | `src/features/[feature]/components/[Name].tsx` |
 | "test", "spec"                           | `tests/unit/[type]/[name].test.ts`             |
 | "hook", "use"                            | `src/features/[feature]/hooks/use[Name].ts`    |
-| "e2e", "integration"                     | `tests/e2e/specs/[name].spec.ts`               |
 
 ---
 
@@ -348,7 +347,7 @@ Auto-suggest based on task keywords:
 Auto-detects which file to update:
 
 - **Default:** Feature work → `TASKS.md`
-- **Keywords:** test, spec, e2e, unit test, TDD → `TDD_TASKS.md`
+- **Keywords:** test, spec, unit test, TDD → `TDD_TASKS.md`
 
 User can override: "Create in TDD_TASKS.md"
 

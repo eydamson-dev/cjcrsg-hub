@@ -51,7 +51,6 @@ Use this skill when:
 
 - 🚧 Create Event Types route page
 - ⏳ Add navigation link for Event Types
-- ⏳ E2E testing for Event Types
 
 ## Core Technologies
 
@@ -59,17 +58,16 @@ Use this skill when:
 - **Backend:** Convex (database + server functions)
 - **Auth:** Convex Auth (Password + Google + Facebook OAuth)
 - **State:** TanStack Query + Convex React Query
-- **Testing:** Vitest + convex-test + Playwright
+- **Testing:** Vitest + convex-test
 - **Package Manager:** pnpm
 
 ## Testing Status
 
 | Category        | Count   | Status             |
 | --------------- | ------- | ------------------ |
-| Convex Unit     | 37      | ✅ All passing     |
-| Component Tests | 92      | ✅ All passing     |
-| E2E Tests       | 9       | ✅ All passing     |
-| **Total**       | **138** | **✅ All passing** |
+| Convex Unit     | 94      | ✅ All passing     |
+| Component Tests | 497     | ✅ All passing     |
+| **Total**       | **591** | **✅ All passing** |
 
 ## Quick Tips
 

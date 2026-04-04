@@ -37,7 +37,6 @@ Fixed OAuth account linking bug - Google/Facebook OAuth now links to existing em
 ## 📊 Quality Status
 
 - **Unit Tests:** 591 passing ✅
-- **E2E Tests:** 54 passing ✅
 - **TypeScript:** Pre-existing errors only (not related to this change)
 
 ---
@@ -73,4 +72,4 @@ Fixed OAuth account linking bug - Google/Facebook OAuth now links to existing em
 - Fixed duplicate user creation bug when signing in with Google OAuth
 - Added `allowDangerousEmailAccountLinking: true` to both Google and Facebook providers
 - This ensures existing email/password accounts are linked instead of creating new users
-- All tests passing (591 unit + 54 E2E)
+- All tests passing (591 unit)

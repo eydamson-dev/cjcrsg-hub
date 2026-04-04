@@ -13,11 +13,21 @@ Use this checklist before marking any phase as complete.
 - [ ] Sign up new user with email/password
 - [ ] Sign in with valid credentials
 - [ ] Sign in with invalid credentials shows error
+- [ ] Sign in with Google OAuth
+- [ ] Sign in with Facebook OAuth
 - [ ] Access protected routes while authenticated
 - [ ] Attempt to access protected routes while logged out (should redirect)
 - [ ] Sign out
 - [ ] Session persists after page refresh
 - [ ] Non-existent user sign-in shows appropriate error
+
+### User Account Management
+
+- [ ] View linked attendee profile on Settings > Account
+- [ ] View all authentication methods
+- [ ] Cannot unlink only authentication method (safety check)
+- [ ] Link new OAuth provider to existing account
+- [ ] Change password (if email/password auth exists)
 
 ### Attendee Management
 
@@ -50,13 +60,41 @@ Use this checklist before marking any phase as complete.
 - [ ] Create new event
 - [ ] Edit existing event
 - [ ] Cancel/delete event
+- [ ] Start event (change status to active)
+- [ ] Complete event (change status to completed)
+- [ ] Archive event (soft delete)
 - [ ] View upcoming events
 - [ ] View past events
 - [ ] Filter events by type
+- [ ] Filter events by status
+- [ ] Search events by name
 - [ ] Sort events by date
 - [ ] Event displays correct date and time
 - [ ] Event detail page shows all information
-- [ ] Cannot create event in the past
+- [ ] Cannot create event with end time before start time
+
+### Sunday Service Events
+
+- [ ] Navigate to Sunday Service dedicated page
+- [ ] Create Sunday Service event
+- [ ] View current Sunday Service event
+- [ ] Event defaults to 09:00-11:00 time
+- [ ] Filtered history shows only Sunday Services
+- [ ] Filtered archive shows only Sunday Services
+
+### Spiritual Retreat Events
+
+- [ ] Navigate to Spiritual Retreat dedicated page
+- [ ] Create Spiritual Retreat event
+- [ ] View current Spiritual Retreat event
+- [ ] Event defaults to 08:00-17:00 time
+- [ ] Add qualified teachers (Pastor/Leader/Elder/Deacon)
+- [ ] Remove teachers with confirmation
+- [ ] Add lessons to schedule
+- [ ] Detect time conflicts in schedule
+- [ ] Color-coded lesson types display correctly
+- [ ] Add staff members
+- [ ] Assign staff roles and responsibilities
 
 ### Attendance Tracking
 
@@ -69,6 +107,20 @@ Use this checklist before marking any phase as complete.
 - [ ] Attendance count displays correctly
 - [ ] Export attendance to CSV
 - [ ] Print-friendly attendance view
+- [ ] Assign inviter to attendee
+- [ ] Remove inviter from attendee
+- [ ] View attendance by inviter
+
+### Admin Features
+
+- [ ] Access Admin Dashboard (Super Admin only)
+- [ ] Promote users to different roles
+- [ ] View user role statistics
+- [ ] Link attendee to user account (admin only)
+- [ ] Unlink attendee from user account (admin only)
+- [ ] Change attendee status (admin only)
+- [ ] View link status in attendee list
+- [ ] Filter attendees by link status
 
 ### Dashboard
 
@@ -233,12 +285,12 @@ Use this checklist before marking any phase as complete.
 
 ---
 
-## Automated Testing (Future)
+## Automated Testing
 
-### Unit Tests (Jest/Vitest)
+### Unit Tests (Vitest)
 
 ```typescript
-// Example test structure for future implementation
+// Example test structure
 describe('Attendee utils', () => {
   it('should format attendee name correctly', () => {
     const attendee = { firstName: 'John', lastName: 'Smith' }
@@ -247,17 +299,17 @@ describe('Attendee utils', () => {
 })
 ```
 
-### E2E Tests (Playwright/Cypress)
+### Running Tests
 
-```typescript
-// Example E2E test for future implementation
-test('user can create attendee', async ({ page }) => {
-  await page.goto('/attendees/new')
-  await page.fill('[name="firstName"]', 'Test')
-  await page.fill('[name="lastName"]', 'User')
-  await page.click('button[type="submit"]')
-  await expect(page.locator('text=Attendee created')).toBeVisible()
-})
+```bash
+# Run all tests once
+pnpm test
+
+# Run tests in watch mode (for development)
+pnpm test:watch
+
+# Run tests with coverage report
+pnpm test:coverage
 ```
 
 ---

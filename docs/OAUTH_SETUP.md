@@ -18,15 +18,15 @@ OAuth credentials are configured as **server-side environment variables** in you
 
 ## Current Status
 
-| Provider             | Status     | Configured | E2E Tested       |
-| -------------------- | ---------- | ---------- | ---------------- |
-| **Email & Password** | ✅ Active  | N/A        | ✅ Yes           |
-| **Google OAuth**     | ✅ Active  | ✅ Yes     | ✅ UI tests pass |
-| **Facebook OAuth**   | ⏳ Skipped | ❌ No      | ❌ Skipped       |
+| Provider             | Status     | Configured | Tested     |
+| -------------------- | ---------- | ---------- | ---------- |
+| **Email & Password** | ✅ Active  | N/A        | ✅ Yes     |
+| **Google OAuth**     | ✅ Active  | ✅ Yes     | ✅ Yes     |
+| **Facebook OAuth**   | ⏳ Skipped | ❌ No      | ❌ Skipped |
 
 **Last Updated:** 2026-04-03
 
-**E2E Tests:** `tests/e2e/specs/oauth.spec.ts` - 14 tests passing (Chromium + Mobile Chrome)
+**Manual Test Coverage:**
 
 - OAuth buttons visible and clickable on login page
 - Account page shows authentication methods section

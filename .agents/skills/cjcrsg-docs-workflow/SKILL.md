@@ -22,7 +22,7 @@ Guidelines for updating project documentation files.
 | File                | Purpose                   | Update When...                                | Granularity          | Required?        |
 | ------------------- | ------------------------- | --------------------------------------------- | -------------------- | ---------------- |
 | `docs/TASKS.md`     | Feature implementation    | Working on UI, backend features, bug fixes    | Phase/Task level     | ✅ YES           |
-| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests, E2E tests  | Testing tasks        | ✅ YES           |
+| `docs/TDD_TASKS.md` | Testing & TDD             | Working on test setup, unit tests             | Testing tasks        | ✅ YES           |
 | `CHANGELOG.md`      | User-facing changes       | Any feature, fix, or change users should know | Release notes        | ✅ YES           |
 | `AGENTS.md`         | Project overview & status | **EVERY TASK** - All features, fixes, changes | High-level status    | ✅ **MANDATORY** |
 | **`SESSION.md`**    | **Session continuity**    | **Every session start/end**                   | **Micro-task level** | ✅ **MANDATORY** |
