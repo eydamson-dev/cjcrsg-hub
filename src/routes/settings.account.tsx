@@ -1,8 +1,13 @@
+import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
-import { useAccountInfo, useUnlinkAccount } from '~/hooks/useAccountInfo'
+import {
+  useAccountInfo,
+  useUnlinkAccount,
+  useLinkOAuth,
+} from '~/hooks/useAccountInfo'
 import {
   Card,
   CardContent,
@@ -58,6 +63,7 @@ function AccountPage() {
 function AccountContent() {
   const { data: accountInfo, isLoading } = useAccountInfo()
   const unlinkAccount = useUnlinkAccount()
+  const { linkOAuth, linkingProvider } = useLinkOAuth()
   const [unlinkingAccountId, setUnlinkingAccountId] = useState<string | null>(
     null,
   )
@@ -66,6 +72,17 @@ function AccountContent() {
     id: string
     provider: string
   } | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('linked') === 'true') {
+      toast.success('Account linked successfully')
+      window.history.replaceState({}, '', '/settings/account')
+    } else if (params.get('error')) {
+      toast.error(`Failed to link account: ${params.get('error')}`)
+      window.history.replaceState({}, '', '/settings/account')
+    }
+  }, [])
 
   if (isLoading) {
     return (
@@ -336,14 +353,30 @@ function AccountContent() {
               {!accountInfo.authMethods.some(
                 (m) => m.provider === 'google',
               ) && (
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => linkOAuth('google')}
+                  disabled={linkingProvider === 'google'}
+                >
+                  {linkingProvider === 'google' ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  ) : null}
                   Link Google
                 </Button>
               )}
               {!accountInfo.authMethods.some(
                 (m) => m.provider === 'facebook',
               ) && (
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => linkOAuth('facebook')}
+                  disabled={linkingProvider === 'facebook'}
+                >
+                  {linkingProvider === 'facebook' ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  ) : null}
                   Link Facebook
                 </Button>
               )}
