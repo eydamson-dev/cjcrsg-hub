@@ -2,17 +2,17 @@
 
 Complete task list for implementing Test Driven Development (TDD) in CJCRSG-Hub.
 
-**Last Updated:** 2026-04-02  
+**Last Updated:** 2026-04-03  
 **Current Phase:** All Testing Phases Complete  
-**Status:** ✅ 591 tests passing
+**Status:** ✅ 599 tests passing
 
 ---
 
 ## Current Status
 
-**Test Count:** 591 tests passing
+**Test Count:** 599 tests passing
 
-- Convex Unit: 94 tests
+- Convex Unit: 102 tests
 - Component Tests: 497 tests
 
 **All test phases complete.** Infrastructure, backend queries/mutations, and component tests all implemented.
@@ -185,6 +185,18 @@ Component tests for Spiritual Retreat form.
 
 ---
 
+### Phase 16: Account Management Tests ✅
+
+Convex unit tests for password management mutations.
+
+**Test Files:**
+
+- `tests/unit/convex/account/mutations.test.ts` (8 tests)
+  - `setPassword`: adds password account, rejects short passwords, rejects duplicate, requires auth
+  - `changePassword`: changes password, rejects wrong current password, rejects when no password, validates new password
+
+---
+
 ## Testing Strategy
 
 ### Implementation-First Workflow
@@ -239,7 +251,8 @@ Component tests for Spiritual Retreat form.
 | 9         | Events Components  | 78      |
 | 13        | Retreat Backend    | 37      |
 | 14        | Event Forms        | 16      |
-| **Total** |                    | **591** |
+| 16        | Account Backend    | 8       |
+| **Total** |                    | **599** |
 
 ---
 

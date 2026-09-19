@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Settings > Account: Complete "Link New Account" section** - Wire up remaining auth-method management actions
+  - `convex/account.ts` - New `setPassword` mutation (adds email/password to OAuth-only accounts) and `changePassword` mutation (updates existing password with current-password verification)
+  - Passwords hashed with `lucia` Scrypt, matching `@convex-dev/auth`'s `Password` provider
+  - `src/hooks/useAccountInfo.ts` - `useSetPassword` and `useChangePassword` hooks
+  - `src/components/auth/SetPasswordDialog.tsx` - Dialog with new password + confirmation and validation (min 8 chars, match check)
+  - `src/components/auth/ChangePasswordDialog.tsx` - Dialog with current/new/confirm password fields
+  - `src/routes/settings.account.tsx` - "Set Password" button opens dialog; "Change Password" button on email & password method opens dialog; Google/Facebook "Link" buttons wired to `signIn` with loading states
+  - 8 new backend tests (599 total tests passing)
+
 ### Fixed
 
 - **OAuth account linking:** Google/Facebook OAuth now correctly links to existing email/password accounts instead of creating duplicate users. Added `allowDangerousEmailAccountLinking: true` to OAuth providers.

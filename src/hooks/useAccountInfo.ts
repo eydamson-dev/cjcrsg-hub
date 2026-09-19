@@ -9,3 +9,11 @@ export function useAccountInfo() {
 export function useUnlinkAccount() {
   return useConvexMutation(api.account.unlinkAccount)
 }
+
+export function useSetPassword() {
+  return useConvexMutation(api.account.setPassword)
+}
+
+export function useChangePassword() {
+  return useConvexMutation(api.account.changePassword)
+}

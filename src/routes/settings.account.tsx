@@ -3,6 +3,9 @@ import { Layout } from '~/components/layout/Layout'
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
 import { requireAuth } from '~/lib/auth-guard'
 import { useAccountInfo, useUnlinkAccount } from '~/hooks/useAccountInfo'
+import { useAuthActions } from '@convex-dev/auth/react'
+import { SetPasswordDialog } from '~/components/auth/SetPasswordDialog'
+import { ChangePasswordDialog } from '~/components/auth/ChangePasswordDialog'
 import {
   Card,
   CardContent,
@@ -58,6 +61,7 @@ function AccountPage() {
 function AccountContent() {
   const { data: accountInfo, isLoading } = useAccountInfo()
   const unlinkAccount = useUnlinkAccount()
+  const { signIn } = useAuthActions()
   const [unlinkingAccountId, setUnlinkingAccountId] = useState<string | null>(
     null,
   )
@@ -66,6 +70,9 @@ function AccountContent() {
     id: string
     provider: string
   } | null>(null)
+  const [linkingProvider, setLinkingProvider] = useState<string | null>(null)
+  const [setPasswordOpen, setSetPasswordOpen] = useState(false)
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -172,6 +179,23 @@ function AccountContent() {
 
   const isOnlyMethod = (_accountId: string) => {
     return accountInfo.authMethods.length <= 1
+  }
+
+  const handleLinkOAuth = async (provider: 'google' | 'facebook') => {
+    setLinkingProvider(provider)
+    try {
+      const result = await signIn(provider)
+      if (result.redirect) {
+        window.location.href = result.redirect.toString()
+      }
+      // If successful linking without redirect, toast will be shown after redirect back
+    } catch (err) {
+      toast.error(
+        `Failed to link ${provider}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      )
+    } finally {
+      setLinkingProvider(null)
+    }
   }
 
   return (
@@ -290,7 +314,11 @@ function AccountContent() {
                   </div>
                   <div className="flex items-center gap-2">
                     {method.isPassword && (
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setChangePasswordOpen(true)}
+                      >
                         Change Password
                       </Button>
                     )}
@@ -336,32 +364,80 @@ function AccountContent() {
               {!accountInfo.authMethods.some(
                 (m) => m.provider === 'google',
               ) && (
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleLinkOAuth('google')}
+                  disabled={linkingProvider === 'google'}
+                >
+                  {linkingProvider === 'google' ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  ) : (
+                    <svg
+                      className="h-3 w-3 mr-1"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                  )}
                   Link Google
                 </Button>
               )}
               {!accountInfo.authMethods.some(
                 (m) => m.provider === 'facebook',
               ) && (
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleLinkOAuth('facebook')}
+                  disabled={linkingProvider === 'facebook'}
+                >
+                  {linkingProvider === 'facebook' ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  ) : (
+                    <svg
+                      className="h-3 w-3 mr-1"
+                      fill="#1877F2"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  )}
                   Link Facebook
                 </Button>
               )}
               {!accountInfo.authMethods.some((m) => m.isPassword) && (
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSetPasswordOpen(true)}
+                >
                   Set Password
                 </Button>
               )}
-              {accountInfo.authMethods.some((m) => m.isPassword) &&
-                !accountInfo.authMethods.some((m) => m.provider === 'google') &&
-                !accountInfo.authMethods.some(
-                  (m) => m.provider === 'facebook',
-                ) && (
-                  <p className="text-sm text-muted-foreground">
-                    All available authentication methods are linked
-                  </p>
-                )}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Note: Linking a Google or Facebook account requires signing in
+              with that provider. If your Google/Facebook email matches your
+              current account email, the accounts will be automatically linked.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -408,6 +484,18 @@ function AccountContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Set Password Dialog */}
+      <SetPasswordDialog
+        open={setPasswordOpen}
+        onOpenChange={setSetPasswordOpen}
+      />
+
+      {/* Change Password Dialog */}
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        onOpenChange={setChangePasswordOpen}
+      />
     </div>
   )
 }

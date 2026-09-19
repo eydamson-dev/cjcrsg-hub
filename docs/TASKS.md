@@ -250,18 +250,20 @@ Standardized event creation using GenericEventDetails. Consistent EventPageHeade
 
 ### Phase 16: Auth Module with Admin Roles & Account Linking ✅
 
-Admin role system (super_admin, admin, moderator, user) with CLI promotion. Attendee-user auto-linking by email. Manual linking/unlinking (admin only). Admin dashboard. Settings > Account page. OAuth account linking (Google/Facebook).
+Admin role system (super_admin, admin, moderator, user) with CLI promotion. Attendee-user auto-linking by email. Manual linking/unlinking (admin only). Admin dashboard. Settings > Account page. OAuth account linking (Google/Facebook). Set Password (OAuth-only accounts) and Change Password.
 
 **Files:**
 
 - `convex/auth.ts` (OAuth config with account linking)
 - `convex/admin.ts` (CLI promotion)
 - `convex/users.ts` (user queries)
-- `convex/account.ts` (account management)
+- `convex/account.ts` (account management: `getAccountInfo`, `unlinkAccount`, `setPassword`, `changePassword`)
 - `convex/attendees/admin.ts` (linking mutations)
 - `convex/lib/authHelpers.ts` (role checking)
 - `src/routes/settings.admin.tsx` (admin dashboard)
 - `src/routes/settings.account.tsx` (account management)
+- `src/components/auth/SetPasswordDialog.tsx`
+- `src/components/auth/ChangePasswordDialog.tsx`
 - `src/features/attendees/components/AdminSection.tsx`
 - `src/hooks/useCurrentUserRole.ts`
 
